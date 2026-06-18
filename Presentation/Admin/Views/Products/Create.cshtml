@@ -1,0 +1,80 @@
+@model AspnetCoreMvcFull.Models.Product
+
+@{
+    ViewData["Title"] = "Create";
+    Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+}
+
+<div class="row mb-6 gy-6">
+	<!-- Basic Layout -->
+	<div class="col-xxl">
+		<div class="card">
+			<div class="card-header d-flex align-items-center justify-content-between">
+				<h5 class="mb-0">Add Product</h5>
+				<small class="text-body-secondary float-end">Default label</small>
+			</div>
+			<div class="card-body">
+				<form asp-action="Create" enctype="multipart/form-data">
+					<div asp-validation-summary="ModelOnly" class="text-danger"></div>
+					<div class="row mb-6">
+						<label class="col-sm-2 col-form-label" for="basic-default-name">Name</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="basic-default-name" asp-for="Name" placeholder="Name" />
+							<span asp-validation-for="Name" class="text-danger"></span>
+
+						</div>
+					</div>
+					<div class="row mb-6">
+						<label class="col-sm-2 col-form-label" for="basic-default-company">Image</label>
+						<div class="col-sm-10">
+							<input type="File" class="form-control" id="basic-default-company" asp-for="Image" placeholder="Image" />
+							<span asp-validation-for="Image" class="text-danger"></span>
+						</div>
+					</div>
+					<div class="row mb-6">
+						<label class="col-sm-2 col-form-label" for="basic-default-company">Price</label>
+						<div class="col-sm-10">
+							<input type="number" class="form-control" id="basic-default-company" asp-for="Price" placeholder="Price" />
+							<span asp-validation-for="Price" class="text-danger"></span>
+
+						</div>
+					</div>
+					<div class="row mb-6">
+						<label class="col-sm-2 col-form-label" for="basic-default-company">Description</label>
+						<div class="col-sm-10">
+							<input type="text" class="form-control" id="basic-default-company" asp-for="Description" placeholder="Description" />
+							<span asp-validation-for="Description" class="text-danger"></span>
+
+						</div>
+					</div>
+					<div class="row mb-6">
+						<label class="col-sm-2 col-form-label">Category</label>
+						<div class="col-sm-10">
+							<select class="form-control"
+									asp-for="CategoryId"
+									asp-items="ViewBag.CategoryId">
+								<option value="">-- Select Category --</option>
+							</select>
+							<span asp-validation-for="CategoryId" class="text-danger"></span>
+						</div>
+					</div>
+
+					<div class="row mb-6">
+						<label class="col-sm-2 col-form-label" for="basic-default-status">Status</label>
+						<div class="col-sm-10">
+							<select class="form-control" id="basic-default-status" asp-for="Status" asp-items="@(new SelectList(new List<string> { "Active", "Inactive" }))">
+								<option value="">-- Choose One --</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="row justify-content-end">
+						<div class="col-sm-10">
+							<button type="submit" class="btn btn-primary">Send</button>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

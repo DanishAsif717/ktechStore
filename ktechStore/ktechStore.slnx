@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/Core/">
+    <Project Path="../Core/ktechStore.Application/ktechStore.Application.csproj" />
+    <Project Path="../Core/ktechStore.Core/ktechStore.Core.csproj" />
+  </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="../Infrastructure/ktechStore.Infrastructure/ktechStore.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/Presentation/">
+    <Project Path="../Presentation/Admin/AspnetCoreMvcFull.csproj" />
+    <Project Path="../Presentation/ktechStore.Web/ktechStore.Web.csproj" />
+  </Folder>
+</Solution>
