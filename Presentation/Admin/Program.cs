@@ -1,8 +1,11 @@
 using AspnetCoreMvcFull.Models;
 using Microsoft.DotNet.Scaffolding.Shared.ProjectModel;
 using Microsoft.EntityFrameworkCore;
+using ktechStore.Infrastructure.Persistence;
+
 
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
