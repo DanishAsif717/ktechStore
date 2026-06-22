@@ -1,21 +1,31 @@
 using AspnetCoreMvcFull.Models;
+using ktechStore.Core.Interfaces;
+using ktechStore.Infrastructure.Persistence;
+using ktechStore.Infrastructure.Repositories;
 using Microsoft.DotNet.Scaffolding.Shared.ProjectModel;
 using Microsoft.EntityFrameworkCore;
-using ktechStore.Infrastructure.Persistence;
 
 
 var builder = WebApplication.CreateBuilder(args);
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+builder.Configuration.SetBasePath(AppContext.BaseDirectory);
+builder.Configuration.AddJsonFile("sharedsettings.json", optional: true, reloadOnChange: true);
+builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine($"====== MY CONNECTION STRING: {connectionString} ======");
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(connectionString, b => b.MigrationsAssembly("ktechStore.Infrastructure")));
+
+
+
+//Repositries
+
+builder.Services.AddScoped<ICategoryService, CategoryRepository>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
+
 
 var app = builder.Build();
 
