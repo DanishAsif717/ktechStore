@@ -2,10 +2,10 @@
 
 #nullable disable
 
-namespace AspnetCoreMvcFull.Migrations
+namespace ktechStore.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
-    public partial class Product : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
