@@ -414,3 +414,9 @@ ASALocalRun/
 # wal and shm files - SQLite
 *-wal
 *-shm
+frontend/.next/
+frontend/out/
+frontend/build/
+
+# Keep node_modules ignored but track everything else
+frontend/node_modules/
