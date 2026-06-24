@@ -39,16 +39,31 @@ namespace AspnetCoreMvcFull.Controllers
     // POST: CategoriesController/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Create(IFormCollection collection)
+    public async Task<IActionResult> Create(Category category)
     {
+      if (!ModelState.IsValid) return View(category);
+
       try
       {
-        return RedirectToAction(nameof(Index));
+        await _categoryRepo.AddAsync(category);
+        bool success = await _categoryRepo.SaveChangesAsync();
+
+        if (success)
+        {
+          TempData["SuccessMessage"] = "Category created successfully!";
+          return Redirect("/admin/Categories/Index");
+        }
+        else
+        {
+          TempData["ErrorMessage"] = "Failed to save the category to the database.";
+        }
       }
-      catch
+      catch (Exception ex)
       {
-        return View();
+        TempData["ErrorMessage"] = "An error occurred: " + ex.Message;
       }
+
+      return View(category);
     }
 
     // GET: CategoriesController/Edit/5

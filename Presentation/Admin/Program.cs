@@ -29,6 +29,16 @@ builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
+app.Use(async (context, next) =>
+{
+  if (context.Request.PathBase.Value != "/admin")
+  {
+    context.Request.PathBase = new PathString("/admin");
+  }
+  await next();
+});
+
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
