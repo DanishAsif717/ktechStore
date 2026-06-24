@@ -13,7 +13,7 @@ namespace ktechStore.Core.Entities
         [Column("id")]
         public int Id { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Category name is required")]
         [MaxLength(100)]
         [Column("name")]
         public string Name { get; set; } = string.Empty;
