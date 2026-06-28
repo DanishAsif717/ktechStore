@@ -14,6 +14,8 @@ namespace ktechStore.Infrastructure.Persistence
         }
 
         public DbSet<Category> Categories { get; set; }
+        public DbSet<ModuleDefinition> ModuleDefinitions { get; set; }
+        public DbSet<ModuleField> ModuleFields { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

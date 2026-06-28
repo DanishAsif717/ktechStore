@@ -1,8 +1,10 @@
-@{
-  TempData.Keep();
-  string? currentPage = ViewContext.HttpContext.Request.Path;
-}
 
+@inject ktechStore.Core.Interfaces.IModuleService ModuleService
+@{
+	TempData.Keep();
+	string? currentPage = ViewContext.HttpContext.Request.Path;
+	var modules = await ModuleService.GetAllAsync();
+}
 <!-- Menu -->
 @* ! Do this simple *@
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
@@ -378,6 +380,19 @@
         <div class="text-truncate">Documentation</div>
       </a>
     </li>
+
+		<!-- Dynamic Modules -->
+		@foreach (var m in modules)
+		{
+			<li class='menu-item@(currentPage.StartsWith("/ModuleBuilder/Records/" + m.Id) ? " active" : "")'>
+				<a href="/admin/ModuleBuilder/Records/@m.Id" class="menu-link">
+					<i class="menu-icon icon-base bx bx-data"></i>
+					<div class="text-truncate">@m.ModuleName</div>
+				</a>
+			</li>
+		}
+
+		<!-- Layouts -->
   </ul>
 
 </aside>

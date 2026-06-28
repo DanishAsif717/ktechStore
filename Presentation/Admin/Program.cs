@@ -21,6 +21,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 //Repositries
 
 builder.Services.AddScoped<ICategoryService, CategoryRepository>();
+builder.Services.AddScoped<IModuleService, ModuleRepository>();
+
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
 // Add services to the container.
@@ -54,8 +56,15 @@ app.UseRouting();
 
 app.UseAuthorization();
 
+// Module record route - default 
+app.MapControllerRoute(
+    name: "module-record",
+    pattern: "{controller}/{action}/{id}/{recordId}",
+    defaults: new { controller = "ModuleBuilder" });
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Dashboards}/{action=Index}/{id?}");
+
 
 app.Run();

@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ObjectDumper.NET" Version="4.3.2" />
+  </ItemGroup>
+
 </Project>

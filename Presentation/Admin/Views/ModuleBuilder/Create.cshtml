@@ -1,0 +1,71 @@
+@{ Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml"; }
+
+<div class="container-xxl flex-grow-1 container-p-y">
+    <h4 class="fw-bold mb-4">Create New Module</h4>
+    <div class="card p-4">
+        <form method="post">
+			<div asp-validation-summary="ModelOnly" class="text-danger mb-3 fw-bold"></div>
+            <div class="mb-3">
+                <label class="form-label">Module Name</label>
+                <input name="ModuleName" class="form-control" placeholder="e.g. Shop" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Table Name</label>
+                <input name="TableName" class="form-control" placeholder="e.g. shops" required />
+            </div>
+
+            <h5 class="mt-4">Fields</h5>
+            <div id="fields-container"></div>
+
+            <button type="button" onclick="addField()" class="btn btn-secondary mt-2">+ Add Field</button>
+            <button type="submit" class="btn btn-primary mt-2">Create Module</button>
+        </form>
+    </div>
+</div>
+
+<script>
+let count = 0;
+	function addField() {
+		const div = document.createElement('div');
+		div.className = 'row mb-2';
+		div.innerHTML = `
+			<div class="col-md-4">
+				<input name="Fields[${count}].FieldName" class="form-control" placeholder="Field Name" required />
+			</div>
+			<div class="col-md-3">
+				<select name="Fields[${count}].FieldType" class="form-select" onchange="toggleRelationInput(this, ${count})">
+					<option>Text</option>
+					<option>Number</option>
+					<option>Boolean</option>
+					<option>Date</option>
+					<option>Email</option>
+					<option>TextArea</option>
+					<option>Relation</option>
+				</select> <div id="relation-target-${count}" class="mt-1" style="display:none;">
+					<input name="Fields[${count}].RelatedTable" class="form-control form-control-sm" placeholder="Target Table Name (e.g. category)" />
+					<input type="hidden" name="Fields[${count}].IsForeignKey" value="false" id="is-fk-${count}" />
+				</div>
+			</div>
+			<div class="col-md-3 d-flex align-items-center">
+				<input type="checkbox" name="Fields[${count}].IsRequired" value="true" class="me-2" />
+				<label>Required</label>
+			</div>
+			<div class="col-md-2">
+				<button type="button" onclick="this.parentElement.remove()" class="btn btn-danger btn-sm">Remove</button>
+			</div>`;
+		document.getElementById('fields-container').appendChild(div);
+		count++;
+	}
+
+function toggleRelationInput(selectObj, index) {
+	const relationDiv = document.getElementById(`relation-target-${index}`);
+	const hiddenFk = document.getElementById(`is-fk-${index}`);
+	if (selectObj.value === "Relation") {
+		relationDiv.style.display = "block";
+		hiddenFk.value = "true";
+	} else {
+		relationDiv.style.display = "none";
+		hiddenFk.value = "false";
+	}
+}
+</script>
