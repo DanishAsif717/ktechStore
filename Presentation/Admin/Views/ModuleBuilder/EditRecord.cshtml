@@ -1,0 +1,55 @@
+@{
+	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+	var module = ViewBag.Module as ktechStore.Core.Entities.ModuleDefinition;
+	var record = ViewBag.Record as Dictionary<string, object>;
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+	<h4 class="fw-bold mb-4">Edit — @module.ModuleName</h4>
+    
+	<div class="card p-4">
+		<div class="col-md-6">
+			<form method="post">
+				@foreach (var field in module.Fields.OrderBy(f => f.DisplayOrder))
+				{
+					var value = record.ContainsKey(field.FieldName) ? record[field.FieldName]?.ToString() : "";
+                    
+					<div class="mb-3">
+						<label class="form-label">@field.FieldName</label>
+                        
+						@if (field.FieldType == "Boolean")
+						{
+							<select name="@field.FieldName" class="form-select">
+								<option value="true" selected="@(value == "True")">Yes</option>
+								<option value="false" selected="@(value == "False")">No</option>
+							</select>
+						}
+						else if (field.FieldType == "TextArea")
+						{
+							<textarea name="@field.FieldName" class="form-control" rows="3">@value</textarea>
+						}
+						else if (field.FieldType == "Date")
+						{
+							<input type="date" name="@field.FieldName" class="form-control" value="@value" />
+						}
+						else if (field.FieldType == "Number")
+						{
+							<input type="number" name="@field.FieldName" class="form-control" value="@value" />
+						}
+						else if (field.FieldType == "Email")
+						{
+							<input type="email" name="@field.FieldName" class="form-control" value="@value" />
+						}
+						else
+						{
+							<input type="text" name="@field.FieldName" class="form-control" value="@value" />
+						}
+					</div>
+				}
+                
+				<button type="submit" class="btn btn-primary">Update</button>
+				<a href="/admin/ModuleBuilder/Records/@module.Id" class="btn btn-secondary">Cancel</a>
+			</form>
+		</div>
+	</div>
+</div>

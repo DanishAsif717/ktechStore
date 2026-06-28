@@ -1,0 +1,52 @@
+@{
+	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+	var module = ViewBag.Module as ktechStore.Core.Entities.ModuleDefinition;
+	var records = ViewBag.Records as List<Dictionary<string, object>>;
+}
+
+<div class="container-xxl flex-grow-1 container-p-y">
+	<div class="d-flex justify-content-between mb-4">
+		<h4 class="fw-bold">@module.ModuleName</h4>
+		<a href="/admin/ModuleBuilder/CreateRecord/@module.Id" class="btn btn-primary">+ Add New</a>
+	</div>
+
+	<div class="card">
+		<div class="table-responsive">
+			<table class="table table-striped">
+				<thead>
+					<tr>
+						@foreach (var field in module.Fields.OrderBy(f => f.DisplayOrder))
+						{
+							<th>@field.FieldName</th>
+						}
+						<th>Actions</th>
+					</tr>
+				</thead>
+				<tbody>
+					@if (records == null || !records.Any())
+					{
+						<tr>
+							<td colspan="@(module.Fields.Count + 1)" class="text-center">No records found</td>
+						</tr>
+					}
+					else
+					{
+						@foreach (var record in records)
+						{
+							<tr>
+								@foreach (var field in module.Fields.OrderBy(f => f.DisplayOrder))
+								{
+									<td>@(record.ContainsKey(field.FieldName) ? record[field.FieldName] : "")</td>
+								}
+								<td>
+									<a href="/admin/ModuleBuilder/EditRecord/@module.Id/@record["id"]" class="btn btn-sm btn-warning">Edit</a>
+									<a href="/admin/ModuleBuilder/DeleteRecord/@module.Id/@record["id"]" class="btn btn-sm btn-danger">Delete</a>
+								</td>
+							</tr>
+						}
+					}
+				</tbody>
+			</table>
+		</div>
+	</div>
+</div>
