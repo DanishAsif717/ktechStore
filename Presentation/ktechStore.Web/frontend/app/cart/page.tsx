@@ -2,27 +2,30 @@
 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { formatPrice } from "@/lib/data";
+import { formatPrice, getVendorById, getProductEmoji } from "@/lib/mock-data";
+import { useState, useMemo } from "react";
+import { Trash2, Minus, Plus, Store } from "lucide-react";
+import EmptyState from "@/components/shared/EmptyState";
 
 export default function CartPage() {
   const { items, removeItem, updateQuantity, getSubtotal, clearCart } = useCart();
 
+  const groupedByVendor = useMemo(() => {
+    const groups: Record<string, typeof items> = {};
+    items.forEach(item => {
+      const vId = item.product.vendorId;
+      if (!groups[vId]) groups[vId] = [];
+      groups[vId].push(item);
+    });
+    return groups;
+  }, [items]);
+
+  const total = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
+
   if (items.length === 0) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center max-w-md mx-auto">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-24 w-24 text-border mx-auto mb-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
-          </svg>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Your Cart is Empty</h1>
-          <p className="text-muted mb-8">Looks like you haven&apos;t added anything yet.</p>
-          <Link
-            href="/products"
-            className="inline-flex items-center gap-2 bg-primary text-white font-medium px-6 py-3 rounded-xl hover:bg-primary-dark transition-colors"
-          >
-            Start Shopping
-          </Link>
-        </div>
+        <EmptyState type="cart" />
       </div>
     );
   }
@@ -32,74 +35,91 @@ export default function CartPage() {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-3xl font-bold text-foreground">Shopping Cart</h1>
-          <p className="text-muted mt-1">{items.length} {items.length === 1 ? "item" : "items"} in your cart</p>
+          <p className="text-muted mt-1">{items.length} {items.length === 1 ? "item" : "items"} from {Object.keys(groupedByVendor).length} vendor(s)</p>
         </div>
         <button
           onClick={clearCart}
-          className="text-sm text-muted hover:text-red-500 transition-colors"
+          className="text-sm text-muted hover:text-red-500 transition-colors flex items-center gap-1"
         >
+          <Trash2 className="w-4 h-4" />
           Clear Cart
         </button>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-4">
-          {items.map(item => (
-            <div key={item.product.id} className="bg-card border border-border rounded-xl p-4 flex gap-4">
-              <Link
-                href={`/products/${item.product.slug}`}
-                className="w-20 h-20 bg-primary-light rounded-xl flex items-center justify-center flex-shrink-0"
-              >
-                <span className="text-3xl">{getProductEmoji(item.product.categoryId)}</span>
-              </Link>
-              <div className="flex-1 min-w-0">
-                <Link
-                  href={`/products/${item.product.slug}`}
-                  className="font-semibold text-foreground hover:text-primary transition-colors line-clamp-1"
-                >
-                  {item.product.name}
-                </Link>
-                <p className="text-sm text-muted mt-0.5">{item.product.unit}</p>
-                <div className="flex items-center justify-between mt-3">
-                  <div className="flex items-center gap-3">
-                    <button
-                      onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
-                      className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-muted hover:text-foreground hover:border-primary transition-colors"
-                      aria-label="Decrease"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
-                      </svg>
-                    </button>
-                    <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
-                    <button
-                      onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                      className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-muted hover:text-foreground hover:border-primary transition-colors"
-                      aria-label="Increase"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="font-semibold text-foreground">
-                      {formatPrice(item.product.price * item.quantity)}
-                    </span>
-                    <button
-                      onClick={() => removeItem(item.product.id)}
-                      className="text-muted hover:text-red-500 transition-colors"
-                      aria-label="Remove"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
+        <div className="lg:col-span-2 space-y-6">
+          {Object.entries(groupedByVendor).map(([vendorId, vendorItems]) => {
+            const vendor = getVendorById(vendorId);
+            const vendorTotal = vendorItems.reduce((s, i) => s + i.product.price * i.quantity, 0);
+            return (
+              <div key={vendorId} className="bg-card border border-border rounded-xl overflow-hidden">
+                <div className="bg-gray-50 px-6 py-3 border-b border-border flex items-center justify-between">
+                  <Link
+                    href={`/vendor/${vendorId}`}
+                    className="flex items-center gap-2 text-sm font-semibold text-foreground hover:text-primary transition-colors"
+                  >
+                    <Store className="w-4 h-4 text-primary" />
+                    {vendor?.shopName || "Unknown Vendor"}
+                  </Link>
+                  <span className="text-sm text-muted">{vendorItems.length} item(s)</span>
+                </div>
+                <div className="divide-y divide-border">
+                  {vendorItems.map(item => (
+                    <div key={item.product.id} className="p-4 flex gap-4">
+                      <Link
+                        href={`/products/${item.product.slug}`}
+                        className="w-20 h-20 bg-primary-light rounded-xl flex items-center justify-center flex-shrink-0"
+                      >
+                        <span className="text-3xl">{getProductEmoji(item.product.category)}</span>
+                      </Link>
+                      <div className="flex-1 min-w-0">
+                        <Link
+                          href={`/products/${item.product.slug}`}
+                          className="font-semibold text-foreground hover:text-primary transition-colors line-clamp-1"
+                        >
+                          {item.product.name}
+                        </Link>
+                        <p className="text-sm text-muted mt-0.5">{item.product.unit}</p>
+                        <div className="flex items-center justify-between mt-3">
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
+                              className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-muted hover:text-foreground hover:border-primary transition-colors"
+                            >
+                              <Minus className="w-4 h-4" />
+                            </button>
+                            <span className="text-sm font-medium w-8 text-center">{item.quantity}</span>
+                            <button
+                              onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                              className="w-8 h-8 rounded-lg border border-border flex items-center justify-center text-muted hover:text-foreground hover:border-primary transition-colors"
+                            >
+                              <Plus className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="flex items-center gap-4">
+                            <span className="font-semibold text-foreground">
+                              {formatPrice(item.product.price * item.quantity)}
+                            </span>
+                            <button
+                              onClick={() => removeItem(item.product.id)}
+                              className="text-muted hover:text-red-500 transition-colors"
+                              aria-label="Remove"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="bg-gray-50 px-6 py-3 border-t border-border text-right">
+                  <span className="text-sm text-muted">Vendor subtotal: </span>
+                  <span className="font-semibold text-foreground">{formatPrice(vendorTotal)}</span>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="bg-card border border-border rounded-xl p-6 h-fit sticky top-24">
@@ -107,7 +127,7 @@ export default function CartPage() {
           <div className="space-y-3 text-sm">
             <div className="flex justify-between">
               <span className="text-muted">Subtotal</span>
-              <span className="font-medium text-foreground">{formatPrice(getSubtotal())}</span>
+              <span className="font-medium text-foreground">{formatPrice(total)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted">Shipping</span>
@@ -119,7 +139,7 @@ export default function CartPage() {
             </div>
             <div className="border-t border-border pt-3 flex justify-between">
               <span className="font-semibold text-foreground">Total</span>
-              <span className="font-bold text-lg text-primary">{formatPrice(getSubtotal())}</span>
+              <span className="font-bold text-lg text-primary">{formatPrice(total)}</span>
             </div>
           </div>
           <Link
@@ -138,9 +158,4 @@ export default function CartPage() {
       </div>
     </div>
   );
-}
-
-function getProductEmoji(categoryId: number): string {
-  const emojis: Record<number, string> = { 1: "🍌", 2: "🥛", 3: "🍗", 4: "🥖", 5: "🧃", 6: "🍪", 7: "🍚", 8: "🧴" };
-  return emojis[categoryId] || "🛒";
 }

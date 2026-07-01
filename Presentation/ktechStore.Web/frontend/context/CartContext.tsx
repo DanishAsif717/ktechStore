@@ -1,7 +1,12 @@
 "use client";
 
 import { createContext, useContext, useReducer, useEffect, type ReactNode } from "react";
-import type { Product, CartItem } from "@/lib/data";
+import type { Product } from "@/types";
+
+export interface CartItem {
+  product: Product;
+  quantity: number;
+}
 
 interface CartState {
   items: CartItem[];
@@ -82,10 +87,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       try {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed)) {
-          dispatch({ type: "CLEAR_CART" });
           for (const item of parsed) {
             dispatch({ type: "ADD_ITEM", product: item.product });
-            dispatch({ type: "UPDATE_QUANTITY", productId: item.product.id, quantity: item.quantity });
+            if (item.quantity > 1) {
+              for (let i = 1; i < item.quantity; i++) {
+                dispatch({ type: "ADD_ITEM", product: item.product });
+              }
+            }
           }
         }
       } catch { }

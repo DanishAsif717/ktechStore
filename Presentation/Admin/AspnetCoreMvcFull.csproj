@@ -21,6 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Catalog\Data\" />
+    <Folder Include="Areas\Catalog\Models\" />
+    <Folder Include="Controllers\Admin\" />
     <Folder Include="wwwroot\uploads\categories\" />
     <Folder Include="wwwroot\uploads\products\" />
   </ItemGroup>

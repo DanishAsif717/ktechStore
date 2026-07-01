@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { formatPrice } from "@/lib/data";
+import { formatPrice, getProductEmoji } from "@/lib/mock-data";
+import { X, ShoppingBag } from "lucide-react";
 
 export default function CartSidebar() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, getSubtotal } = useCart();
@@ -28,18 +29,14 @@ export default function CartSidebar() {
               className="p-2 text-muted hover:text-foreground transition-colors"
               aria-label="Close cart"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="w-5 h-5" />
             </button>
           </div>
 
           <div className="flex-1 overflow-y-auto px-6 py-4">
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-border mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z" />
-                </svg>
+                <ShoppingBag className="h-16 w-16 text-border mb-4" />
                 <p className="text-muted font-medium">Your cart is empty</p>
                 <p className="text-sm text-muted mt-1">Add some products to get started!</p>
               </div>
@@ -48,7 +45,7 @@ export default function CartSidebar() {
                 {items.map(item => (
                   <li key={item.product.id} className="flex gap-4 py-3 border-b border-border last:border-0">
                     <div className="w-16 h-16 bg-primary-light rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-2xl">{getProductEmoji(item.product.categoryId)}</span>
+                      <span className="text-2xl">{getProductEmoji(item.product.category)}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <Link
@@ -64,17 +61,13 @@ export default function CartSidebar() {
                           onClick={() => updateQuantity(item.product.id, item.quantity - 1)}
                           className="w-7 h-7 rounded-md border border-border flex items-center justify-center text-muted hover:text-foreground hover:border-primary transition-colors text-sm"
                           aria-label="Decrease quantity"
-                        >
-                          -
-                        </button>
+                        >-</button>
                         <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
                           className="w-7 h-7 rounded-md border border-border flex items-center justify-center text-muted hover:text-foreground hover:border-primary transition-colors text-sm"
                           aria-label="Increase quantity"
-                        >
-                          +
-                        </button>
+                        >+</button>
                       </div>
                     </div>
                     <div className="flex flex-col items-end justify-between">
@@ -86,9 +79,7 @@ export default function CartSidebar() {
                         className="text-muted hover:text-red-500 transition-colors"
                         aria-label="Remove item"
                       >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
+                        <X className="w-4 h-4" />
                       </button>
                     </div>
                   </li>
@@ -124,11 +115,4 @@ export default function CartSidebar() {
       </div>
     </>
   );
-}
-
-function getProductEmoji(categoryId: number): string {
-  const emojis: Record<number, string> = {
-    1: "🍌", 2: "🥛", 3: "🍗", 4: "🥖", 5: "🧃", 6: "🍪", 7: "🍚", 8: "🧴",
-  };
-  return emojis[categoryId] || "🛒";
 }

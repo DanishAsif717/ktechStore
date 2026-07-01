@@ -1,6 +1,7 @@
 @{
 	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
 	var module = ViewBag.Module as ktechStore.Core.Entities.ModuleDefinition;
+	var relationData = ViewBag.RelationData as Dictionary<string, List<Dictionary<string, object>>>;
 }
 
 <div class="container-xxl flex-grow-1 container-p-y">
@@ -16,30 +17,44 @@
                         
 						@if (field.FieldType == "Boolean")
 						{
-							<select name="@field.FieldName" class="form-select">
+							<select name="@field.FieldName" class="form-select" @(field.IsRequired ? "required" : "")>
 								<option value="true">Yes</option>
 								<option value="false">No</option>
 							</select>
 						}
+						else if (field.FieldType == "Relation")
+						{
+							<select name="@field.FieldName" class="form-select" @(field.IsRequired ? "required" : "")>
+								<option value="">-- Select @field.FieldName --</option>
+								
+								@if (relationData != null && relationData.ContainsKey(field.FieldName))
+								{
+									foreach (var item in relationData[field.FieldName])
+									{
+										<option value="@item["Id"]">@item["Text"]</option>
+									}
+								}
+							</select>
+						}
 						else if (field.FieldType == "TextArea")
 						{
-							<textarea name="@field.FieldName" class="form-control" rows="3"></textarea>
+							<textarea name="@field.FieldName" class="form-control" rows="3" @(field.IsRequired ? "required" : "")></textarea>
 						}
 						else if (field.FieldType == "Date")
 						{
-							<input type="date" name="@field.FieldName" class="form-control" />
+							<input type="date" name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "") />
 						}
 						else if (field.FieldType == "Number")
 						{
-							<input type="number" name="@field.FieldName" class="form-control" />
+							<input type="number" name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "") />
 						}
 						else if (field.FieldType == "Email")
 						{
-							<input type="email" name="@field.FieldName" class="form-control" />
+							<input type="email" name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "") />
 						}
 						else
 						{
-							<input type="text" name="@field.FieldName" class="form-control" />
+							<input type="text" name="@field.FieldName" class="form-control" @(field.IsRequired ? "required" : "") />
 						}
 					</div>
 				}

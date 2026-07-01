@@ -2,26 +2,38 @@
 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { formatPrice } from "@/lib/data";
-import { useState } from "react";
+import { formatPrice, getVendorById, getProductEmoji, generateOrderId } from "@/lib/mock-data";
+import { useState, useMemo } from "react";
+import { Store, CreditCard, CheckCircle, Package } from "lucide-react";
+import EmptyState from "@/components/shared/EmptyState";
 
 export default function CheckoutPage() {
   const { items, getSubtotal, clearCart } = useCart();
   const [submitted, setSubmitted] = useState(false);
+  const [orderId, setOrderId] = useState("");
+
+  const groupedByVendor = useMemo(() => {
+    const groups: Record<string, typeof items> = {};
+    items.forEach(item => {
+      const vId = item.product.vendorId;
+      if (!groups[vId]) groups[vId] = [];
+      groups[vId].push(item);
+    });
+    return groups;
+  }, [items]);
+
+  const total = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
 
   if (items.length === 0 && !submitted) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="text-center max-w-md mx-auto">
-          <h1 className="text-2xl font-bold text-foreground mb-2">Nothing to Checkout</h1>
-          <p className="text-muted mb-8">Your cart is empty. Add some products first.</p>
-          <Link
-            href="/products"
-            className="inline-flex items-center gap-2 bg-primary text-white font-medium px-6 py-3 rounded-xl hover:bg-primary-dark transition-colors"
-          >
-            Start Shopping
-          </Link>
-        </div>
+        <EmptyState
+          type="cart"
+          title="Nothing to Checkout"
+          message="Your cart is empty. Add some products first."
+          actionLabel="Start Shopping"
+          actionHref="/products"
+        />
       </div>
     );
   }
@@ -31,13 +43,28 @@ export default function CheckoutPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center max-w-md mx-auto">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+            <CheckCircle className="h-10 w-10 text-green-600" />
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">Order Placed Successfully!</h1>
-          <p className="text-muted mb-2">Thank you for your purchase. Your order confirmation has been sent to your email.</p>
-          <p className="text-sm text-muted mb-8">Order #KT-{Math.random().toString(36).substring(2, 8).toUpperCase()}</p>
+          <p className="text-muted mb-2">Thank you for your purchase. Your order has been placed and the vendors have been notified.</p>
+          <p className="text-sm font-medium text-primary mb-8">Order #{orderId}</p>
+          <div className="space-y-3 text-left bg-gray-50 rounded-xl p-4 mb-8">
+            <p className="text-sm font-semibold text-foreground">Order Summary</p>
+            {Object.entries(groupedByVendor).map(([vendorId, vendorItems]) => {
+              const vendor = getVendorById(vendorId);
+              const vTotal = vendorItems.reduce((s, i) => s + i.product.price * i.quantity, 0);
+              return (
+                <div key={vendorId} className="text-sm text-muted flex justify-between">
+                  <span>{vendor?.shopName} ({vendorItems.length} items)</span>
+                  <span className="font-medium text-foreground">{formatPrice(vTotal)}</span>
+                </div>
+              );
+            })}
+            <div className="border-t border-border pt-2 flex justify-between font-semibold text-foreground">
+              <span>Total Paid</span>
+              <span>{formatPrice(total)}</span>
+            </div>
+          </div>
           <Link
             href="/products"
             className="inline-flex items-center gap-2 bg-primary text-white font-medium px-6 py-3 rounded-xl hover:bg-primary-dark transition-colors"
@@ -48,6 +75,13 @@ export default function CheckoutPage() {
       </div>
     );
   }
+
+  const handlePlaceOrder = () => {
+    const id = generateOrderId();
+    setOrderId(id);
+    clearCart();
+    setSubmitted(true);
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -98,10 +132,14 @@ export default function CheckoutPage() {
           <div className="bg-card border border-border rounded-xl p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">Payment Method</h2>
             <div className="space-y-3">
-              {["Credit Card", "PayPal", "Cash on Delivery"].map(method => (
-                <label key={method} className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
-                  <input type="radio" name="payment" className="text-primary focus:ring-primary" defaultChecked={method === "Credit Card"} />
-                  <span className="text-sm font-medium text-foreground">{method}</span>
+              {[
+                { name: "Credit Card", icon: CreditCard },
+                { name: "Cash on Delivery", icon: Package },
+              ].map(({ name, icon: Icon }) => (
+                <label key={name} className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
+                  <input type="radio" name="payment" className="text-primary focus:ring-primary" defaultChecked={name === "Cash on Delivery"} />
+                  <Icon className="w-5 h-5 text-muted" />
+                  <span className="text-sm font-medium text-foreground">{name}</span>
                 </label>
               ))}
             </div>
@@ -110,24 +148,41 @@ export default function CheckoutPage() {
 
         <div className="bg-card border border-border rounded-xl p-6 h-fit sticky top-24">
           <h2 className="text-lg font-semibold text-foreground mb-4">Order Summary</h2>
-          <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
-            {items.map(item => (
-              <div key={item.product.id} className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-primary-light rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-lg">{getProductEmoji(item.product.categoryId)}</span>
+
+          <div className="space-y-4 mb-4 max-h-80 overflow-y-auto">
+            {Object.entries(groupedByVendor).map(([vendorId, vendorItems]) => {
+              const vendor = getVendorById(vendorId);
+              const vTotal = vendorItems.reduce((s, i) => s + i.product.price * i.quantity, 0);
+              return (
+                <div key={vendorId} className="border border-border rounded-lg p-3">
+                  <div className="flex items-center gap-2 text-sm font-semibold text-foreground mb-2">
+                    <Store className="w-3.5 h-3.5 text-primary" />
+                    {vendor?.shopName}
+                  </div>
+                  {vendorItems.map(item => (
+                    <div key={item.product.id} className="flex items-center gap-3 py-1.5">
+                      <div className="w-8 h-8 bg-primary-light rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-sm">{getProductEmoji(item.product.category)}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-xs text-foreground line-clamp-1">{item.product.name}</p>
+                        <p className="text-xs text-muted">Qty: {item.quantity}</p>
+                      </div>
+                      <span className="text-xs font-medium text-foreground">{formatPrice(item.product.price * item.quantity)}</span>
+                    </div>
+                  ))}
+                  <div className="text-right text-xs text-muted mt-1 pt-1 border-t border-border">
+                    Subtotal: <span className="font-medium text-foreground">{formatPrice(vTotal)}</span>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground line-clamp-1">{item.product.name}</p>
-                  <p className="text-xs text-muted">Qty: {item.quantity}</p>
-                </div>
-                <span className="text-sm font-medium text-foreground">{formatPrice(item.product.price * item.quantity)}</span>
-              </div>
-            ))}
+              );
+            })}
           </div>
+
           <div className="space-y-3 text-sm border-t border-border pt-4">
             <div className="flex justify-between">
               <span className="text-muted">Subtotal</span>
-              <span className="font-medium text-foreground">{formatPrice(getSubtotal())}</span>
+              <span className="font-medium text-foreground">{formatPrice(total)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted">Shipping</span>
@@ -135,26 +190,23 @@ export default function CheckoutPage() {
             </div>
             <div className="flex justify-between">
               <span className="text-muted">Tax</span>
-              <span className="text-foreground">{formatPrice(getSubtotal() * 0.08)}</span>
+              <span className="text-foreground">{formatPrice(total * 0.08)}</span>
             </div>
             <div className="border-t border-border pt-3 flex justify-between">
               <span className="font-semibold text-foreground">Total</span>
-              <span className="font-bold text-lg text-primary">{formatPrice(getSubtotal() * 1.08)}</span>
+              <span className="font-bold text-lg text-primary">{formatPrice(total * 1.08)}</span>
             </div>
           </div>
+
           <button
-            onClick={() => { clearCart(); setSubmitted(true); }}
-            className="w-full bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-dark transition-colors mt-6"
+            onClick={handlePlaceOrder}
+            className="w-full bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-dark transition-colors mt-6 flex items-center justify-center gap-2"
           >
+            <CheckCircle className="w-5 h-5" />
             Place Order
           </button>
         </div>
       </div>
     </div>
   );
-}
-
-function getProductEmoji(categoryId: number): string {
-  const emojis: Record<number, string> = { 1: "🍌", 2: "🥛", 3: "🍗", 4: "🥖", 5: "🧃", 6: "🍪", 7: "🍚", 8: "🧴" };
-  return emojis[categoryId] || "🛒";
 }

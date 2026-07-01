@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { categories } from "@/lib/mock-data";
 
 export default function Footer() {
   return (
@@ -10,23 +11,20 @@ export default function Footer() {
               <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">K</span>
               </div>
-              <span className="text-xl font-bold text-foreground">KTech<span className="text-primary">Store</span></span>
+              <span className="text-xl font-bold text-foreground">KTech<span className="text-primary">Market</span></span>
             </Link>
             <p className="text-sm text-muted leading-relaxed">
-              Your one-stop shop for fresh groceries and everyday essentials. Quality products, fast delivery.
+              A multi-vendor marketplace connecting shoppers with the best sellers across all categories.
             </p>
           </div>
 
           <div>
             <h3 className="font-semibold text-foreground mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              {["Home", "Products", "Categories", "About Us", "Contact"].map(item => (
-                <li key={item}>
-                  <Link
-                    href={item === "Home" ? "/" : `/${item.toLowerCase().replace(/\s+/g, "-")}`}
-                    className="text-sm text-muted hover:text-primary transition-colors"
-                  >
-                    {item}
+              {[{ label: "Home", href: "/" }, { label: "Products", href: "/products" }, { label: "Categories", href: "/categories" }, { label: "About Us", href: "/about" }, { label: "Contact", href: "/contact" }].map(item => (
+                <li key={item.label}>
+                  <Link href={item.href} className="text-sm text-muted hover:text-primary transition-colors">
+                    {item.label}
                   </Link>
                 </li>
               ))}
@@ -34,15 +32,12 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Categories</h3>
+            <h3 className="font-semibold text-foreground mb-4">Shop by Category</h3>
             <ul className="space-y-2">
-              {["Fruits & Vegetables", "Dairy & Eggs", "Meat & Poultry", "Bakery", "Beverages"].map(item => (
-                <li key={item}>
-                  <Link
-                    href={`/categories/${item.toLowerCase().replace(/[\s&]+/g, "-")}`}
-                    className="text-sm text-muted hover:text-primary transition-colors"
-                  >
-                    {item}
+              {categories.map(cat => (
+                <li key={cat.slug}>
+                  <Link href={`/categories/${cat.slug}`} className="text-sm text-muted hover:text-primary transition-colors">
+                    {cat.name}
                   </Link>
                 </li>
               ))}
@@ -50,33 +45,20 @@ export default function Footer() {
           </div>
 
           <div>
-            <h3 className="font-semibold text-foreground mb-4">Contact Info</h3>
-            <ul className="space-y-2 text-sm text-muted">
-              <li className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                123 Grocery Lane, Foodville, FC 12345
-              </li>
-              <li className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                </svg>
-                hello@ktechstore.com
-              </li>
-              <li className="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                +1 (555) 123-4567
-              </li>
+            <h3 className="font-semibold text-foreground mb-4">For Vendors</h3>
+            <ul className="space-y-2">
+              <li><Link href="/vendor/register" className="text-sm text-muted hover:text-primary transition-colors">Become a Vendor</Link></li>
+              <li><Link href="/vendor/login" className="text-sm text-muted hover:text-primary transition-colors">Vendor Login</Link></li>
+              <li><Link href="/" className="text-sm text-muted hover:text-primary transition-colors">Seller Resources</Link></li>
             </ul>
+            <h3 className="font-semibold text-foreground mt-6 mb-2">Contact</h3>
+            <p className="text-sm text-muted">hello@ktechmarket.com</p>
+            <p className="text-sm text-muted">+1 (555) 000-0000</p>
           </div>
         </div>
 
         <div className="border-t border-border mt-8 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-muted">&copy; {new Date().getFullYear()} KTech Store. All rights reserved.</p>
+          <p className="text-xs text-muted">&copy; {new Date().getFullYear()} KTech Market. All rights reserved.</p>
           <div className="flex items-center gap-4">
             <Link href="#" className="text-muted hover:text-primary transition-colors">
               <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>

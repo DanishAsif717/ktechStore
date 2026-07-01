@@ -1,5 +1,6 @@
 import Link from "next/link";
-import type { Category } from "@/lib/data";
+import type { Category } from "@/types";
+import { getCategoryEmoji } from "@/lib/mock-data";
 
 interface CategoryCardProps {
   category: Category;
@@ -13,7 +14,7 @@ export default function CategoryCard({ category }: CategoryCardProps) {
     >
       <div className="aspect-[4/3] bg-gradient-to-br from-primary-light to-white flex items-center justify-center p-8">
         <span className="text-6xl group-hover:scale-110 transition-transform duration-300">
-          {getCategoryEmoji(category.id)}
+          {getCategoryEmoji(category.slug)}
         </span>
       </div>
       <div className="p-4 text-center">
@@ -24,11 +25,4 @@ export default function CategoryCard({ category }: CategoryCardProps) {
       </div>
     </Link>
   );
-}
-
-function getCategoryEmoji(id: number): string {
-  const emojis: Record<number, string> = {
-    1: "🥬", 2: "🥛", 3: "🥩", 4: "🥐", 5: "🧃", 6: "🍿", 7: "🍝", 8: "🧹",
-  };
-  return emojis[id] || "🛒";
 }
