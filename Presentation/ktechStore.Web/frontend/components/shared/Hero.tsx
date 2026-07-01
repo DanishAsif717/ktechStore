@@ -8,48 +8,48 @@ export default function Hero() {
           <div className="space-y-6">
             <div className="inline-flex items-center gap-2 bg-primary-light text-primary text-sm font-medium px-4 py-1.5 rounded-full">
               <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
-              Fresh Groceries Delivered Daily
+              Multi-Vendor Marketplace
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
-              Fresh &{" "}
-              <span className="text-primary">Organic</span>
+              Shop Across{" "}
+              <span className="text-primary">Every</span>
               <br />
-              Groceries for You
+              Category You Love
             </h1>
             <p className="text-lg text-muted max-w-lg">
-              Shop the freshest fruits, vegetables, dairy, and more. Free delivery on orders over $50!
+              From fresh groceries to electronics, fashion to car parts — discover products from hundreds of trusted vendors in one place.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/products"
                 className="inline-flex items-center gap-2 bg-primary text-white font-medium px-6 py-3 rounded-xl hover:bg-primary-dark transition-colors"
               >
-                Shop Now
+                Start Shopping
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </Link>
               <Link
-                href="/categories"
+                href="/vendor/register"
                 className="inline-flex items-center gap-2 border-2 border-border text-foreground font-medium px-6 py-3 rounded-xl hover:border-primary hover:text-primary transition-colors"
               >
-                Browse Categories
+                Sell on KTechMarket
               </Link>
             </div>
             <div className="flex items-center gap-8 pt-4">
               <div className="text-center">
-                <div className="text-2xl font-bold text-primary">10K+</div>
+                <div className="text-2xl font-bold text-primary">6+</div>
+                <div className="text-xs text-muted">Categories</div>
+              </div>
+              <div className="w-px h-10 bg-border" />
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">30+</div>
+                <div className="text-xs text-muted">Vendors</div>
+              </div>
+              <div className="w-px h-10 bg-border" />
+              <div className="text-center">
+                <div className="text-2xl font-bold text-primary">200+</div>
                 <div className="text-xs text-muted">Products</div>
-              </div>
-              <div className="w-px h-10 bg-border" />
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">5K+</div>
-                <div className="text-xs text-muted">Happy Customers</div>
-              </div>
-              <div className="w-px h-10 bg-border" />
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary">2hr</div>
-                <div className="text-xs text-muted">Delivery</div>
               </div>
             </div>
           </div>
@@ -58,7 +58,7 @@ export default function Hero() {
               <div className="absolute inset-0 bg-primary/10 rounded-full animate-pulse" />
               <div className="relative w-full h-full flex items-center justify-center">
                 <div className="grid grid-cols-2 gap-4">
-                  {["🥬", "🍎", "🥕", "🥑"].map((emoji, i) => (
+                  {["🥬", "👕", "🔧", "⚡"].map((emoji, i) => (
                     <div key={i} className="w-28 h-28 bg-white rounded-2xl shadow-lg flex items-center justify-center text-5xl transform hover:scale-110 transition-transform">
                       {emoji}
                     </div>

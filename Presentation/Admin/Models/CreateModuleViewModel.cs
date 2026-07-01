@@ -13,7 +13,6 @@ namespace AspnetCoreMvcFull.Models
     public string FieldType { get; set; }
     public bool IsRequired { get; set; }
     public int DisplayOrder { get; set; }
-
     public bool IsForeignKey { get; set; }
     public string? RelatedTable { get; set; }
   }

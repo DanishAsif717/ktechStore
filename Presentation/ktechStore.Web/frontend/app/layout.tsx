@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import { WishlistProvider } from "@/context/WishlistContext";
+import { AuthProvider } from "@/context/AuthContext";
+import Navbar from "@/components/shared/Navbar";
+import Footer from "@/components/shared/Footer";
 import CartSidebar from "@/components/CartSidebar";
 
 const geistSans = Geist({
@@ -17,28 +19,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "KTech Store - Fresh Groceries Delivered",
-  description: "Shop fresh organic groceries, fruits, vegetables, dairy, meat, bakery, and more. Free delivery on orders over $50.",
-  keywords: ["grocery store", "fresh groceries", "organic food", "online grocery", "food delivery"],
+  title: "KTech Market - Multi-Vendor Marketplace",
+  description: "Shop from multiple vendors across Grocery, Clothes, Electronics, Car Parts, Home & Kitchen, Sports and more.",
+  keywords: ["marketplace", "multi-vendor", "online shopping", "ecommerce", "grocery", "fashion", "electronics"],
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col">
-        <CartProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <Footer />
-          <CartSidebar />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+              <CartSidebar />
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   );

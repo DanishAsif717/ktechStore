@@ -22,7 +22,14 @@ namespace AspnetCoreMvcFull.Controllers
     public async Task<IActionResult> Index() =>
         View(await _moduleService.GetAllAsync());
 
-    public IActionResult Create() => View();
+    public async Task<IActionResult> Create()
+    {
+      var existingModules = await _moduleService.GetAllAsync();
+
+      ViewBag.ExistingTables = existingModules.Select(m => m.TableName).ToList();
+
+      return View();
+    }
 
     [HttpPost]
     public async Task<IActionResult> Create(CreateModuleViewModel vm)
@@ -46,8 +53,8 @@ namespace AspnetCoreMvcFull.Controllers
           FieldType = f.FieldType,
           IsRequired = f.IsRequired,
           DisplayOrder = i,
-          //IsForeignKey = f.IsForeignKey, 
-          //RelatedTable = f.RelatedTable
+          IsForeignKey = f.IsForeignKey,
+          RelatedTable = f.RelatedTable
         }).ToList();
 
         await _moduleService.CreateModuleAsync(module, fields);
@@ -69,19 +76,65 @@ namespace AspnetCoreMvcFull.Controllers
       var module = await _moduleService.GetByIdAsync(id);
       var records = new List<Dictionary<string, object>>();
 
+      var selectColumns = new List<string> { $"m.\"Id\" AS \"id\"" };
+      var joinClauses = new List<string>();
+
+      var allModules = await _db.ModuleDefinitions.Include(m => m.Fields).ToListAsync();
+
+      foreach (var field in module.Fields.OrderBy(f => f.DisplayOrder))
+      {
+        if (field.FieldType == "Relation" && !string.IsNullOrEmpty(field.RelatedTable))
+        {
+          var targetTableClean = field.RelatedTable.Trim().ToLower();
+          var alias = $"t_{field.FieldName.Trim().ToLower()}";
+
+          var targetModule = allModules.FirstOrDefault(m => m.TableName.ToLower() == targetTableClean);
+
+          var displayColumn = targetModule?.Fields?
+              .OrderBy(f => f.DisplayOrder)
+              .FirstOrDefault(f => f.FieldType == "Text")?.FieldName;
+
+          if (!string.IsNullOrEmpty(displayColumn))
+          {
+            selectColumns.Add($"{alias}.\"{displayColumn}\" AS \"{field.FieldName}_text\"");
+          }
+          else
+          {
+            selectColumns.Add($"{alias}.\"Id\" AS \"{field.FieldName}_text\"");
+          }
+
+          selectColumns.Add($"m.\"{field.FieldName}\" AS \"{field.FieldName}\"");
+
+          joinClauses.Add($"LEFT JOIN \"{targetTableClean}\" AS {alias} ON m.\"{field.FieldName}\" = {alias}.\"Id\"");
+        }
+        else
+        {
+          selectColumns.Add($"m.\"{field.FieldName}\"");
+        }
+      }
+
+      // Mukammal Query banana
+      var columnsSql = string.Join(", ", selectColumns);
+      var joinsSql = string.Join(" ", joinClauses);
+      var finalSql = $"SELECT {columnsSql} FROM \"{module.TableName}\" AS m {joinsSql}";
+
+      // 2. DATABASE EXECUTION
       var connectionString = _db.Database.GetConnectionString();
       await using var conn = new Npgsql.NpgsqlConnection(connectionString);
       await conn.OpenAsync();
 
       await using var cmd = conn.CreateCommand();
-      cmd.CommandText = $"SELECT * FROM {module.TableName}";
+      cmd.CommandText = finalSql;
 
       await using var reader = await cmd.ExecuteReaderAsync();
       while (await reader.ReadAsync())
       {
         var row = new Dictionary<string, object>();
         for (int i = 0; i < reader.FieldCount; i++)
-          row[reader.GetName(i)] = reader.GetValue(i);
+        {
+          var value = reader.GetValue(i);
+          row[reader.GetName(i)] = value == DBNull.Value ? null : value;
+        }
         records.Add(row);
       }
 
@@ -101,7 +154,58 @@ namespace AspnetCoreMvcFull.Controllers
     public async Task<IActionResult> CreateRecord(int id)
     {
       var module = await _moduleService.GetByIdAsync(id);
+      var allModules = await _db.ModuleDefinitions.Include(m => m.Fields).ToListAsync();
+
+      var relationData = new Dictionary<string, List<Dictionary<string, object>>>();
+
+      var connectionString = _db.Database.GetConnectionString();
+      await using var conn = new Npgsql.NpgsqlConnection(connectionString);
+      await conn.OpenAsync();
+
+      foreach (var field in module.Fields)
+      {
+        if (field.FieldType == "Relation" && !string.IsNullOrEmpty(field.RelatedTable))
+        {
+          var targetTable = field.RelatedTable.Trim().ToLower();
+          var targetModule = allModules.FirstOrDefault(m => m.TableName.ToLower() == targetTable);
+
+          // Target table ka text column dhoondte hain display karne ke liye
+          var displayColumn = targetModule?.Fields?
+              .OrderBy(f => f.DisplayOrder)
+              .FirstOrDefault(f => f.FieldType == "Text")?.FieldName;
+
+          // Agar koi text column na mile, to fallback to "Id"
+          displayColumn = !string.IsNullOrEmpty(displayColumn) ? $"\"{displayColumn}\"" : "\"Id\"";
+
+          var items = new List<Dictionary<string, object>>();
+          try
+          {
+            await using var cmd = conn.CreateCommand();
+            // Query: SELECT "Id", "Name" FROM "category"
+            cmd.CommandText = $"SELECT \"Id\", {displayColumn} FROM \"{targetTable}\"";
+
+            await using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+              var item = new Dictionary<string, object>
+                    {
+                        { "Id", reader.GetValue(0) },
+                        { "Text", reader.GetValue(1) }
+                    };
+              items.Add(item);
+            }
+          }
+          catch (Exception)
+          {
+            // Target table agar empty ho ya na mile to crash na ho
+          }
+
+          relationData[field.FieldName] = items;
+        }
+      }
+
       ViewBag.Module = module;
+      ViewBag.RelationData = relationData; // Dropdown data sent to View
       return View();
     }
 
