@@ -2,6 +2,9 @@ using ktechStore.Core.Interfaces;
 using ktechStore.Infrastructure.Persistence;
 using ktechStore.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using ktechStore.Application.Interfaces;
+using ktechStore.Application.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.SetBasePath(AppContext.BaseDirectory);
 
@@ -17,8 +20,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 //Repositries
 
-builder.Services.AddScoped<ICategoryService, CategoryRepository>();
-
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IModuleService, ModuleRepository>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 

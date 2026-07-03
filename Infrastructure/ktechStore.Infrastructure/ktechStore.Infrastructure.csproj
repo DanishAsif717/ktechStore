@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Core\ktechStore.Application\ktechStore.Application.csproj" />
     <ProjectReference Include="..\..\Core\ktechStore.Core\ktechStore.Core.csproj" />
   </ItemGroup>
 

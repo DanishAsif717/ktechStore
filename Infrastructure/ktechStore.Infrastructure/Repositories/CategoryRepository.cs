@@ -1,11 +1,14 @@
-﻿using ktechStore.Core.Entities;
-using ktechStore.Core.Interfaces;
+﻿using ktechStore.Application.Interfaces;
+using ktechStore.Core.Entities;
 using ktechStore.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
-
+using System.Collections.Generic;
+using System.Threading.Tasks;
+    
 namespace ktechStore.Infrastructure.Repositories
 {
-    public class CategoryRepository : ICategoryService
+    // Yeh sahi repository class hai jo DB se baat karegi
+    public class CategoryRepository : ICategoryRepository
     {
         private readonly ApplicationDbContext _context;
 
@@ -41,7 +44,7 @@ namespace ktechStore.Infrastructure.Repositories
 
         public async Task<bool> SaveChangesAsync()
         {
-            return (await _context.SaveChangesAsync()) >= 0;
+            return (await _context.SaveChangesAsync()) > 0;
         }
     }
 }

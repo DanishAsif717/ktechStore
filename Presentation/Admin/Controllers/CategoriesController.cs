@@ -1,29 +1,30 @@
-using ktechStore.Core.Entities;
-using ktechStore.Core.Interfaces;
-using ktechStore.Infrastructure.Persistence;
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore; 
+using ktechStore.Core.Entities;
+using ktechStore.Application.Interfaces; // <-- 1. Naya sahi namespace jahan ICategoryService majood hy
 
 namespace AspnetCoreMvcFull.Controllers
 {
   public class CategoriesController : Controller
   {
+    // 2. Service ka sahi injection aur clean variable name
+    private readonly ICategoryService _categoryService;
 
-    // DB Context constructor injection ke zariye load ho raha hy
-    private readonly ICategoryService _categoryRepo;
-
-    public CategoriesController(ICategoryService categoryRepo)
+    public CategoriesController(ICategoryService categoryService)
     {
-      _categoryRepo = categoryRepo;
+      _categoryService = categoryService;
     }
 
     // GET: Categories
     public async Task<IActionResult> Index()
     {
-      var categories = await _categoryRepo.GetAllAsync();
+      // Naye Application layer ke function ka naam use kiya
+      var categories = await _categoryService.GetAllCategoriesAsync();
       return View(categories);
     }
+
     // GET: CategoriesController/Details/5
     public ActionResult Details(int id)
     {
@@ -45,18 +46,11 @@ namespace AspnetCoreMvcFull.Controllers
 
       try
       {
-        await _categoryRepo.AddAsync(category);
-        bool success = await _categoryRepo.SaveChangesAsync();
+        // Service khud hi add bhi karegi aur SaveChanges b chalayegi (jo humne CategoryService mein likha tha)
+        await _categoryService.CreateCategoryAsync(category);
 
-        if (success)
-        {
-          TempData["SuccessMessage"] = "Category created successfully!";
-          return Redirect("/admin/Categories/Index");
-        }
-        else
-        {
-          TempData["ErrorMessage"] = "Failed to save the category to the database.";
-        }
+        TempData["SuccessMessage"] = "Category created successfully!";
+        return RedirectToAction(nameof(Index));
       }
       catch (Exception ex)
       {
