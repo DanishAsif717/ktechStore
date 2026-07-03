@@ -1,7 +1,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ktechStore.Core.Entities;
-using ktechStore.Application.Interfaces; // <-- Naya namespace takay service mil sakay
+using ktechStore.Application.Interfaces;
+using ktechStore.Application.DTOs;
 
 namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
 {
@@ -50,15 +51,15 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
     // POST: Catalog/Categories/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,Name,Description,IsActive,CreatedAt")] Category category)
+    public async Task<IActionResult> Create(CategoryCreateDto dto)
     {
       if (ModelState.IsValid)
       {
         // Service ko bola ke create karo (woh khud hi save b karegi)
-        await _categoryService.CreateCategoryAsync(category);
+        await _categoryService.CreateCategoryAsync(dto);
         return RedirectToAction(nameof(Index));
       }
-      return View(category);
+      return View(dto);
     }
 
     // GET: Catalog/Categories/Edit/5
@@ -80,18 +81,14 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
     // POST: Catalog/Categories/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,IsActive,CreatedAt")] Category category)
+    public async Task<IActionResult> Edit(int id, CategoryCreateDto dto)
     {
-      if (id != category.Id)
-      {
-        return NotFound();
-      }
-
+      
       if (ModelState.IsValid)
       {
         try
         {
-          await _categoryService.UpdateCategoryAsync(category);
+          await _categoryService.UpdateCategoryAsync(id, dto);
         }
         catch
         {
@@ -106,7 +103,7 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
         }
         return RedirectToAction(nameof(Index));
       }
-      return View(category);
+      return View(dto);
     }
 
     // GET: Catalog/Categories/Delete/5

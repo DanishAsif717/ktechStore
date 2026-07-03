@@ -1,9 +1,10 @@
-using System;
-using System.Threading.Tasks;
+using ktechStore.Application.Interfaces;
+using ktechStore.Core.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using ktechStore.Core.Entities;
-using ktechStore.Application.Interfaces; // <-- 1. Naya sahi namespace jahan ICategoryService majood hy
+using System;
+using System.Threading.Tasks;
+using ktechStore.Application.DTOs;
 
 namespace AspnetCoreMvcFull.Controllers
 {
@@ -40,24 +41,15 @@ namespace AspnetCoreMvcFull.Controllers
     // POST: CategoriesController/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Category category)
+    public async Task<IActionResult> Create(CategoryCreateDto dto)
     {
-      if (!ModelState.IsValid) return View(category);
-
-      try
+      if (ModelState.IsValid)
       {
-        // Service khud hi add bhi karegi aur SaveChanges b chalayegi (jo humne CategoryService mein likha tha)
-        await _categoryService.CreateCategoryAsync(category);
-
-        TempData["SuccessMessage"] = "Category created successfully!";
+        // Service ko direct DTO bhej diya, mapping woh khud andar karegi
+        await _categoryService.CreateCategoryAsync(dto);
         return RedirectToAction(nameof(Index));
       }
-      catch (Exception ex)
-      {
-        TempData["ErrorMessage"] = "An error occurred: " + ex.Message;
-      }
-
-      return View(category);
+      return View(dto);
     }
 
     // GET: CategoriesController/Edit/5

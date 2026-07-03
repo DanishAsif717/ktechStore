@@ -1,14 +1,18 @@
-﻿using ktechStore.Core.Enums; // <-- Enum ka namespace
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using ktechStore.Core.Enums;
 
-namespace ktechStore.Core.Entities
+namespace ktechStore.Application.DTOs
 {
-    public class Category
+    public class CategoryDto
     {
         public int Id { get; set; }
+
         public string Name { get; set; } = string.Empty;
+
         public string Description { get; set; } = string.Empty;
 
-        // Purana bool IsActive hata kar yeh Enum laga dena:
         public CategoryStatus Status { get; set; }
 
         public DateTime CreatedAt { get; set; }

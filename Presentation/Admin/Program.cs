@@ -41,7 +41,7 @@ if (!app.Environment.IsDevelopment())
 
 app.Use((context, next) =>
 {
-  context.Request.PathBase = "/admin";   // 👈 Hamesha force karo, condition check nahi
+  context.Request.PathBase = "/admin";  
   return next();
 });
 app.UseHttpsRedirection();
