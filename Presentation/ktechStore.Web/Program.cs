@@ -1,9 +1,6 @@
-using ktechStore.Core.Interfaces;
-using ktechStore.Infrastructure.Persistence;
-using ktechStore.Infrastructure.Repositories;
-using Microsoft.EntityFrameworkCore;
-using ktechStore.Application.Interfaces;
-using ktechStore.Application.Services;
+
+using ktechStore.Infrastructure;
+using ktechStore.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.SetBasePath(AppContext.BaseDirectory);
@@ -11,18 +8,10 @@ builder.Configuration.SetBasePath(AppContext.BaseDirectory);
 builder.Configuration.AddJsonFile("sharedsettings.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
-Console.WriteLine($"====== MY CONNECTION STRING:TRdt {connectionString} ======");
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString, b => b.MigrationsAssembly("ktechStore.Infrastructure")));
+builder.Services.AddInfrastructureServices(builder.Configuration);
+builder.Services.AddApplicationServices();
 
-
-//Repositries
-
-builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
-builder.Services.AddScoped<ICategoryService, CategoryService>();
-builder.Services.AddScoped<IModuleService, ModuleRepository>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -35,7 +24,6 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -47,14 +35,9 @@ app.UseRouting();
 app.UseAuthorization();
 
 
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapReverseProxy();
-
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
-});
-
+app.MapReverseProxy();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
