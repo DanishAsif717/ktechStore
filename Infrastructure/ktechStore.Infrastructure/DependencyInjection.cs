@@ -19,7 +19,8 @@ namespace ktechStore.Infrastructure
 
             // Saari Repositories yahan aayengi
             services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<IModuleService, ModuleRepository>(); 
+            services.AddScoped<IModuleService, ModuleRepository>();
+            services.AddScoped<IProductRepository, ProductRepository>();
 
             return services;
         }

@@ -1,102 +1,116 @@
-@model IEnumerable<ktechStore.Core.Entities.Product>
+@model IEnumerable<ktechStore.Application.DTOs.ProductDto>
 
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+	ViewData["Title"] = "Products List";
+	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
 }
 
-<h1>Index</h1>
+<h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalog /</span> Products</h4>
 
-<p>
-	<a asp-action="Create" style="cursor: pointer;">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Price)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Stock)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SKU)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImageUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsActive)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Category)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedBy)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedAt)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.UpdatedBy)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Stock)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SKU)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ImageUrl)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsActive)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Category.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedBy)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CreatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedAt)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.UpdatedBy)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+<!-- Sneat Styled Table Card -->
+<div class="card">
+	<div class="card-header d-flex justify-content-between align-items-center">
+		<h5 class="mb-0">All Products</h5>
+		<a asp-action="Create" class="btn btn-primary">
+			<span class="tf-icons bx bx-plus me-1"></span>Create New Product
+		</a>
+	</div>
+    
+	<div class="table-responsive text-nowrap">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Category</th>
+					<th>Price</th>
+					<th>Stock</th>
+					<th>SKU</th>
+					<th>Status</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody class="table-border-bottom-0">
+				@foreach (var item in Model)
+				{
+					<tr>
+						<!-- Product Name & Image Thumbnail Combo -->
+						<td>
+							<div class="d-flex align-items-center">
+								@if (!string.IsNullOrEmpty(item.ImageUrl))
+								{
+									<img src="@item.ImageUrl" alt="@item.Name" class="rounded-circle me-3" style="width: 40px; height: 40px; object-fit: cover;" />
+								}
+								else
+								{
+									<div class="avatar-initial rounded-circle bg-label-secondary d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+										<i class="bx bx-package"></i>
+									</div>
+								}
+								<span class="fw-semibold">@item.Name</span>
+							</div>
+						</td>
+                        
+						<!-- Category Name -->
+						<td>
+							<span class="badge bg-label-primary">@item.CategoryName</span>
+						</td>
+                        
+						<!-- Price -->
+						<td class="text-success fw-semibold">
+							Rs. @item.Price.ToString("N2")
+						</td>
+                        
+						<!-- Stock -->
+						<td>
+							@if (item.Stock <= 5)
+							{
+								<span class="text-danger fw-bold">@item.Stock (Low Stock)</span>
+							}
+							else
+							{
+								<span>@item.Stock</span>
+							}
+						</td>
+                        
+						<!-- SKU -->
+						<td>
+							<code>@item.SKU</code>
+						</td>
+                        
+						<!-- Status Badge -->
+						<td>
+							@if (item.IsActive)
+							{
+								<span class="badge bg-label-success">Active</span>
+							}
+							else
+							{
+								<span class="badge bg-label-danger">Inactive</span>
+							}
+						</td>
+                        
+						<!-- Sneat Dropdown Actions -->
+						<td>
+							<div class="dropdown">
+								<button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
+									<i class="bx bx-dots-vertical-rounded"></i>
+								</button>
+								<div class="dropdown-menu">
+									<a class="dropdown-menu-item dropdown-item" asp-action="Edit" asp-route-id="@item.Id">
+										<i class="bx bx-edit-alt me-1"></i> Edit
+									</a>
+									<a class="dropdown-menu-item dropdown-item" asp-action="Details" asp-route-id="@item.Id">
+										<i class="bx bx-show-alt me-1"></i> Details
+									</a>
+									<a class="dropdown-menu-item dropdown-item text-danger" asp-action="Delete" asp-route-id="@item.Id">
+										<i class="bx bx-trash me-1"></i> Delete
+									</a>
+								</div>
+							</div>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>

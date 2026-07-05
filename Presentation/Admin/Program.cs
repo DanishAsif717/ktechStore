@@ -19,7 +19,12 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddRazorOptions(options =>
+    {
+      // Taaki areas ke views root ke shared folder se partial views utha sakein
+      options.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+    });
 
 
 var app = builder.Build();

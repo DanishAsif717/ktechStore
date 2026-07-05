@@ -1,90 +1,102 @@
-﻿@model ktechStore.Core.Entities.Product
+@model ktechStore.Application.DTOs.ProductUpsertDto
 
 @{
-    ViewData["Title"] = "Edit";
-    Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+	ViewData["Title"] = "Edit Product";
+	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
 }
 
-<h1>Edit</h1>
+<h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalog /</span> Edit Product</h4>
 
-<h4>Product</h4>
-<hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Price" class="control-label"></label>
-                <input asp-for="Price" class="form-control" />
-                <span asp-validation-for="Price" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Stock" class="control-label"></label>
-                <input asp-for="Stock" class="form-control" />
-                <span asp-validation-for="Stock" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="SKU" class="control-label"></label>
-                <input asp-for="SKU" class="form-control" />
-                <span asp-validation-for="SKU" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ImageUrl" class="control-label"></label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="IsActive" /> @Html.DisplayNameFor(model => model.IsActive)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
-                <span asp-validation-for="CategoryId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedBy" class="control-label"></label>
-                <input asp-for="CreatedBy" class="form-control" />
-                <span asp-validation-for="CreatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedAt" class="control-label"></label>
-                <input asp-for="CreatedAt" class="form-control" />
-                <span asp-validation-for="CreatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdatedAt" class="control-label"></label>
-                <input asp-for="UpdatedAt" class="form-control" />
-                <span asp-validation-for="UpdatedAt" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UpdatedBy" class="control-label"></label>
-                <input asp-for="UpdatedBy" class="form-control" />
-                <span asp-validation-for="UpdatedBy" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
-    </div>
-</div>
+	<div class="col-md-8">
+		<div class="card mb-4">
+			<h5 class="card-header">Modify Product Information</h5>
+			<div class="card-body">
+				<form asp-action="Edit">
+					<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+					<input type="hidden" asp-for="Id" />
 
-<div>
-    <a asp-action="Index">Back to List</a>
+					<div class="row">
+						<!-- Product Name -->
+						<div class="mb-3 col-md-6">
+							<label asp-for="Name" class="form-label fw-semibold"></label>
+							<input asp-for="Name" class="form-control" placeholder="Enter product name" />
+							<span asp-validation-for="Name" class="text-danger"></span>
+						</div>
+
+						<!-- SKU -->
+						<div class="mb-3 col-md-6">
+							<label asp-for="SKU" class="form-label fw-semibold"></label>
+							<input asp-for="SKU" class="form-control" placeholder="e.g., PROD-123" />
+							<span asp-validation-for="SKU" class="text-danger"></span>
+						</div>
+
+						<!-- Price -->
+						<div class="mb-3 col-md-6">
+							<label asp-for="Price" class="form-label fw-semibold"></label>
+							<div class="input-group input-group-merge">
+								<span class="input-group-text">Rs.</span>
+								<input asp-for="Price" class="form-control" type="number" step="0.01" />
+							</div>
+							<span asp-validation-for="Price" class="text-danger"></span>
+						</div>
+
+						<!-- Stock -->
+						<div class="mb-3 col-md-6">
+							<label asp-for="Stock" class="form-label fw-semibold"></label>
+							<input asp-for="Stock" class="form-control" type="number" />
+							<span asp-validation-for="Stock" class="text-danger"></span>
+						</div>
+
+						<!-- Category Selection Dropdown -->
+						<div class="mb-3 col-md-6">
+							<label asp-for="CategoryId" class="form-label fw-semibold">Category</label>
+							<select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+								<option value="">-- Select Category --</option>
+							</select>
+							<span asp-validation-for="CategoryId" class="text-danger"></span>
+						</div>
+
+						<!-- Image URL Field -->
+						<div class="mb-3 col-md-6">
+							<label asp-for="ImageUrl" class="form-label fw-semibold">Product Image URL</label>
+							<input asp-for="ImageUrl" class="form-control" placeholder="URL path or cloud reference" />
+							<span asp-validation-for="ImageUrl" class="text-danger"></span>
+						</div>
+
+						<!-- Description -->
+						<div class="mb-3 col-md-12">
+							<label asp-for="Description" class="form-label fw-semibold"></label>
+							<textarea asp-for="Description" class="form-control" rows="3" placeholder="Describe the item details..."></textarea>
+							<span asp-validation-for="Description" class="text-danger"></span>
+						</div>
+
+						<!-- Status Checkbox -->
+						<div class="mb-4 col-md-12">
+							<div class="form-check form-switch mt-2">
+								<input class="form-check-input" type="checkbox" asp-for="IsActive" />
+								<label class="form-check-label fw-semibold" asp-for="IsActive">Visible & Active in Store</label>
+							</div>
+						</div>
+					</div>
+
+					<!-- Action Buttons -->
+					<div class="mt-2">
+						<button type="submit" class="btn btn-primary me-2">
+							<i class="bx bx-save me-1"></i> Save Changes
+						</button>
+						<a asp-action="Index" class="btn btn-outline-secondary">
+							<i class="bx bx-arrow-back me-1"></i> Back to List
+						</a>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+	@{
+		await Html.RenderPartialAsync("_ValidationScriptsPartial");
+	}
 }

@@ -1,91 +1,76 @@
-﻿@model ktechStore.Core.Entities.Product
+@model ktechStore.Application.DTOs.ProductDto
 
 @{
-    ViewData["Title"] = "Details";
-    Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+	ViewData["Title"] = "Product Details";
+	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
 }
 
-<h1>Details</h1>
+<h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalog /</span> Product Details</h4>
 
-<div>
-    <h4>Product</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Price)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Price)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Stock)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Stock)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SKU)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SKU)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ImageUrl)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageUrl)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.IsActive)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.IsActive)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Category)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Category.Name)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedBy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedBy)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.CreatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.CreatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdatedAt)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdatedAt)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UpdatedBy)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UpdatedBy)
-        </dd>
-    </dl>
+<div class="card mb-4">
+	<h5 class="card-header">Product Overview</h5>
+	<div class="card-body">
+		<div class="row">
+			<!-- Product Image Preview (If exists) -->
+			<div class="col-md-3 text-center mb-3">
+				@if (!string.IsNullOrEmpty(Model.ImageUrl))
+				{
+					<img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded d-block m-auto shadow-sm" style="max-height: 200px; object-fit: cover;" />
+				}
+				else
+				{
+					<div class="bg-light rounded d-flex align-items-center justify-content-center m-auto shadow-sm" style="height: 200px; width: 100%; max-width: 200px;">
+						<span class="text-muted">No Image</span>
+					</div>
+				}
+			</div>
+
+			<!-- Product Details List -->
+			<div class="col-md-9">
+				<dl class="row mb-0">
+					<dt class="col-sm-3 fw-bold">Name</dt>
+					<dd class="col-sm-9">@Model.Name</dd>
+
+					<dt class="col-sm-3 fw-bold">Category</dt>
+					<dd class="col-sm-9"><span class="badge bg-label-primary">@Model.CategoryName</span></dd>
+
+					<dt class="col-sm-3 fw-bold">Base Price</dt>
+					<dd class="col-sm-9 text-success fw-semibold">Rs. @Model.Price.ToString("N2")</dd>
+
+					<dt class="col-sm-3 fw-bold">Total Stock</dt>
+					<dd class="col-sm-9">@Model.Stock</dd>
+
+					<dt class="col-sm-3 fw-bold">SKU</dt>
+					<dd class="col-sm-9"><code class="text-dark">@Model.SKU</code></dd>
+
+					<dt class="col-sm-3 fw-bold">Status</dt>
+					<dd class="col-sm-9">
+						@if (Model.IsActive)
+						{
+							<span class="badge bg-label-success">Active</span>
+						}
+						else
+						{
+							<span class="badge bg-label-danger">Inactive</span>
+						}
+					</dd>
+
+					<dt class="col-sm-3 fw-bold">Created At</dt>
+					<dd class="col-sm-9">@Model.CreatedAt.ToString("dd-MMM-yyyy hh:mm tt")</dd>
+
+					<dt class="col-sm-3 fw-bold">Description</dt>
+					<dd class="col-sm-9 text-muted">@(string.IsNullOrEmpty(Model.Description) ? "No description provided." : Model.Description)</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+
+<div class="mb-4">
+	<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary me-2">
+		<span class="tf-icons bx bx-edit-alt me-1"></span>Edit Product
+	</a>
+	<a asp-action="Index" class="btn btn-outline-secondary">
+		<span class="tf-icons bx bx-arrow-back me-1"></span>Back to List
+	</a>
 </div>

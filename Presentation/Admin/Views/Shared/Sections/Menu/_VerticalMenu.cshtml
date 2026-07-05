@@ -96,6 +96,34 @@
 		</ul>
 	</li>
 
+
+
+		<!-- Catalog Module (Categories & Products) -->
+		<li class="menu-header small text-uppercase">
+			<span class="menu-header-text">Store Management</span>
+		</li>
+		<li class="menu-item @(currentPage.Contains("/Catalog/") ? "active open" : "")">
+			<a href="javascript:void(0);" class="menu-link menu-toggle">
+				<i class="menu-icon icon-base bx bx-shopping-bag"></i>
+				<div class="text-truncate">Catalog</div>
+			</a>
+			<ul class="menu-sub">
+				<!-- Categories Link -->
+				<li class="menu-item @(currentPage.Contains("/Catalog/Categories") ? "active" : "")">
+					<a asp-area="Catalog" asp-controller="Categories" asp-action="Index" class="menu-link">
+						<div class="text-truncate">Categories</div>
+					</a>
+				</li>
+				<!-- Products Link -->
+				<li class="menu-item @(currentPage.Contains("/Catalog/Products") ? "active" : "")">
+					<a asp-area="Catalog" asp-controller="Products" asp-action="Index" class="menu-link">
+						<div class="text-truncate">Products</div>
+					</a>
+				</li>
+			</ul>
+		</li>
+
+
    
     <!-- Apps & Pages -->
     <li class="menu-header small text-uppercase">

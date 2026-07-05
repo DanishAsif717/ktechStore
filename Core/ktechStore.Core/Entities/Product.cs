@@ -55,5 +55,6 @@ namespace ktechStore.Core.Entities
         public DateTime? UpdatedAt { get; set; }
 
         public string? UpdatedBy { get; set; }
+        public virtual ICollection<ProductDetail> ProductDetails { get; set; } = new List<ProductDetail>();
     }
 }

@@ -1,165 +1,108 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using ktechStore.Core.Entities;
-using ktechStore.Infrastructure.Persistence;
+using ktechStore.Application.DTOs;
+using ktechStore.Application.Interfaces;
 
 namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
 {
-    [Area("Catalog")]
-    public class ProductsController : Controller
+  [Area("Catalog")]
+  public class ProductsController : Controller
+  {
+    private readonly IProductService _productService;
+    private readonly ICategoryService _categoryService; // Category dropdowns ke liye
+
+    public ProductsController(IProductService productService, ICategoryService categoryService)
     {
-        private readonly ApplicationDbContext _context;
-
-        public ProductsController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        // GET: Product/Products
-        public async Task<IActionResult> Index()
-        {
-            var applicationDbContext = _context.Products.Include(p => p.Category);
-            return View(await applicationDbContext.ToListAsync());
-        }
-
-        // GET: Product/Products/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        // GET: Product/Products/Create
-        public IActionResult Create()
-        {
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name");
-            return View();
-        }
-
-        // POST: Product/Products/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Description,Price,Stock,SKU,ImageUrl,IsActive,CategoryId,CreatedBy,CreatedAt,UpdatedAt,UpdatedBy")] Product product)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(product);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
-        }
-
-        // GET: Product/Products/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
-        }
-
-        // POST: Product/Products/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description,Price,Stock,SKU,ImageUrl,IsActive,CategoryId,CreatedBy,CreatedAt,UpdatedAt,UpdatedBy")] Product product)
-        {
-            if (id != product.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(product);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ProductExists(product.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "Id", "Name", product.CategoryId);
-            return View(product);
-        }
-
-        // GET: Product/Products/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var product = await _context.Products
-                .Include(p => p.Category)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        // POST: Product/Products/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
-            {
-                _context.Products.Remove(product);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ProductExists(int id)
-        {
-            return _context.Products.Any(e => e.Id == id);
-        }
+      _productService = productService;
+      _categoryService = categoryService;
     }
+
+    // GET: Catalog/Products
+    public async Task<IActionResult> Index()
+    {
+      var products = await _productService.GetAllProductsAsync();
+      return View(products);
+    }
+
+    // GET: Catalog/Products/Details/5
+    public async Task<IActionResult> Details(int id)
+    {
+      var product = await _productService.GetProductByIdAsync(id);
+      if (product == null) return NotFound();
+
+      return View(product);
+    }
+
+    // GET: Catalog/Products/Create
+    public async Task<IActionResult> Create()
+    {
+      var categories = await _categoryService.GetAllCategoriesAsync(); // Assuming this method exists in your CategoryService
+      ViewData["CategoryId"] = new SelectList(categories, "Id", "Name");
+      return View(new ProductUpsertDto());
+    }
+
+    // POST: Catalog/Products/Create
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(ProductUpsertDto dto)
+    {
+      if (ModelState.IsValid)
+      {
+        await _productService.CreateProductAsync(dto, User.Identity?.Name ?? "Admin");
+        return RedirectToAction(nameof(Index));
+      }
+
+      var categories = await _categoryService.GetAllCategoriesAsync();
+      ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", dto.CategoryId);
+      return View(dto);
+    }
+
+    // GET: Catalog/Products/Edit/5
+    public async Task<IActionResult> Edit(int id)
+    {
+      var dto = await _productService.GetProductForEditAsync(id);
+      if (dto == null) return NotFound();
+
+      var categories = await _categoryService.GetAllCategoriesAsync();
+      ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", dto.CategoryId);
+      return View(dto);
+    }
+
+    // POST: Catalog/Products/Edit/5
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, ProductUpsertDto dto)
+    {
+      if (id != dto.Id) return NotFound();
+
+      if (ModelState.IsValid)
+      {
+        await _productService.UpdateProductAsync(dto, User.Identity?.Name ?? "Admin");
+        return RedirectToAction(nameof(Index));
+      }
+
+      var categories = await _categoryService.GetAllCategoriesAsync();
+      ViewData["CategoryId"] = new SelectList(categories, "Id", "Name", dto.CategoryId);
+      return View(dto);
+    }
+
+    // GET: Catalog/Products/Delete/5
+    public async Task<IActionResult> Delete(int id)
+    {
+      var product = await _productService.GetProductByIdAsync(id);
+      if (product == null) return NotFound();
+
+      return View(product);
+    }
+
+    // POST: Catalog/Products/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+      await _productService.DeleteProductAsync(id);
+      return RedirectToAction(nameof(Index));
+    }
+  }
 }
