@@ -1,0 +1,14 @@
+
+**/wwwroot/lib/* linguist-vendored
+**/node_modules/* linguist-vendored
+**/frontend/.next/* linguist-vendored
+**/frontend/build/* linguist-vendored
+
+
+*.cshtml linguist-detectable=false
+*.html linguist-detectable=false
+*.css linguist-detectable=false
+*.js linguist-detectable=false
+
+# C# ko top priority par set karein
+*.cs linguist-detectable=true
