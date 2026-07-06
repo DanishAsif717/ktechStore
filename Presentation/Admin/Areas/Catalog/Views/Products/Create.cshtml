@@ -7,12 +7,13 @@
 
 <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalog /</span> Create Product</h4>
 
-<div class="row">
-	<div class="col-md-8">
-		<div class="card mb-4">
-			<h5 class="card-header">Add a New Product</h5>
-			<div class="card-body">
-				<form asp-action="Create">
+<form asp-action="Create">
+	<div class="row">
+		<!-- Left Side: Product Main Form -->
+		<div class="col-md-8">
+			<div class="card mb-4">
+				<h5 class="card-header">Add a New Product</h5>
+				<div class="card-body">
 					<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
 					<div class="row">
@@ -71,26 +72,145 @@
 						</div>
 
 						<!-- Status Checkbox -->
-						<div class="mb-4 col-md-12">
+						<div class="mb-3 col-md-12">
 							<div class="form-check form-switch mt-2">
 								<input class="form-check-input" type="checkbox" asp-for="IsActive" checked />
 								<label class="form-check-label fw-semibold" asp-for="IsActive">Visible & Active in Store</label>
 							</div>
 						</div>
-					</div>
 
-					<!-- Action Buttons -->
-					<div class="mt-2">
-						<button type="submit" class="btn btn-primary me-2">
-							<i class="bx bx-plus me-1"></i> Create Product
-						</button>
-						<a asp-action="Index" class="btn btn-outline-secondary">
-							<i class="bx bx-arrow-back me-1"></i> Back to List
-						</a>
+						<!-- Variant Toggle Switch -->
+						<div class="mb-2 col-md-12">
+							<div class="form-check form-switch mt-2 p-3 bg-label-light rounded border border-dashed">
+								<input class="form-check-input ms-0 me-2" type="checkbox" id="toggleVariants" />
+								<label class="form-check-label fw-bold text-primary" for="toggleVariants">This product has multiple variants (e.g., size, color, weight)</label>
+							</div>
+						</div>
 					</div>
-				</form>
+				</div>
+			</div>
+
+			<!-- Dynamic Product Variants Section -->
+			<div class="card mb-4 d-none" id="variantCardSection">
+				<div class="card-header d-flex justify-content-between align-items-center border-bottom mb-3">
+					<h5 class="mb-0">Product Variants Configuration</h5>
+					<button type="button" class="btn btn-sm btn-outline-primary" id="addVariantRowBtn">
+						<i class="bx bx-plus me-1"></i> Add Variant Row
+					</button>
+				</div>
+				<div class="card-body">
+					<div class="table-responsive text-nowrap">
+						<table class="table table-bordered table-sm" id="variantsTable">
+							<thead>
+								<tr>
+									<th style="width: 20%;">Variant Name <span class="text-danger">*</span></th>
+									<th style="width: 20%;">Variant Value <span class="text-danger">*</span></th>
+									<th style="width: 15%;">Price (Rs.)</th>
+									<th style="width: 15%;">Stock Qty</th>
+									<th style="width: 22%;">Variant Image URL</th>
+									<th style="width: 8%;" class="text-center">Action</th>
+								</tr>
+							</thead>
+							<tbody id="variantsContainer">
+								<!-- Dynamic rows inject here via JavaScript -->
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<!-- Form Submit Actions -->
+			<div class="mb-4">
+				<button type="submit" class="btn btn-primary me-2">
+					<i class="bx bx-plus me-1"></i> Create Product
+				</button>
+				<a asp-action="Index" class="btn btn-outline-secondary">
+					<i class="bx bx-arrow-back me-1"></i> Back to List
+				</a>
 			</div>
 		</div>
 	</div>
-</div>
+</form>
 
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const toggleVariants = document.getElementById("toggleVariants");
+		const variantSection = document.getElementById("variantCardSection");
+		const container = document.getElementById("variantsContainer");
+		const addBtn = document.getElementById("addVariantRowBtn");
+		
+		let variantIndex = 0;
+
+		// Toggle View Visibility
+		toggleVariants.addEventListener("change", function () {
+			if (this.checked) {
+				variantSection.classList.remove("d-none");
+				if (container.children.length === 0) {
+					addVariantRow(); // Pehli row auto add ho jaye
+				}
+			} else {
+				variantSection.classList.add("d-none");
+				container.innerHTML = ""; // Empty array bindings if unchecked
+				variantIndex = 0;
+			}
+		});
+
+		// Add Variant Row Logic
+		addBtn.addEventListener("click", function () {
+			addVariantRow();
+		});
+
+		function addVariantRow() {
+			const html = `
+				<tr class="variant-row" data-index="${variantIndex}">
+					<td>
+						<input name="Variants[${variantIndex}].Name" class="form-control form-control-sm" placeholder="e.g., Size, Color" required />
+					</td>
+					<td>
+						<input name="Variants[${variantIndex}].Value" class="form-control form-control-sm" placeholder="e.g., Large, Red" required />
+					</td>
+					<td>
+						<input name="Variants[${variantIndex}].Price" class="form-control form-control-sm" type="number" step="0.01" value="0.00" />
+					</td>
+					<td>
+						<input name="Variants[${variantIndex}].Stock" class="form-control form-control-sm" type="number" value="0" />
+					</td>
+					<td>
+						<input name="Variants[${variantIndex}].ImageUrl" class="form-control form-control-sm" placeholder="Cloud URL or reference" />
+					</td>
+					<td class="text-center">
+						<button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
+							<i class="bx bx-trash"></i>
+						</button>
+					</td>
+				</tr>
+			`;
+			container.insertAdjacentHTML('beforeend', html);
+			variantIndex++;
+		}
+
+		// Remove Row Event Handler
+		container.addEventListener("click", function (e) {
+			if (e.target.closest(".remove-row-btn")) {
+				const row = e.target.closest(".variant-row");
+				row.remove();
+				reIndexRows();
+			}
+		});
+
+		// Re-indexing sequence logic to maintain valid ASP.NET Model Binding continuity
+		function reIndexRows() {
+			const rows = container.querySelectorAll(".variant-row");
+			variantIndex = 0;
+			rows.forEach(function (row) {
+				row.setAttribute("data-index", variantIndex);
+				row.querySelector('input[name$=".Name"]').setAttribute("name", `Variants[${variantIndex}].Name`);
+				row.querySelector('input[name$=".Value"]').setAttribute("name", `Variants[${variantIndex}].Value`);
+				row.querySelector('input[name$=".Price"]').setAttribute("name", `Variants[${variantIndex}].Price`);
+				row.querySelector('input[name$=".Stock"]').setAttribute("name", `Variants[${variantIndex}].Stock`);
+				row.querySelector('input[name$=".ImageUrl"]').setAttribute("name", `Variants[${variantIndex}].ImageUrl`);
+				variantIndex++;
+			});
+		}
+	});
+</script>
