@@ -7,31 +7,28 @@
 
 <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalog /</span> Edit Product</h4>
 
-<div class="row">
-	<div class="col-md-8">
-		<div class="card mb-4">
-			<h5 class="card-header">Modify Product Information</h5>
-			<div class="card-body">
-				<form asp-action="Edit">
+<form asp-action="Edit">
+	<div class="row">
+		<div class="col-md-8">
+			<div class="card mb-4">
+				<h5 class="card-header">Modify Product Information</h5>
+				<div class="card-body">
 					<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 					<input type="hidden" asp-for="Id" />
 
 					<div class="row">
-						<!-- Product Name -->
 						<div class="mb-3 col-md-6">
 							<label asp-for="Name" class="form-label fw-semibold"></label>
 							<input asp-for="Name" class="form-control" placeholder="Enter product name" />
 							<span asp-validation-for="Name" class="text-danger"></span>
 						</div>
 
-						<!-- SKU -->
 						<div class="mb-3 col-md-6">
 							<label asp-for="SKU" class="form-label fw-semibold"></label>
 							<input asp-for="SKU" class="form-control" placeholder="e.g., PROD-123" />
 							<span asp-validation-for="SKU" class="text-danger"></span>
 						</div>
 
-						<!-- Price -->
 						<div class="mb-3 col-md-6">
 							<label asp-for="Price" class="form-label fw-semibold"></label>
 							<div class="input-group input-group-merge">
@@ -41,14 +38,12 @@
 							<span asp-validation-for="Price" class="text-danger"></span>
 						</div>
 
-						<!-- Stock -->
 						<div class="mb-3 col-md-6">
 							<label asp-for="Stock" class="form-label fw-semibold"></label>
 							<input asp-for="Stock" class="form-control" type="number" />
 							<span asp-validation-for="Stock" class="text-danger"></span>
 						</div>
 
-						<!-- Category Selection Dropdown -->
 						<div class="mb-3 col-md-6">
 							<label asp-for="CategoryId" class="form-label fw-semibold">Category</label>
 							<select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
@@ -57,46 +52,186 @@
 							<span asp-validation-for="CategoryId" class="text-danger"></span>
 						</div>
 
-						<!-- Image URL Field -->
 						<div class="mb-3 col-md-6">
 							<label asp-for="ImageUrl" class="form-label fw-semibold">Product Image URL</label>
 							<input asp-for="ImageUrl" class="form-control" placeholder="URL path or cloud reference" />
 							<span asp-validation-for="ImageUrl" class="text-danger"></span>
 						</div>
 
-						<!-- Description -->
 						<div class="mb-3 col-md-12">
 							<label asp-for="Description" class="form-label fw-semibold"></label>
 							<textarea asp-for="Description" class="form-control" rows="3" placeholder="Describe the item details..."></textarea>
 							<span asp-validation-for="Description" class="text-danger"></span>
 						</div>
 
-						<!-- Status Checkbox -->
-						<div class="mb-4 col-md-12">
+						<div class="mb-3 col-md-12">
 							<div class="form-check form-switch mt-2">
 								<input class="form-check-input" type="checkbox" asp-for="IsActive" />
 								<label class="form-check-label fw-semibold" asp-for="IsActive">Visible & Active in Store</label>
 							</div>
 						</div>
-					</div>
 
-					<!-- Action Buttons -->
-					<div class="mt-2">
-						<button type="submit" class="btn btn-primary me-2">
-							<i class="bx bx-save me-1"></i> Save Changes
-						</button>
-						<a asp-action="Index" class="btn btn-outline-secondary">
-							<i class="bx bx-arrow-back me-1"></i> Back to List
-						</a>
+						<div class="mb-2 col-md-12">
+							<div class="form-check form-switch mt-2 p-3 bg-label-light rounded border border-dashed">
+								<input class="form-check-input ms-0 me-2" type="checkbox" id="toggleVariants" @(Model.ProductDetails != null && Model.ProductDetails.Any() ? "checked" : "") />
+								<label class="form-check-label fw-bold text-primary" for="toggleVariants">This product has multiple variants (e.g., size, color, weight)</label>
+							</div>
+						</div>
 					</div>
-				</form>
+				</div>
+			</div>
+
+			<div class="card mb-4 @(Model.ProductDetails != null && Model.ProductDetails.Any() ? "" : "d-none")" id="variantCardSection">
+				<div class="card-header d-flex justify-content-between align-items-center border-bottom mb-3">
+					<h5 class="mb-0">Product Variants Configuration</h5>
+					<button type="button" class="btn btn-sm btn-outline-primary" id="addVariantRowBtn">
+						<i class="bx bx-plus me-1"></i> Add Variant Row
+					</button>
+				</div>
+				<div class="card-body">
+					<div class="table-responsive text-nowrap">
+						<table class="table table-bordered table-sm" id="variantsTable">
+							<thead>
+								<tr>
+									<th style="width: 20%;">Size</th>
+									<th style="width: 20%;">Color</th>
+									<th style="width: 15%;">Price (Rs.)</th>
+									<th style="width: 15%;">Stock Qty</th>
+									<th style="width: 22%;">Variant Image URL</th>
+									<th style="width: 8%;" class="text-center">Action</th>
+								</tr>
+							</thead>
+							<tbody id="variantsContainer">
+								@if (Model.ProductDetails != null && Model.ProductDetails.Any())
+								{
+									for (int i = 0; i < Model.ProductDetails.Count; i++)
+									{
+										<tr class="variant-row" data-index="@i">
+											<td>
+												<input type="hidden" name="ProductDetails[@i].Id" value="@Model.ProductDetails[i].Id" />
+												<input name="ProductDetails[@i].Size" class="form-control form-control-sm" value="@Model.ProductDetails[i].Size" placeholder="e.g., Large, XL" />
+											</td>
+											<td>
+												<input name="ProductDetails[@i].Color" class="form-control form-control-sm" value="@Model.ProductDetails[i].Color" placeholder="e.g., Red, Blue" />
+											</td>
+											<td>
+												<input name="ProductDetails[@i].Price" class="form-control form-control-sm" type="number" step="0.01" value="@Model.ProductDetails[i].Price" />
+											</td>
+											<td>
+												<input name="ProductDetails[@i].Stock" class="form-control form-control-sm" type="number" value="@Model.ProductDetails[i].Stock" />
+											</td>
+											<td>
+												<input name="ProductDetails[@i].ImageUrl" class="form-control form-control-sm" value="@Model.ProductDetails[i].ImageUrl" placeholder="Cloud URL" />
+											</td>
+											<td class="text-center">
+												<button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
+													<i class="bx bx-trash"></i>
+												</button>
+											</td>
+										</tr>
+									}
+								}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<div class="mb-4">
+				<button type="submit" class="btn btn-primary me-2">
+					<i class="bx bx-save me-1"></i> Save Changes
+				</button>
+				<a asp-action="Index" class="btn btn-outline-secondary">
+					<i class="bx bx-arrow-back me-1"></i> Back to List
+				</a>
 			</div>
 		</div>
 	</div>
-</div>
+</form>
 
-@section Scripts {
-	@{
-		await Html.RenderPartialAsync("_ValidationScriptsPartial");
-	}
-}
+
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			const toggleVariants = document.getElementById("toggleVariants");
+			const variantSection = document.getElementById("variantCardSection");
+			const container = document.getElementById("variantsContainer");
+			const addBtn = document.getElementById("addVariantRowBtn");
+			
+			// Initial index setup based on existing server-rendered rows
+			let variantIndex = container.querySelectorAll(".variant-row").length;
+
+			// Toggle View Visibility
+			toggleVariants.addEventListener("change", function () {
+				if (this.checked) {
+					variantSection.classList.remove("d-none");
+					if (container.children.length === 0) {
+						addVariantRow();
+					}
+				} else {
+					variantSection.classList.add("d-none");
+					container.innerHTML = "";
+					variantIndex = 0;
+				}
+			});
+
+			// Add Variant Row Logic
+			addBtn.addEventListener("click", function () {
+				addVariantRow();
+			});
+
+			function addVariantRow() {
+				const html = `
+					<tr class="variant-row" data-index="${variantIndex}">
+						<td>
+							<input type="hidden" name="ProductDetails[${variantIndex}].Id" value="0" />
+							<input name="ProductDetails[${variantIndex}].Size" class="form-control form-control-sm" placeholder="e.g., Large, XL" />
+						</td>
+						<td>
+							<input name="ProductDetails[${variantIndex}].Color" class="form-control form-control-sm" placeholder="e.g., Red, Blue" />
+						</td>
+						<td>
+							<input name="ProductDetails[${variantIndex}].Price" class="form-control form-control-sm" type="number" step="0.01" value="0.00" />
+						</td>
+						<td>
+							<input name="ProductDetails[${variantIndex}].Stock" class="form-control form-control-sm" type="number" value="0" />
+						</td>
+						<td>
+							<input name="ProductDetails[${variantIndex}].ImageUrl" class="form-control form-control-sm" placeholder="Cloud URL or reference" />
+						</td>
+						<td class="text-center">
+							<button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
+								<i class="bx bx-trash"></i>
+							</button>
+						</td>
+					</tr>
+				`;
+				container.insertAdjacentHTML('beforeend', html);
+				variantIndex++;
+			}
+
+			// Remove Row Event Handler
+			container.addEventListener("click", function (e) {
+				if (e.target.closest(".remove-row-btn")) {
+					const row = e.target.closest(".variant-row");
+					row.remove();
+					reIndexRows();
+				}
+			});
+
+			// Re-indexing sequence logic to maintain valid ASP.NET Model Binding continuity
+			function reIndexRows() {
+				const rows = container.querySelectorAll(".variant-row");
+				variantIndex = 0;
+				rows.forEach(function (row) {
+					row.setAttribute("data-index", variantIndex);
+					row.querySelector('input[name$=".Id"]').setAttribute("name", `ProductDetails[${variantIndex}].Id`);
+					row.querySelector('input[name$=".Size"]').setAttribute("name", `ProductDetails[${variantIndex}].Size`);
+					row.querySelector('input[name$=".Color"]').setAttribute("name", `ProductDetails[${variantIndex}].Color`);
+					row.querySelector('input[name$=".Price"]').setAttribute("name", `ProductDetails[${variantIndex}].Price`);
+					row.querySelector('input[name$=".Stock"]').setAttribute("name", `ProductDetails[${variantIndex}].Stock`);
+					row.querySelector('input[name$=".ImageUrl"]').setAttribute("name", `ProductDetails[${variantIndex}].ImageUrl`);
+					variantIndex++;
+				});
+			}
+		});
+	</script>

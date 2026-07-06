@@ -160,34 +160,34 @@
 			addVariantRow();
 		});
 
-		function addVariantRow() {
-			const html = `
-				<tr class="variant-row" data-index="${variantIndex}">
-					<td>
-						<input name="Variants[${variantIndex}].Name" class="form-control form-control-sm" placeholder="e.g., Size, Color" required />
-					</td>
-					<td>
-						<input name="Variants[${variantIndex}].Value" class="form-control form-control-sm" placeholder="e.g., Large, Red" required />
-					</td>
-					<td>
-						<input name="Variants[${variantIndex}].Price" class="form-control form-control-sm" type="number" step="0.01" value="0.00" />
-					</td>
-					<td>
-						<input name="Variants[${variantIndex}].Stock" class="form-control form-control-sm" type="number" value="0" />
-					</td>
-					<td>
-						<input name="Variants[${variantIndex}].ImageUrl" class="form-control form-control-sm" placeholder="Cloud URL or reference" />
-					</td>
-					<td class="text-center">
-						<button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
-							<i class="bx bx-trash"></i>
-						</button>
-					</td>
-				</tr>
-			`;
-			container.insertAdjacentHTML('beforeend', html);
-			variantIndex++;
-		}
+			function addVariantRow() {
+			  const html = `
+				  <tr class="variant-row" data-index="${variantIndex}">
+					  <td>
+						  <input name="ProductDetails[${variantIndex}].Size" class="form-control form-control-sm" placeholder="e.g., Large, XL" required />
+					  </td>
+					  <td>
+						  <input name="ProductDetails[${variantIndex}].Color" class="form-control form-control-sm" placeholder="e.g., Red, Blue" required />
+					  </td>
+					  <td>
+						  <input name="ProductDetails[${variantIndex}].Price" class="form-control form-control-sm" type="number" step="0.01" value="0.00" />
+					  </td>
+					  <td>
+						  <input name="ProductDetails[${variantIndex}].Stock" class="form-control form-control-sm" type="number" value="0" />
+					  </td>
+					  <td>
+						  <input name="ProductDetails[${variantIndex}].ImageUrl" class="form-control form-control-sm" placeholder="Cloud URL or reference" />
+					  </td>
+					  <td class="text-center">
+						  <button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
+							  <i class="bx bx-trash"></i>
+						  </button>
+					  </td>
+				  </tr>
+			  `;
+			  container.insertAdjacentHTML('beforeend', html);
+			  variantIndex++;
+		  }
 
 		// Remove Row Event Handler
 		container.addEventListener("click", function (e) {
@@ -199,18 +199,18 @@
 		});
 
 		// Re-indexing sequence logic to maintain valid ASP.NET Model Binding continuity
-		function reIndexRows() {
-			const rows = container.querySelectorAll(".variant-row");
-			variantIndex = 0;
-			rows.forEach(function (row) {
-				row.setAttribute("data-index", variantIndex);
-				row.querySelector('input[name$=".Name"]').setAttribute("name", `Variants[${variantIndex}].Name`);
-				row.querySelector('input[name$=".Value"]').setAttribute("name", `Variants[${variantIndex}].Value`);
-				row.querySelector('input[name$=".Price"]').setAttribute("name", `Variants[${variantIndex}].Price`);
-				row.querySelector('input[name$=".Stock"]').setAttribute("name", `Variants[${variantIndex}].Stock`);
-				row.querySelector('input[name$=".ImageUrl"]').setAttribute("name", `Variants[${variantIndex}].ImageUrl`);
-				variantIndex++;
-			});
-		}
+			function reIndexRows() {
+				const rows = container.querySelectorAll(".variant-row");
+				variantIndex = 0;
+				rows.forEach(function (row) {
+					row.setAttribute("data-index", variantIndex);
+					row.querySelector('input[name$=".Size"]').setAttribute("name", `ProductDetails[${variantIndex}].Size`);
+					row.querySelector('input[name$=".Color"]').setAttribute("name", `ProductDetails[${variantIndex}].Color`);
+					row.querySelector('input[name$=".Price"]').setAttribute("name", `ProductDetails[${variantIndex}].Price`);
+					row.querySelector('input[name$=".Stock"]').setAttribute("name", `ProductDetails[${variantIndex}].Stock`);
+					row.querySelector('input[name$=".ImageUrl"]').setAttribute("name", `ProductDetails[${variantIndex}].ImageUrl`);
+					variantIndex++;
+				});
+			}
 	});
 </script>

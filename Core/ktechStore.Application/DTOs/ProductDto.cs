@@ -17,5 +17,6 @@ namespace ktechStore.Application.DTOs
         public int CategoryId { get; set; }
         public string? CategoryName { get; set; } // View me Category Name dikhane ke liye
         public DateTime CreatedAt { get; set; }
+        public List<ProductDetailDto> ProductDetails { get; set; } = new List<ProductDetailDto>();
     }
 }

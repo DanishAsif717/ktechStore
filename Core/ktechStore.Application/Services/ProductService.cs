@@ -54,7 +54,17 @@ namespace ktechStore.Application.Services
                 IsActive = p.IsActive,
                 CategoryId = p.CategoryId,
                 CategoryName = p.Category?.Name ?? "No Category",
-                CreatedAt = p.CreatedAt
+                CreatedAt = p.CreatedAt,
+
+                ProductDetails = p.ProductDetails.Select(pd => new ProductDetailDto
+                {
+                    Id = pd.Id,
+                    Size = pd.Size,
+                    Color = pd.Color,
+                    Price = pd.Price,
+                    Stock = pd.Stock,
+                    ImageUrl = pd.ImageUrl
+                }).ToList()
             };
         }
 
