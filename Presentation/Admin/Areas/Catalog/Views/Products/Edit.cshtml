@@ -19,13 +19,18 @@
 					<div class="row">
 						<div class="mb-3 col-md-6">
 							<label asp-for="Name" class="form-label fw-semibold"></label>
-							<input asp-for="Name" class="form-control" placeholder="Enter product name" />
+							<input asp-for="Name" id="productNameInput" class="form-control" placeholder="Enter product name" />
 							<span asp-validation-for="Name" class="text-danger"></span>
 						</div>
 
 						<div class="mb-3 col-md-6">
-							<label asp-for="SKU" class="form-label fw-semibold"></label>
-							<input asp-for="SKU" class="form-control" placeholder="e.g., PROD-123" />
+							<div class="d-flex justify-content-between align-items-center mb-1">
+								<label asp-for="SKU" class="form-label fw-semibold mb-0"></label>
+								<button type="button" id="btnAiGenerateSku" class="btn btn-xs btn-outline-primary py-0">
+									<i class="bx bx-bolt-circle"></i> ✨ Generate SKU
+								</button>
+							</div>
+							<input asp-for="SKU" id="productSkuInput" class="form-control" placeholder="e.g., PROD-123" />
 							<span asp-validation-for="SKU" class="text-danger"></span>
 						</div>
 
@@ -46,7 +51,7 @@
 
 						<div class="mb-3 col-md-6">
 							<label asp-for="CategoryId" class="form-label fw-semibold">Category</label>
-							<select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+							<select asp-for="CategoryId" id="categorySelectInput" class="form-select" asp-items="ViewBag.CategoryId">
 								<option value="">-- Select Category --</option>
 							</select>
 							<span asp-validation-for="CategoryId" class="text-danger"></span>
@@ -59,8 +64,13 @@
 						</div>
 
 						<div class="mb-3 col-md-12">
-							<label asp-for="Description" class="form-label fw-semibold"></label>
-							<textarea asp-for="Description" class="form-control" rows="3" placeholder="Describe the item details..."></textarea>
+							<div class="d-flex justify-content-between align-items-center mb-1">
+								<label asp-for="Description" class="form-label fw-semibold mb-0"></label>
+								<button type="button" id="btnAiGenerate" class="btn btn-sm btn-outline-secondary">
+									<i class="bx bx-wand me-1"></i> ✨ AI Generate
+								</button>
+							</div>
+							<textarea asp-for="Description" id="productDescription" class="form-control" rows="3" placeholder="Describe the item details..."></textarea>
 							<span asp-validation-for="Description" class="text-danger"></span>
 						</div>
 
@@ -149,89 +159,179 @@
 	</div>
 </form>
 
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const toggleVariants = document.getElementById("toggleVariants");
+		const variantSection = document.getElementById("variantCardSection");
+		const container = document.getElementById("variantsContainer");
+		const addBtn = document.getElementById("addVariantRowBtn");
+		const btnAiGenerate = document.getElementById("btnAiGenerate");
+		const btnAiGenerateSku = document.getElementById("btnAiGenerateSku");
+		
+		// Initial index setup based on existing server-rendered rows
+		let variantIndex = container.querySelectorAll(".variant-row").length;
 
-	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			const toggleVariants = document.getElementById("toggleVariants");
-			const variantSection = document.getElementById("variantCardSection");
-			const container = document.getElementById("variantsContainer");
-			const addBtn = document.getElementById("addVariantRowBtn");
+		// Helper function to extract fields securely
+		function getProductContext() {
+			const productNameInput = document.getElementById("productNameInput");
+			const categorySelect = document.getElementById("categorySelectInput");
 			
-			// Initial index setup based on existing server-rendered rows
-			let variantIndex = container.querySelectorAll(".variant-row").length;
+			if (!productNameInput || !categorySelect) return null;
 
-			// Toggle View Visibility
-			toggleVariants.addEventListener("change", function () {
-				if (this.checked) {
-					variantSection.classList.remove("d-none");
-					if (container.children.length === 0) {
-						addVariantRow();
-					}
-				} else {
-					variantSection.classList.add("d-none");
-					container.innerHTML = "";
-					variantIndex = 0;
-				}
-			});
+			const productName = productNameInput.value.trim();
+			let categoryName = "";
+			if (categorySelect.selectedIndex > 0) {
+				categoryName = categorySelect.options[categorySelect.selectedIndex].text;
+			}
+			return { productName, categoryName };
+		}
 
-			// Add Variant Row Logic
-			addBtn.addEventListener("click", function () {
-				addVariantRow();
-			});
-
-			function addVariantRow() {
-				const html = `
-					<tr class="variant-row" data-index="${variantIndex}">
-						<td>
-							<input type="hidden" name="ProductDetails[${variantIndex}].Id" value="0" />
-							<input name="ProductDetails[${variantIndex}].Size" class="form-control form-control-sm" placeholder="e.g., Large, XL" />
-						</td>
-						<td>
-							<input name="ProductDetails[${variantIndex}].Color" class="form-control form-control-sm" placeholder="e.g., Red, Blue" />
-						</td>
-						<td>
-							<input name="ProductDetails[${variantIndex}].Price" class="form-control form-control-sm" type="number" step="0.01" value="0.00" />
-						</td>
-						<td>
-							<input name="ProductDetails[${variantIndex}].Stock" class="form-control form-control-sm" type="number" value="0" />
-						</td>
-						<td>
-							<input name="ProductDetails[${variantIndex}].ImageUrl" class="form-control form-control-sm" placeholder="Cloud URL or reference" />
-						</td>
-						<td class="text-center">
-							<button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
-								<i class="bx bx-trash"></i>
-							</button>
-						</td>
-					</tr>
-				`;
-				container.insertAdjacentHTML('beforeend', html);
-				variantIndex++;
+		// --- SKU AI Generation ---
+		btnAiGenerateSku.addEventListener("click", async function () {
+			const context = getProductContext();
+			if (!context || !context.productName) {
+				alert("Pehle Product Name likhein taake AI SKU code bana sakay!");
+				return;
 			}
 
-			// Remove Row Event Handler
-			container.addEventListener("click", function (e) {
-				if (e.target.closest(".remove-row-btn")) {
-					const row = e.target.closest(".variant-row");
-					row.remove();
-					reIndexRows();
-				}
-			});
+			const originalBtnHtml = btnAiGenerateSku.innerHTML;
+			btnAiGenerateSku.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span>`;
+			btnAiGenerateSku.disabled = true;
 
-			// Re-indexing sequence logic to maintain valid ASP.NET Model Binding continuity
-			function reIndexRows() {
-				const rows = container.querySelectorAll(".variant-row");
-				variantIndex = 0;
-				rows.forEach(function (row) {
-					row.setAttribute("data-index", variantIndex);
-					row.querySelector('input[name$=".Id"]').setAttribute("name", `ProductDetails[${variantIndex}].Id`);
-					row.querySelector('input[name$=".Size"]').setAttribute("name", `ProductDetails[${variantIndex}].Size`);
-					row.querySelector('input[name$=".Color"]').setAttribute("name", `ProductDetails[${variantIndex}].Color`);
-					row.querySelector('input[name$=".Price"]').setAttribute("name", `ProductDetails[${variantIndex}].Price`);
-					row.querySelector('input[name$=".Stock"]').setAttribute("name", `ProductDetails[${variantIndex}].Stock`);
-					row.querySelector('input[name$=".ImageUrl"]').setAttribute("name", `ProductDetails[${variantIndex}].ImageUrl`);
-					variantIndex++;
+			try {
+				const skuUrl = '@Url.Action("GenerateSku", "Products", new { area = "Catalog" })';
+				const response = await fetch(skuUrl, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ productName: context.productName, categoryName: context.categoryName })
 				});
+
+				if (!response.ok) throw new Error("Server error");
+
+				const data = await response.json();
+				if (data.success) {
+					document.getElementById("productSkuInput").value = data.sku;
+				} else {
+					alert(data.message || "Failed to generate SKU.");
+				}
+			} catch (error) {
+				console.error("SKU Error:", error);
+				alert("SKU endpoint block ya unreachable hy.");
+			} finally {
+				btnAiGenerateSku.innerHTML = originalBtnHtml;
+				btnAiGenerateSku.disabled = false;
 			}
 		});
-	</script>
+
+		// --- Description AI Generation ---
+		btnAiGenerate.addEventListener("click", async function () {
+			const context = getProductContext();
+			if (!context || !context.productName) {
+				alert("Pehle Product Name likhein taake AI description bana sakay!");
+				return;
+			}
+
+			const originalBtnHtml = btnAiGenerate.innerHTML;
+			btnAiGenerate.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Generating...`;
+			btnAiGenerate.disabled = true;
+
+			try {
+				const generateUrl = '@Url.Action("GenerateDescription", "Products", new { area = "Catalog" })';
+				const response = await fetch(generateUrl, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ productName: context.productName, categoryName: context.categoryName })
+				});
+
+				if (!response.ok) throw new Error("Server error");
+
+				const data = await response.json();
+				if (data.success) {
+					document.getElementById("productDescription").value = data.description;
+				} else {
+					alert(data.message || "Failed to generate description.");
+				}
+			} catch (error) {
+				console.error("AI Error:", error);
+				alert("Mistral API backend integration issue.");
+			} finally {
+				btnAiGenerate.innerHTML = originalBtnHtml;
+				btnAiGenerate.disabled = false;
+			}
+		});
+
+		// Toggle View Visibility
+		toggleVariants.addEventListener("change", function () {
+			if (this.checked) {
+				variantSection.classList.remove("d-none");
+				if (container.children.length === 0) {
+					addVariantRow();
+				}
+			} else {
+				variantSection.classList.add("d-none");
+				container.innerHTML = "";
+				variantIndex = 0;
+			}
+		});
+
+		// Add Variant Row Logic
+		addBtn.addEventListener("click", function () {
+			addVariantRow();
+		});
+
+		function addVariantRow() {
+			const html = `
+				<tr class="variant-row" data-index="${variantIndex}">
+					<td>
+						<input type="hidden" name="ProductDetails[${variantIndex}].Id" value="0" />
+						<input name="ProductDetails[${variantIndex}].Size" class="form-control form-control-sm" placeholder="e.g., Large, XL" />
+					</td>
+					<td>
+						<input name="ProductDetails[${variantIndex}].Color" class="form-control form-control-sm" placeholder="e.g., Red, Blue" />
+					</td>
+					<td>
+						<input name="ProductDetails[${variantIndex}].Price" class="form-control form-control-sm" type="number" step="0.01" value="0.00" />
+					</td>
+					<td>
+						<input name="ProductDetails[${variantIndex}].Stock" class="form-control form-control-sm" type="number" value="0" />
+					</td>
+					<td>
+						<input name="ProductDetails[${variantIndex}].ImageUrl" class="form-control form-control-sm" placeholder="Cloud URL or reference" />
+					</td>
+					<td class="text-center">
+						<button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
+							<i class="bx bx-trash"></i>
+						</button>
+					</td>
+				</tr>
+			`;
+			container.insertAdjacentHTML('beforeend', html);
+			variantIndex++;
+		}
+
+		// Remove Row Event Handler
+		container.addEventListener("click", function (e) {
+			if (e.target.closest(".remove-row-btn")) {
+				const row = e.target.closest(".variant-row");
+				row.remove();
+				reIndexRows();
+			}
+		});
+
+		// Re-indexing sequence logic to maintain valid ASP.NET Model Binding continuity
+		function reIndexRows() {
+			const rows = container.querySelectorAll(".variant-row");
+			variantIndex = 0;
+			rows.forEach(function (row) {
+				row.setAttribute("data-index", variantIndex);
+				row.querySelector('input[name$=".Id"]').setAttribute("name", `ProductDetails[${variantIndex}].Id`);
+				row.querySelector('input[name$=".Size"]').setAttribute("name", `ProductDetails[${variantIndex}].Size`);
+				row.querySelector('input[name$=".Color"]').setAttribute("name", `ProductDetails[${variantIndex}].Color`);
+				row.querySelector('input[name$=".Price"]').setAttribute("name", `ProductDetails[${variantIndex}].Price`);
+				row.querySelector('input[name$=".Stock"]').setAttribute("name", `ProductDetails[${variantIndex}].Stock`);
+				row.querySelector('input[name$=".ImageUrl"]').setAttribute("name", `ProductDetails[${variantIndex}].ImageUrl`);
+				variantIndex++;
+			});
+		}
+	});
+</script>

@@ -10,14 +10,58 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
   public class ProductsController : Controller
   {
     private readonly IProductService _productService;
-    private readonly ICategoryService _categoryService; // Category dropdowns ke liye
+    private readonly ICategoryService _categoryService;
+    private readonly IMistralService _mistralService;
 
-    public ProductsController(IProductService productService, ICategoryService categoryService)
+    public ProductsController(
+      IProductService productService,
+      ICategoryService categoryService,
+      IMistralService mistralService
+    )
     {
       _productService = productService;
       _categoryService = categoryService;
+      _mistralService = mistralService;
     }
 
+
+    //  Product Descrption Generation Endpoint
+
+    [HttpPost]
+    public async Task<IActionResult> GenerateDescription([FromBody] DescriptionRequestDto request)
+    {
+      if (string.IsNullOrEmpty(request.ProductName))
+        return BadRequest("Product name is required.");
+
+      // Prompts define karein
+      string systemPrompt = "You are an e-commerce copywriter. Write a compelling product description under 250 characters max. Do not use markdown, formatting, or quotation marks.";
+      string userPrompt = $"Product Name: {request.ProductName}, Category: {request.CategoryName}. Generate a description focused on user benefits.";
+
+      // Service call karein
+      string aiDescription = await _mistralService.GenerateDescriptionAsync(systemPrompt, userPrompt);
+
+      return Json(new { success = true, description = aiDescription });
+    }
+
+    //  SKU Generation Endpoint
+    [HttpPost]
+    public async Task<IActionResult> GenerateSku([FromBody] DescriptionRequestDto dto)
+    {
+      if (dto == null || string.IsNullOrEmpty(dto.ProductName))
+      {
+        return Json(new { success = false, message = "Product name is required to build SKU." });
+      }
+
+      try
+      {
+        var sku = await _mistralService.GenerateSkuAsync(dto.ProductName, dto.CategoryName);
+        return Json(new { success = true, sku });
+      }
+      catch (Exception ex)
+      {
+        return Json(new { success = false, message = ex.Message });
+      }
+    }
     // GET: Catalog/Products
     public async Task<IActionResult> Index()
     {
