@@ -1,4 +1,5 @@
 @model ktechStore.Application.DTOs.ProductUpsertDto
+@using Microsoft.AspNetCore.Http
 
 @{
 	ViewData["Title"] = "Edit Product";
@@ -7,7 +8,7 @@
 
 <h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Catalog /</span> Edit Product</h4>
 
-<form asp-action="Edit">
+<form asp-action="Edit" enctype="multipart/form-data">
 	<div class="row">
 		<div class="col-md-8">
 			<div class="card mb-4">
@@ -58,9 +59,11 @@
 						</div>
 
 						<div class="mb-3 col-md-6">
-							<label asp-for="ImageUrl" class="form-label fw-semibold">Product Image URL</label>
-							<input asp-for="ImageUrl" class="form-control" placeholder="URL path or cloud reference" />
-							<span asp-validation-for="ImageUrl" class="text-danger"></span>
+							<label asp-for="ProductImageFile" class="form-label fw-semibold">Update Product Image</label>
+							<input asp-for="ProductImageFile" type="file" id="imageFileInput" class="form-control" accept="image/*" />
+							<span asp-validation-for="ProductImageFile" class="text-danger"></span>
+							
+							<input type="hidden" asp-for="ImageUrl" id="productImageUrlHidden" />
 						</div>
 
 						<div class="mb-3 col-md-12">
@@ -103,11 +106,12 @@
 						<table class="table table-bordered table-sm" id="variantsTable">
 							<thead>
 								<tr>
-									<th style="width: 20%;">Size</th>
-									<th style="width: 20%;">Color</th>
+									<th style="width: 15%;">Size</th>
+									<th style="width: 15%;">Color</th>
 									<th style="width: 15%;">Price (Rs.)</th>
-									<th style="width: 15%;">Stock Qty</th>
-									<th style="width: 22%;">Variant Image URL</th>
+									<th style="width: 12%;">Stock Qty</th>
+									<th style="width: 25%;">Upload Variant Image</th>
+									<th style="width: 10%;" class="text-center">Preview</th>
 									<th style="width: 8%;" class="text-center">Action</th>
 								</tr>
 							</thead>
@@ -116,6 +120,7 @@
 								{
 									for (int i = 0; i < Model.ProductDetails.Count; i++)
 									{
+										var hasImg = !string.IsNullOrEmpty(Model.ProductDetails[i].ImageUrl);
 										<tr class="variant-row" data-index="@i">
 											<td>
 												<input type="hidden" name="ProductDetails[@i].Id" value="@Model.ProductDetails[i].Id" />
@@ -131,9 +136,16 @@
 												<input name="ProductDetails[@i].Stock" class="form-control form-control-sm" type="number" value="@Model.ProductDetails[i].Stock" />
 											</td>
 											<td>
-												<input name="ProductDetails[@i].ImageUrl" class="form-control form-control-sm" value="@Model.ProductDetails[i].ImageUrl" placeholder="Cloud URL" />
+												<input type="file" name="ProductDetails[@i].VariantImageFile" class="form-control form-control-sm variant-image-input" accept="image/*" />
+												<input type="hidden" name="ProductDetails[@i].ImageUrl" class="variant-hidden-url" value="@Model.ProductDetails[i].ImageUrl" />
 											</td>
-											<td class="text-center">
+											<td class="text-center align-middle">
+												<div class="d-flex align-items-center justify-content-center border rounded bg-light mx-auto" style="width: 40px; height: 40px; overflow: hidden;">
+													<img src="@(hasImg ? Model.ProductDetails[i].ImageUrl : "#")" alt="Thumb" class="img-fluid @(hasImg ? "" : "d-none") variant-thumb-preview" style="max-height: 100%; object-fit: cover;" />
+													<i class="bx bx-image text-muted variant-thumb-icon @(hasImg ? "d-none" : "")"></i>
+												</div>
+											</td>
+											<td class="text-center align-middle">
 												<button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
 													<i class="bx bx-trash"></i>
 												</button>
@@ -156,6 +168,24 @@
 				</a>
 			</div>
 		</div>
+
+		<div class="col-md-4">
+			<div class="card mb-4">
+				<h5 class="card-header">Main Image Preview</h5>
+				<div class="card-body text-center">
+					@{
+						var hasMainImg = !string.IsNullOrEmpty(Model.ImageUrl);
+					}
+					<div class="border rounded p-2 d-flex align-items-center justify-content-center bg-light" style="min-height: 250px; position: relative;">
+						<img id="imgPreview" src="@(hasMainImg ? Model.ImageUrl : "#")" alt="Product Preview" class="img-fluid rounded @(hasMainImg ? "" : "d-none")" style="max-height: 240px; object-fit: contain;" />
+						<div id="previewPlaceholder" class="text-muted @(hasMainImg ? "d-none" : "")">
+							<i class="bx bx-image-add display-4 d-block mb-2"></i>
+							<span>No Image Uploaded</span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 </form>
 
@@ -167,9 +197,124 @@
 		const addBtn = document.getElementById("addVariantRowBtn");
 		const btnAiGenerate = document.getElementById("btnAiGenerate");
 		const btnAiGenerateSku = document.getElementById("btnAiGenerateSku");
+		const imageFileInput = document.getElementById("imageFileInput");
+		const imgPreview = document.getElementById("imgPreview");
+		const previewPlaceholder = document.getElementById("previewPlaceholder");
 		
-		// Initial index setup based on existing server-rendered rows
 		let variantIndex = container.querySelectorAll(".variant-row").length;
+
+		// --- Live Main Image Preview Switcher ---
+		imageFileInput.addEventListener("change", function () {
+			const file = this.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = function (e) {
+					imgPreview.setAttribute("src", e.target.result);
+					imgPreview.classList.remove("d-none");
+					previewPlaceholder.classList.add("d-none");
+				}
+				reader.readAsDataURL(file);
+			}
+		});
+
+		// --- Dynamic Inline Row Thumbnail Engine ---
+		container.addEventListener("change", function (e) {
+			if (e.target.classList.contains("variant-image-input")) {
+				const input = e.target;
+				const row = input.closest(".variant-row");
+				const thumbImg = row.querySelector(".variant-thumb-preview");
+				const thumbIcon = row.querySelector(".variant-thumb-icon");
+				
+				const file = input.files[0];
+				if (file) {
+					const reader = new FileReader();
+					reader.onload = function (event) {
+						thumbImg.setAttribute("src", event.target.result);
+						thumbImg.classList.remove("d-none");
+						thumbIcon.classList.add("d-none");
+					}
+					reader.readAsDataURL(file);
+				}
+			}
+		});
+
+		// Toggle View Visibility
+		toggleVariants.addEventListener("change", function () {
+			if (this.checked) {
+				variantSection.classList.remove("d-none");
+				if (container.children.length === 0) {
+					addVariantRow();
+				}
+			} else {
+				variantSection.classList.add("d-none");
+				container.innerHTML = "";
+				variantIndex = 0;
+			}
+		});
+
+		addBtn.addEventListener("click", function () {
+			addVariantRow();
+		});
+
+		function addVariantRow() {
+			const html = `
+				<tr class="variant-row" data-index="${variantIndex}">
+					<td>
+						<input type="hidden" name="ProductDetails[${variantIndex}].Id" value="0" />
+						<input name="ProductDetails[${variantIndex}].Size" class="form-control form-control-sm" placeholder="e.g., Large, XL" />
+					</td>
+					<td>
+						<input name="ProductDetails[${variantIndex}].Color" class="form-control form-control-sm" placeholder="e.g., Red, Blue" />
+					</td>
+					<td>
+						<input name="ProductDetails[${variantIndex}].Price" class="form-control form-control-sm" type="number" step="0.01" value="0.00" />
+					</td>
+					<td>
+						<input name="ProductDetails[${variantIndex}].Stock" class="form-control form-control-sm" type="number" value="0" />
+					</td>
+					<td>
+						<input type="file" name="ProductDetails[${variantIndex}].VariantImageFile" class="form-control form-control-sm variant-image-input" accept="image/*" />
+						<input type="hidden" name="ProductDetails[${variantIndex}].ImageUrl" class="variant-hidden-url" value="" />
+					</td>
+					<td class="text-center align-middle">
+						<div class="d-flex align-items-center justify-content-center border rounded bg-light mx-auto" style="width: 40px; height: 40px; overflow: hidden;">
+							<img src="#" alt="Thumb" class="img-fluid d-none variant-thumb-preview" style="max-height: 100%; object-fit: cover;" />
+							<i class="bx bx-image text-muted variant-thumb-icon"></i>
+						</div>
+					</td>
+					<td class="text-center align-middle">
+						<button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
+							<i class="bx bx-trash"></i>
+						</button>
+					</td>
+				</tr>
+			`;
+			container.insertAdjacentHTML('beforeend', html);
+			variantIndex++;
+		}
+
+		container.addEventListener("click", function (e) {
+			if (e.target.closest(".remove-row-btn")) {
+				e.target.closest(".variant-row").remove();
+				reIndexRows();
+			}
+		});
+
+		function reIndexRows() {
+			const rows = container.querySelectorAll(".variant-row");
+			variantIndex = 0;
+			rows.forEach(function (row) {
+				row.setAttribute("data-index", variantIndex);
+				row.querySelector('input[name$=".Id"]').setAttribute("name", `ProductDetails[${variantIndex}].Id`);
+				row.querySelector('input[name$=".Size"]').setAttribute("name", `ProductDetails[${variantIndex}].Size`);
+				row.querySelector('input[name$=".Color"]').setAttribute("name", `ProductDetails[${variantIndex}].Color`);
+				row.querySelector('input[name$=".Price"]').setAttribute("name", `ProductDetails[${variantIndex}].Price`);
+				row.querySelector('input[name$=".Stock"]').setAttribute("name", `ProductDetails[${variantIndex}].Stock`);
+				row.querySelector('input[name$=".VariantImageFile"]').setAttribute("name", `ProductDetails[${variantIndex}].VariantImageFile`);
+				row.querySelector('input[name$=".ImageUrl"]').setAttribute("name", `ProductDetails[${variantIndex}].ImageUrl`);
+				variantIndex++;
+			});
+		}
 
 		// Helper function to extract fields securely
 		function getProductContext() {
@@ -259,79 +404,5 @@
 				btnAiGenerate.disabled = false;
 			}
 		});
-
-		// Toggle View Visibility
-		toggleVariants.addEventListener("change", function () {
-			if (this.checked) {
-				variantSection.classList.remove("d-none");
-				if (container.children.length === 0) {
-					addVariantRow();
-				}
-			} else {
-				variantSection.classList.add("d-none");
-				container.innerHTML = "";
-				variantIndex = 0;
-			}
-		});
-
-		// Add Variant Row Logic
-		addBtn.addEventListener("click", function () {
-			addVariantRow();
-		});
-
-		function addVariantRow() {
-			const html = `
-				<tr class="variant-row" data-index="${variantIndex}">
-					<td>
-						<input type="hidden" name="ProductDetails[${variantIndex}].Id" value="0" />
-						<input name="ProductDetails[${variantIndex}].Size" class="form-control form-control-sm" placeholder="e.g., Large, XL" />
-					</td>
-					<td>
-						<input name="ProductDetails[${variantIndex}].Color" class="form-control form-control-sm" placeholder="e.g., Red, Blue" />
-					</td>
-					<td>
-						<input name="ProductDetails[${variantIndex}].Price" class="form-control form-control-sm" type="number" step="0.01" value="0.00" />
-					</td>
-					<td>
-						<input name="ProductDetails[${variantIndex}].Stock" class="form-control form-control-sm" type="number" value="0" />
-					</td>
-					<td>
-						<input name="ProductDetails[${variantIndex}].ImageUrl" class="form-control form-control-sm" placeholder="Cloud URL or reference" />
-					</td>
-					<td class="text-center">
-						<button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
-							<i class="bx bx-trash"></i>
-						</button>
-					</td>
-				</tr>
-			`;
-			container.insertAdjacentHTML('beforeend', html);
-			variantIndex++;
-		}
-
-		// Remove Row Event Handler
-		container.addEventListener("click", function (e) {
-			if (e.target.closest(".remove-row-btn")) {
-				const row = e.target.closest(".variant-row");
-				row.remove();
-				reIndexRows();
-			}
-		});
-
-		// Re-indexing sequence logic to maintain valid ASP.NET Model Binding continuity
-		function reIndexRows() {
-			const rows = container.querySelectorAll(".variant-row");
-			variantIndex = 0;
-			rows.forEach(function (row) {
-				row.setAttribute("data-index", variantIndex);
-				row.querySelector('input[name$=".Id"]').setAttribute("name", `ProductDetails[${variantIndex}].Id`);
-				row.querySelector('input[name$=".Size"]').setAttribute("name", `ProductDetails[${variantIndex}].Size`);
-				row.querySelector('input[name$=".Color"]').setAttribute("name", `ProductDetails[${variantIndex}].Color`);
-				row.querySelector('input[name$=".Price"]').setAttribute("name", `ProductDetails[${variantIndex}].Price`);
-				row.querySelector('input[name$=".Stock"]').setAttribute("name", `ProductDetails[${variantIndex}].Stock`);
-				row.querySelector('input[name$=".ImageUrl"]').setAttribute("name", `ProductDetails[${variantIndex}].ImageUrl`);
-				variantIndex++;
-			});
-		}
 	});
 </script>

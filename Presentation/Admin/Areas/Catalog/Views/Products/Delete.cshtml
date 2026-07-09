@@ -18,7 +18,7 @@
 					<div class="col-md-3 text-center mb-3">
 						@if (!string.IsNullOrEmpty(Model.ImageUrl))
 						{
-							<img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded d-block m-auto shadow-sm" style="max-height: 150px; object-fit: cover;" />
+							<img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded d-block m-auto shadow-sm cursor-pointer view-zoom-img" style="max-height: 150px; object-fit: cover;" />
 						}
 						else
 						{
@@ -67,22 +67,39 @@
 				<div class="card-body mt-3">
 					<p class="text-muted mb-3">Deleting this product will also <strong>permanently delete</strong> the following @Model.ProductDetails.Count variant(s):</p>
 					<div class="table-responsive text-nowrap">
-						<table class="table table-bordered table-sm table-striped">
+						<table class="table table-bordered table-sm table-striped align-middle">
 							<thead>
 								<tr>
-									<th>Size</th>
-									<th>Color</th>
-									<th>Price (Rs.)</th>
-									<th>Stock</th>
+									<th style="width: 10%;" class="text-center">Image</th>
+									<th style="width: 25%;">Size</th>
+									<th style="width: 25%;">Color</th>
+									<th style="width: 25%;">Price (Rs.)</th>
+									<th style="width: 15%;">Stock</th>
 								</tr>
 							</thead>
 							<tbody>
 								@foreach (var detail in Model.ProductDetails)
 								{
 									<tr>
+										<td class="text-center">
+											@if (!string.IsNullOrEmpty(detail.ImageUrl))
+											{
+												<div class="border rounded bg-light d-flex align-items-center justify-content-center cursor-pointer view-zoom-img mx-auto" style="width: 40px; height: 40px; overflow: hidden;">
+													<img src="@detail.ImageUrl" alt="Variant preview" class="img-fluid" style="max-height: 100%; object-fit: cover;" />
+												</div>
+											}
+											else
+											{
+												<div class="border rounded bg-light d-flex align-items-center justify-content-center mx-auto text-muted" style="width: 40px; height: 40px;">
+													<i class="bx bx-image small"></i>
+												</div>
+											}
+										</td>
 										<td>@(string.IsNullOrEmpty(detail.Size) ? "-" : detail.Size)</td>
 										<td>@(string.IsNullOrEmpty(detail.Color) ? "-" : detail.Color)</td>
-										<td>@(detail.Price.HasValue ? detail.Price.Value.ToString("N2") : Model.Price.ToString("N2"))</td>
+										<td class="text-success fw-semibold">
+											Rs. @(detail.Price.HasValue ? detail.Price.Value.ToString("N2") : Model.Price.ToString("N2"))
+										</td>
 										<td>@detail.Stock</td>
 									</tr>
 								}
@@ -94,3 +111,44 @@
 		}
 	</div>
 </div>
+
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content bg-transparent border-0 shadow-none">
+			<div class="modal-body text-center p-0">
+				<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+				<img src="" id="modalPreviewTarget" class="img-fluid rounded shadow" style="max-height: 85vh; object-fit: contain;" />
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.cursor-pointer { cursor: pointer; transition: transform 0.2s ease; }
+	.cursor-pointer:hover { transform: scale(1.05); }
+</style>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const previewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+		const modalImg = document.getElementById('modalPreviewTarget');
+
+		// Click to zoom dynamic engine
+		document.querySelectorAll('.view-zoom-img').forEach(el => {
+			el.addEventListener('click', function () {
+				let src = "";
+				if(this.tagName === 'IMG') {
+					src = this.getAttribute('src');
+				} else {
+					const childImg = this.querySelector('img');
+					if(childImg) src = childImg.getAttribute('src');
+				}
+				
+				if(src && src !== "#") {
+					modalImg.setAttribute('src', src);
+					previewModal.show();
+				}
+			});
+		});
+	});
+</script>

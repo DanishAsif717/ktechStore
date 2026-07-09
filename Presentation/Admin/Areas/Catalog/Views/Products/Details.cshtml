@@ -14,7 +14,7 @@
 			<div class="col-md-3 text-center mb-3">
 				@if (!string.IsNullOrEmpty(Model.ImageUrl))
 				{
-					<img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded d-block m-auto shadow-sm" style="max-height: 200px; object-fit: cover;" />
+					<img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded d-block m-auto shadow-sm cursor-pointer view-zoom-img" style="max-height: 200px; object-fit: cover;" />
 				}
 				else
 				{
@@ -70,15 +70,15 @@
 		<h5 class="card-header border-bottom mb-3">Available Variants & Configurations</h5>
 		<div class="card-body">
 			<div class="table-responsive text-nowrap">
-				<table class="table table-striped table-bordered table-sm">
+				<table class="table table-striped table-bordered table-sm align-middle">
 					<thead>
 						<tr>
-							<th>#</th>
-							<th>Size</th>
-							<th>Color</th>
-							<th>Variant Price</th>
-							<th>Stock Qty</th>
-							<th>Variant Image</th>
+							<th style="width: 5%;">#</th>
+							<th style="width: 15%;">Size</th>
+							<th style="width: 15%;">Color</th>
+							<th style="width: 20%;">Variant Price</th>
+							<th style="width: 15%;">Stock Qty</th>
+							<th style="width: 30%;">Variant Image</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -98,13 +98,18 @@
 								<td>
 									@if (!string.IsNullOrEmpty(detail.ImageUrl))
 									{
-										<a href="@detail.ImageUrl" target="_blank" class="badge bg-label-info">
-											<i class="bx bx-link-external me-1"></i> View Image
-										</a>
+										<div class="d-flex align-items-center gap-2">
+											<div class="border rounded bg-light d-flex align-items-center justify-content-center cursor-pointer view-zoom-img" style="width: 40px; height: 40px; overflow: hidden;" data-img-url="@detail.ImageUrl">
+												<img src="@detail.ImageUrl" alt="Variant preview" class="img-fluid" style="max-height: 100%; object-fit: cover;" />
+											</div>
+											<a href="@detail.ImageUrl" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1">
+												<i class="bx bx-link-external small"></i> Open Full
+											</a>
+										</div>
 									}
 									else
 									{
-										<span class="text-muted small">No Variant Image</span>
+										<span class="text-muted small"><i class="bx bx-image-alt me-1"></i>No Variant Image</span>
 									}
 								</td>
 							</tr>
@@ -125,3 +130,44 @@
 		<span class="tf-icons bx bx-arrow-back me-1"></span>Back to List
 	</a>
 </div>
+
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content bg-transparent border-0 shadow-none">
+			<div class="modal-body text-center p-0">
+				<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+				<img src="" id="modalPreviewTarget" class="img-fluid rounded shadow" style="max-height: 85vh; object-fit: contain;" />
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.cursor-pointer { cursor: pointer; transition: transform 0.2s ease; }
+	.cursor-pointer:hover { transform: scale(1.05); }
+</style>
+
+<script>
+	document.addEventListener("DOMContentLoaded", function () {
+		const previewModal = new bootstrap.Modal(document.getElementById('imagePreviewModal'));
+		const modalImg = document.getElementById('modalPreviewTarget');
+
+		// Handle Main Image and Variant click triggers
+		document.querySelectorAll('.view-zoom-img').forEach(el => {
+			el.addEventListener('click', function () {
+				let src = "";
+				if(this.tagName === 'IMG') {
+					src = this.getAttribute('src');
+				} else {
+					const childImg = this.querySelector('img');
+					if(childImg) src = childImg.getAttribute('src');
+				}
+				
+				if(src && src !== "#") {
+					modalImg.setAttribute('src', src);
+					previewModal.show();
+				}
+			});
+		});
+	});
+</script>

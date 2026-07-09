@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 using System.Text;
 
 namespace ktechStore.Application.DTOs
@@ -12,5 +13,6 @@ namespace ktechStore.Application.DTOs
         public string? Size { get; set; }
         public string? Color { get; set; }
         public string? ImageUrl { get; set; }
+        public IFormFile? VariantImageFile { get; set; }
     }
 }

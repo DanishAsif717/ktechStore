@@ -4,7 +4,9 @@ using System.Threading.Tasks;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using ktechStore.Application.Interfaces;
-using Microsoft.AspNetCore.Http; 
+using Microsoft.AspNetCore.Http;
+using System.Linq;
+
 using Microsoft.Extensions.Configuration;
 
 namespace ktechStore.Infrastructure.ThirdParty
@@ -47,5 +49,33 @@ namespace ktechStore.Infrastructure.ThirdParty
 
             return uploadResult.SecureUrl?.ToString();
         }
+        public async Task<bool> DeleteImageAsync(string imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl)) return false;
+
+            try
+            {
+               
+                var uri = new Uri(imageUrl);
+                string pathWithExtension = uri.Segments.Last();
+
+                string publicId = imageUrl.Split(new[] { "/v" }, StringSplitOptions.None)[1]
+                                          .Split(new[] { '/' }, 2)[1]
+                                          .Split('.')[0]; 
+
+                var deleteParams = new DeletionParams(publicId);
+                var result = await _cloudinary.DestroyAsync(deleteParams);
+
+                return result.Result == "ok"; 
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error deleting image from Cloudinary: {ex.Message}");
+                return false;
+            }
+        }
+
+
+
     }
 }
