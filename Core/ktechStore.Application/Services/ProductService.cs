@@ -1,21 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using ktechStore.Application.DTOs;
+﻿using ktechStore.Application.DTOs;
 using ktechStore.Application.Interfaces;
 using ktechStore.Core.Entities;
 using ktechStore.Core.Interfaces;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace ktechStore.Application.Services
 {
     public class ProductService : IProductService
     {
         private readonly IProductRepository _productRepo;
+        private readonly IImageService _imageService;
 
-        public ProductService(IProductRepository productRepo)
+        public ProductService(IProductRepository productRepo, IImageService imageService)
         {
             _productRepo = productRepo;
+            _imageService = imageService;
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
@@ -99,6 +102,7 @@ namespace ktechStore.Application.Services
 
         public async Task CreateProductAsync(ProductUpsertDto dto, string user)
         {
+            string uploadedUrl = await HandleProductImageUploadAsync(dto.ProductImageFile, dto.ImageUrl);
             var product = new Product
             {
                 Name = dto.Name,
@@ -106,7 +110,7 @@ namespace ktechStore.Application.Services
                 Price = dto.Price,
                 Stock = dto.Stock,
                 SKU = dto.SKU,
-                ImageUrl = dto.ImageUrl,
+                ImageUrl = uploadedUrl,
                 IsActive = dto.IsActive,
                 CategoryId = dto.CategoryId,
                 CreatedBy = user,
@@ -194,5 +198,18 @@ namespace ktechStore.Application.Services
         {
             await _productRepo.DeleteAsync(id);
         }
+        private async Task<string> HandleProductImageUploadAsync(IFormFile file, string existingUrl)
+        {
+            if (file != null && file.Length > 0)
+            {
+                var cloudUrl = await _imageService.UploadImageAsync(file, "ktech_store_products_local");
+                if (!string.IsNullOrEmpty(cloudUrl))
+                {
+                    return cloudUrl;
+                }
+            }
+            return existingUrl;
+        }
+
     }
 }

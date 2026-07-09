@@ -81,7 +81,7 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
     // GET: Catalog/Products/Create
     public async Task<IActionResult> Create()
     {
-      var categories = await _categoryService.GetAllCategoriesAsync(); // Assuming this method exists in your CategoryService
+      var categories = await _categoryService.GetAllCategoriesAsync(); 
       ViewData["CategoryId"] = new SelectList(categories, "Id", "Name");
       return View(new ProductUpsertDto());
     }

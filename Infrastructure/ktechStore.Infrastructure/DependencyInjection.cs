@@ -5,6 +5,8 @@ using ktechStore.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ktechStore.Infrastructure.ThirdParty; 
+
 
 namespace ktechStore.Infrastructure
 {
@@ -21,6 +23,8 @@ namespace ktechStore.Infrastructure
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IModuleService, ModuleRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();
+
+            services.AddScoped<IImageService, CloudinaryService>();
 
             return services;
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Http;
 
 namespace ktechStore.Application.DTOs
 {
@@ -27,6 +28,7 @@ namespace ktechStore.Application.DTOs
 
         public string? ImageUrl { get; set; }
         public bool IsActive { get; set; } = true;
+        public IFormFile ProductImageFile { get; set; }
 
         [Required(ErrorMessage = "Please select a category")]
         public int CategoryId { get; set; }
