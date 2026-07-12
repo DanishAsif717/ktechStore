@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
+using ktechStore.Application.Validations;
+
 
 namespace ktechStore.Application.DTOs
 {
@@ -28,7 +27,9 @@ namespace ktechStore.Application.DTOs
 
         public string? ImageUrl { get; set; }
         public bool IsActive { get; set; } = true;
-        public IFormFile ProductImageFile { get; set; }
+
+        [RequiredIfIdZero(ErrorMessage = "Product image is required")]
+        public IFormFile? ProductImageFile { get; set; }
 
         [Required(ErrorMessage = "Please select a category")]
         public int CategoryId { get; set; }
