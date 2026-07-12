@@ -25,6 +25,7 @@ namespace ktechStore.Infrastructure
             services.AddScoped<IProductRepository, ProductRepository>();
 
             services.AddScoped<IImageService, CloudinaryService>();
+            services.AddScoped<IMistralService, MistralService>();
 
             return services;
         }

@@ -428,3 +428,7 @@ sharedsettings.json
 .env
 .env*.local
 
+# Logging
+Logs/
+**/Logs/
+

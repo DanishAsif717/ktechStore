@@ -1,7 +1,8 @@
 using AspnetCoreMvcFull.Extensions;
 using ktechStore.Application;
-using Microsoft.EntityFrameworkCore;
 using ktechStore.Infrastructure;
+using ktechStore.Infrastructure.Logging;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,11 +10,7 @@ builder.Configuration.SetBasePath(AppContext.BaseDirectory);
 builder.Configuration.AddJsonFile("sharedsettings.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
-//var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-//Console.WriteLine($"====== MY CONNECTION STRING: {connectionString} ======");
-
-//builder.Services.AddDbContext<ApplicationDbContext>(options =>
-//    options.UseNpgsql(connectionString, b => b.MigrationsAssembly("ktechStore.Infrastructure")));
+builder.Host.AddSharedLogging("Web");
 
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices();
@@ -28,7 +25,6 @@ builder.Services.AddControllersWithViews()
 
 
 var app = builder.Build();
-
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

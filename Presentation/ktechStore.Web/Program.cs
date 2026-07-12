@@ -1,13 +1,16 @@
 
-using ktechStore.Infrastructure;
 using ktechStore.Application;
+using ktechStore.Infrastructure;
+using ktechStore.Infrastructure.Logging;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Configuration.SetBasePath(AppContext.BaseDirectory);
 
+builder.Configuration.SetBasePath(AppContext.BaseDirectory);
 builder.Configuration.AddJsonFile("sharedsettings.json", optional: true, reloadOnChange: true);
 builder.Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
+
+builder.Host.AddSharedLogging("Admin");
 
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices();
