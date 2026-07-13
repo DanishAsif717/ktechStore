@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using ktechStore.Core.Entities;
-using System.Text;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace ktechStore.Infrastructure.Persistence
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
