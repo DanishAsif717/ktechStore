@@ -22,7 +22,8 @@ builder.Services.AddControllersWithViews()
     .AddRazorOptions(options =>
     {
       options.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
-    }).AddNToastNotifyToastr(new ToastrOptions()   
+    })
+    .AddNToastNotifyToastr(new ToastrOptions()   
     {
       ProgressBar = true,
       PositionClass = ToastPositions.TopRight
@@ -48,7 +49,5 @@ app.UseStaticFiles();
 app.UseNToastNotify();
 app.UseRouting();
 app.UseAuthorization();
-
 app.MapAdminRoutes();
-
 app.Run();

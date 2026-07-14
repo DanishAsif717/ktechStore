@@ -86,7 +86,14 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
       {
         return NotFound();
       }
-      return View(category);
+      var dto = new CategoryCreateDto
+      {
+        Name = category.Name,
+        Description = category.Description,
+        Status = category.Status
+      };
+
+      return View(dto);
     }
 
     // POST: Catalog/Categories/Edit/5
@@ -112,6 +119,8 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
             throw;
           }
         }
+        _toastNotification.AddSuccessToastMessage("Category updated");
+
         return RedirectToAction(nameof(Index));
       }
       return View(dto);
@@ -139,7 +148,15 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteConfirmed(int id)
     {
-      await _categoryService.DeleteCategoryAsync(id);
+      try
+      {
+        await _categoryService.DeleteCategoryAsync(id);
+        _toastNotification.AddSuccessToastMessage("Category deleted");
+      }
+      catch
+      {
+        _toastNotification.AddErrorToastMessage("Something went wrong");
+      }
       return RedirectToAction(nameof(Index));
     }
   }
