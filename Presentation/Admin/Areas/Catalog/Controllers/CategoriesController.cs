@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ktechStore.Core.Entities;
 using ktechStore.Application.Interfaces;
 using ktechStore.Application.DTOs;
-
+using NToastNotify;
 namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
 {
   [Area("Catalog")]
@@ -11,10 +11,12 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
   {
     // 1. DbContext ko hata kar Service ka interface lagaya
     private readonly ICategoryService _categoryService;
+    private readonly IToastNotification _toastNotification;   // 👈 add karo
 
-    public CategoriesController(ICategoryService categoryService)
+    public CategoriesController(ICategoryService categoryService, IToastNotification toastNotification)
     {
       _categoryService = categoryService;
+      _toastNotification = toastNotification;
     }
 
     // GET: Catalog/Categories
@@ -55,9 +57,18 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
     {
       if (ModelState.IsValid)
       {
-        // Service ko bola ke create karo (woh khud hi save b karegi)
-        await _categoryService.CreateCategoryAsync(dto);
-        return RedirectToAction(nameof(Index));
+        try
+        {
+          await _categoryService.CreateCategoryAsync(dto);
+          _toastNotification.AddSuccessToastMessage("Category created");
+
+          return RedirectToAction(nameof(Index));
+        }
+        catch
+        {
+          _toastNotification.AddErrorToastMessage("Something went wrong");
+          return View(dto);
+        }
       }
       return View(dto);
     }
