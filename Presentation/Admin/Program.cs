@@ -3,6 +3,8 @@ using ktechStore.Application;
 using ktechStore.Infrastructure;
 using ktechStore.Infrastructure.Logging;
 using Microsoft.EntityFrameworkCore;
+using NToastNotify;   
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,8 +21,11 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddControllersWithViews()
     .AddRazorOptions(options =>
     {
-      // Taaki areas ke views root ke shared folder se partial views utha sakein
       options.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+    }).AddNToastNotifyToastr(new ToastrOptions()   
+    {
+      ProgressBar = true,
+      PositionClass = ToastPositions.TopRight
     });
 
 
@@ -40,7 +45,7 @@ app.Use((context, next) =>
 });
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+app.UseNToastNotify();
 app.UseRouting();
 app.UseAuthorization();
 
