@@ -2,10 +2,12 @@
 using ktechStore.Core.Interfaces;
 using ktechStore.Infrastructure.Persistence;
 using ktechStore.Infrastructure.Repositories;
+using ktechStore.Infrastructure.ThirdParty; 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using ktechStore.Core.Entities;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ktechStore.Infrastructure.ThirdParty; 
 
 
 namespace ktechStore.Infrastructure
@@ -19,7 +21,19 @@ namespace ktechStore.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseNpgsql(connectionString, b => b.MigrationsAssembly("ktechStore.Infrastructure")));
 
-            // Saari Repositories yahan aayengi
+
+            // 🔥 Identity register 
+            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
+
+            //Repositories 
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IModuleService, ModuleRepository>();
             services.AddScoped<IProductRepository, ProductRepository>();

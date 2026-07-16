@@ -12,5 +12,7 @@ namespace ktechStore.Application.Interfaces
         Task UpdateAsync(Product product);
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
+        Task<bool> SkuExistsAsync(string sku);
+
     }
 }

@@ -12,6 +12,8 @@ namespace ktechStore.Application.Interfaces
         Task CreateProductAsync(ProductUpsertDto dto, string user);
         Task UpdateProductAsync(ProductUpsertDto dto, string user);
         Task DeleteProductAsync(int id);
+        Task<string> GenerateUniqueSkuAsync(string productName, string categoryName);
+
 
     }
 }

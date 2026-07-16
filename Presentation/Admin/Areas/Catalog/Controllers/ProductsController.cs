@@ -1,12 +1,16 @@
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using ktechStore.Application.DTOs;
 using ktechStore.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Threading.Tasks;
 
 namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
 {
+
+
   [Area("Catalog")]
+  [Authorize]
   public class ProductsController : Controller
   {
     private readonly IProductService _productService;
@@ -54,7 +58,7 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
 
       try
       {
-        var sku = await _mistralService.GenerateSkuAsync(dto.ProductName, dto.CategoryName);
+        var sku = await _productService.GenerateUniqueSkuAsync(dto.ProductName, dto.CategoryName);
         return Json(new { success = true, sku });
       }
       catch (Exception ex)

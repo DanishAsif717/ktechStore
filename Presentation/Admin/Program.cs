@@ -1,7 +1,9 @@
 using AspnetCoreMvcFull.Extensions;
 using ktechStore.Application;
+using ktechStore.Core.Entities;
 using ktechStore.Infrastructure;
 using ktechStore.Infrastructure.Logging;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NToastNotify;   
 
@@ -29,6 +31,14 @@ builder.Services.AddControllersWithViews()
       PositionClass = ToastPositions.TopRight
     });
 
+// 🔥 Cookie authentication configure kiya
+builder.Services.ConfigureApplicationCookie(options =>
+{
+  options.LoginPath = "/Account/Login";
+  options.AccessDeniedPath = "/Account/AccessDenied";
+  options.Cookie.Name = "KtechStoreAdminAuth";
+});
+
 
 var app = builder.Build();
 
@@ -50,4 +60,33 @@ app.UseNToastNotify();
 app.UseRouting();
 app.UseAuthorization();
 app.MapAdminRoutes();
+
+using (var scope = app.Services.CreateScope())
+{
+  var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+  string[] roles = { "Admin", "Vendor" };
+  foreach (var role in roles)
+  {
+    if (!await roleManager.RoleExistsAsync(role))
+      await roleManager.CreateAsync(new IdentityRole(role));
+  }
+
+  var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+  var adminEmail = "admin@ktechstore.com";
+  if (await userManager.FindByEmailAsync(adminEmail) == null)
+  {
+    var adminUser = new ApplicationUser
+    {
+      UserName = adminEmail,
+      Email = adminEmail,
+      FullName = "Super Admin",
+      EmailConfirmed = true
+    };
+    var result = await userManager.CreateAsync(adminUser, "Admin@123");
+    if (result.Succeeded)
+    {
+      await userManager.AddToRoleAsync(adminUser, "Admin");
+    }
+  }
+}
 app.Run();
