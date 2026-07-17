@@ -60,5 +60,9 @@ namespace ktechStore.Infrastructure.Repositories
         {
             return await _context.Products.AnyAsync(e => e.Id == id);
         }
+        public async Task<bool> SkuExistsAsync(string sku)
+        {
+            return await _context.Products.AnyAsync(p => p.SKU == sku);
+        }
     }
 }

@@ -15,11 +15,13 @@ namespace ktechStore.Application.Services
     {
         private readonly IProductRepository _productRepo;
         private readonly IImageService _imageService;
+        private readonly IMistralService _mistralService;
 
-        public ProductService(IProductRepository productRepo, IImageService imageService)
+        public ProductService(IProductRepository productRepo, IImageService imageService, IMistralService mistralService)
         {
             _productRepo = productRepo;
             _imageService = imageService;
+            _mistralService = mistralService;
         }
 
         public async Task<IEnumerable<ProductDto>> GetAllProductsAsync()
@@ -283,8 +285,29 @@ namespace ktechStore.Application.Services
             return existingUrl;
         }
 
-        #endregion
 
+        #endregion
+        public async Task<string> GenerateUniqueSkuAsync(string productName, string categoryName)
+        {
+            string sku = string.Empty;
+            int attempts = 0;
+            const int maxAttempts = 3;
+            bool isUnique = false;
+
+            while (attempts < maxAttempts && !isUnique)
+            {
+                sku = await _mistralService.GenerateSkuAsync(productName, categoryName);
+                isUnique = !await _productRepo.SkuExistsAsync(sku);
+                attempts++;
+            }
+
+            if (!isUnique)
+            {
+                sku = $"{sku}-{DateTime.UtcNow.Ticks.ToString().Substring(10)}";
+            }
+
+            return sku;
+        }
 
     }
 }

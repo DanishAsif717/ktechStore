@@ -1,0 +1,63 @@
+@model ktechStore.Application.DTOs.LoginDto
+
+@{
+	Layout = "_BlankLayout";
+	ViewData["Title"] = "Login - Admin";
+}
+
+@section PageStyles {
+	<link rel="stylesheet" href="~/vendor/css/pages/page-auth.css" />
+}
+
+@* ************** Content ************** *@
+<div class="container-xxl">
+	<div class="authentication-wrapper authentication-basic container-p-y">
+		<div class="authentication-inner">
+			<!-- Login -->
+			<div class="card px-sm-6 px-0">
+				<div class="card-body">
+					<!-- Logo -->
+					<div class="app-brand justify-content-center">
+						<a href="/" class="app-brand-link gap-2">
+							<span class="app-brand-logo demo">@await Html.PartialAsync("../_Partials/_Macros")</span>
+							<span class="app-brand-text demo text-heading fw-bold">@TempData.Peek("appName")</span>
+						</a>
+					</div>
+					<!-- /Logo -->
+					<h4 class="mb-1">Welcome to @TempData.Peek("appName")! 👋</h4>
+					<p class="mb-6">Please sign-in to your account and start the adventure</p>
+
+					<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+					<form id="formAuthentication" class="mb-6" asp-action="Login" asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+						<div class="mb-6">
+							<label asp-for="Email" class="form-label">Email or Username</label>
+							<input asp-for="Email" class="form-control" placeholder="Enter your email or username" autofocus />
+							<span asp-validation-for="Email" class="text-danger"></span>
+						</div>
+						<div class="mb-6 form-password-toggle">
+							<label asp-for="Password" class="form-label">Password</label>
+							<div class="input-group input-group-merge">
+								<input asp-for="Password" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" />
+								<span class="input-group-text cursor-pointer"><i class="icon-base bx bx-hide"></i></span>
+							</div>
+							<span asp-validation-for="Password" class="text-danger"></span>
+						</div>
+						<div class="mb-8">
+							<div class="d-flex justify-content-between">
+								<div class="form-check mb-0">
+									<input asp-for="RememberMe" class="form-check-input" />
+									<label asp-for="RememberMe" class="form-check-label"> Remember Me </label>
+								</div>
+							</div>
+						</div>
+						<div class="mb-6">
+							<button class="btn btn-primary d-grid w-100" type="submit">Login</button>
+						</div>
+					</form>
+				</div>
+			</div>
+			<!-- /Login -->
+		</div>
+	</div>
+</div>
