@@ -5,6 +5,8 @@ using ktechStore.Infrastructure;
 using ktechStore.Infrastructure.Logging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using NToastNotify;   
 
 
@@ -20,18 +22,25 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices();
 
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-builder.Services.AddControllersWithViews()
-    .AddRazorOptions(options =>
-    {
-      options.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
-    })
-    .AddNToastNotifyToastr(new ToastrOptions()   
-    {
-      ProgressBar = true,
-      PositionClass = ToastPositions.TopRight
-    });
+builder.Services.AddControllersWithViews(options =>
+{
+  var policy = new AuthorizationPolicyBuilder()
+      .RequireAuthenticatedUser()
+      .Build();
+  options.Filters.Add(new AuthorizeFilter(policy));
+})
+.AddRazorOptions(options =>
+{
+  options.ViewLocationFormats.Add("/Views/Shared/{0}.cshtml");
+})
+.AddNToastNotifyToastr(new ToastrOptions()
+{
+  ProgressBar = true,
+  PositionClass = ToastPositions.TopRight
+});
 
-// 🔥 Cookie authentication configure kiya
+
+// 🔥 Cookie authentication configure 
 builder.Services.ConfigureApplicationCookie(options =>
 {
   options.LoginPath = "/Account/Login";
@@ -58,6 +67,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseNToastNotify();
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapAdminRoutes();
 

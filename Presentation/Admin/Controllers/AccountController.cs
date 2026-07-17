@@ -1,12 +1,14 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+using ktechStore.Application.DTOs;
+using ktechStore.Core.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ktechStore.Core.Entities;
-using ktechStore.Application.DTOs;
+using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace AspnetCoreMvcFull.Controllers
 {
+  [AllowAnonymous]
   public class AccountController : Controller
   {
     private readonly SignInManager<ApplicationUser> _signInManager;

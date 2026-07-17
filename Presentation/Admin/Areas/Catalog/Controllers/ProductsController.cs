@@ -10,7 +10,6 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
 
 
   [Area("Catalog")]
-  [Authorize]
   public class ProductsController : Controller
   {
     private readonly IProductService _productService;
