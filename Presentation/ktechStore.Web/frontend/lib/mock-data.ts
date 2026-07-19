@@ -1,13 +1,12 @@
 import vendorsData from "@/data/vendors.json";
-import productsData from "@/data/products.json";
 import ordersData from "@/data/orders.json";
 import reviewsData from "@/data/reviews.json";
 import type { Vendor, Product, Category, Review, Order, VendorDashboardStats } from "@/types";
 
 export const vendors: Vendor[] = vendorsData as Vendor[];
-export const products: Product[] = productsData as Product[];
 export const orders: Order[] = ordersData as Order[];
 export const reviews: Review[] = reviewsData as Review[];
+export const products: Product[] = [];
 
 export function getVendorById(id: string): Vendor | undefined {
   return vendors.find(v => v.id === id);

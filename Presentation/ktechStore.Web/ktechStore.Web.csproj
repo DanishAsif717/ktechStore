@@ -7,6 +7,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="frontend\hooks\useProducts.ts" />
+    <None Remove="frontend\lib\api\products.ts" />
+    <None Remove="frontend\lib\mappers\product-mapper.ts" />
+    <None Remove="frontend\types\api.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.10" />
     <PackageReference Include="ObjectDumper.NET" Version="4.3.2" />
@@ -24,6 +31,13 @@
 		<None Include="..\..\ktechStore\sharedsettings.json" Link="sharedsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <TypeScriptCompile Include="frontend\hooks\useProducts.ts" />
+	  <TypeScriptCompile Include="frontend\lib\api\products.ts" />
+	  <TypeScriptCompile Include="frontend\lib\mappers\product-mapper.ts" />
+	  <TypeScriptCompile Include="frontend\types\api.ts" />
 	</ItemGroup>
 
 </Project>
