@@ -5,7 +5,7 @@ using ktechStore.Application.Interfaces;
 
 namespace ktechStore.Web.Controllers.Api
 {
-    [Route("api/[controller]")]
+    [Route("api/products")]
     [ApiController]
     public class ProductsApiController : ControllerBase
     {

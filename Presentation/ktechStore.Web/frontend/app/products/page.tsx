@@ -1,8 +1,11 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import ProductCard from "@/components/shared/ProductCard";
-import { products, categories, getAllSubcategories, vendors } from "@/lib/mock-data";
+import {getAllSubcategories, vendors } from "@/lib/mock-data";
+import { useProducts } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useCategories";
+
 import { SlidersHorizontal, X } from "lucide-react";
 
 export default function ProductsPage() {
@@ -11,6 +14,15 @@ export default function ProductsPage() {
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState("default");
   const [showFilters, setShowFilters] = useState(false);
+  const { products, loading, error } = useProducts();
+  const { categories } = useCategories();
+
+
+    useEffect(() => {
+        console.log("Products state:", products);
+        console.log("Loading:", loading);
+        console.log("Error:", error);
+    }, [products, loading, error]);
 
   const filtered = useMemo(() => {
     let result = [...products];
@@ -26,7 +38,7 @@ export default function ProductsPage() {
         default: return 0;
       }
     });
-  }, [selectedCategory, selectedSubcategory, selectedVendor, sortBy]);
+  }, [products, selectedCategory, selectedSubcategory, selectedVendor, sortBy]);
 
   const subcategories = selectedCategory ? getAllSubcategories(selectedCategory) : [];
 
