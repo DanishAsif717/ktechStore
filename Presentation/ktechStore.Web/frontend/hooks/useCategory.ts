@@ -1,25 +1,25 @@
-﻿import { useState, useEffect } from "react";
-import type { Product } from "@/types";
-import { fetchProducts } from "@/lib/services/product.service";
+import { useState, useEffect } from "react";
+import type { Category } from "@/types";
+import { fetchCategoryBySlug } from "@/lib/services/category.service";
 
-export function useProducts() {
-    const [products, setProducts] = useState<Product[]>([]);
+export function useCategory(slug: string) {
+    const [category, setCategory] = useState<Category | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         let cancelled = false;
 
-        fetchProducts()
+        fetchCategoryBySlug(slug)
             .then(data => {
                 if (!cancelled) {
-                    setProducts(data);
+                    setCategory(data);
                     setError(null);
                 }
             })
             .catch(err => {
                 if (!cancelled) {
-                    setError(err instanceof Error ? err.message : "Failed to load products");
+                    setError(err instanceof Error ? err.message : "Failed to load category");
                 }
             })
             .finally(() => {
@@ -27,7 +27,7 @@ export function useProducts() {
             });
 
         return () => { cancelled = true; };
-    }, []);
+    }, [slug]);
 
-    return { products, loading, error };
+    return { category, loading, error };
 }

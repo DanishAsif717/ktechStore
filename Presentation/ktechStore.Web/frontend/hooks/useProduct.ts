@@ -1,25 +1,25 @@
-﻿import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import type { Product } from "@/types";
-import { fetchProducts } from "@/lib/services/product.service";
+import { fetchProductBySlug } from "@/lib/services/product.service";
 
-export function useProducts() {
-    const [products, setProducts] = useState<Product[]>([]);
+export function useProduct(slug: string) {
+    const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         let cancelled = false;
 
-        fetchProducts()
+        fetchProductBySlug(slug)
             .then(data => {
                 if (!cancelled) {
-                    setProducts(data);
+                    setProduct(data);
                     setError(null);
                 }
             })
             .catch(err => {
                 if (!cancelled) {
-                    setError(err instanceof Error ? err.message : "Failed to load products");
+                    setError(err instanceof Error ? err.message : "Failed to load product");
                 }
             })
             .finally(() => {
@@ -27,7 +27,7 @@ export function useProducts() {
             });
 
         return () => { cancelled = true; };
-    }, []);
+    }, [slug]);
 
-    return { products, loading, error };
+    return { product, loading, error };
 }
