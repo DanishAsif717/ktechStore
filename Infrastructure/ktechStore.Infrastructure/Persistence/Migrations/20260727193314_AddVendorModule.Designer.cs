@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using ktechStore.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using ktechStore.Infrastructure.Persistence;
 namespace ktechStore.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260727193314_AddVendorModule")]
+    partial class AddVendorModule
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -249,51 +252,6 @@ namespace ktechStore.Infrastructure.Persistence.Migrations
                     b.ToTable("Categories");
                 });
 
-            modelBuilder.Entity("ktechStore.Core.Entities.CategoryRequest", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("ApprovedCategoryId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTime>("RequestedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("RequestedByVendorId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime?>("ReviewedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ReviewedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApprovedCategoryId");
-
-                    b.HasIndex("RequestedByVendorId");
-
-                    b.ToTable("CategoryRequests");
-                });
-
             modelBuilder.Entity("ktechStore.Core.Entities.ModuleDefinition", b =>
                 {
                     b.Property<int>("Id")
@@ -406,17 +364,12 @@ namespace ktechStore.Infrastructure.Persistence.Migrations
                     b.Property<string>("UpdatedBy")
                         .HasColumnType("text");
 
-                    b.Property<int?>("VendorId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("SKU")
                         .IsUnique();
-
-                    b.HasIndex("VendorId");
 
                     b.ToTable("Products");
                 });
@@ -455,92 +408,6 @@ namespace ktechStore.Infrastructure.Persistence.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductDetails");
-                });
-
-            modelBuilder.Entity("ktechStore.Core.Entities.Vendor", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ApplicationUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("AppliedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("ApprovedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("BusinessDescription")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("ContactPhone")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("ShopName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
-
-                    b.ToTable("Vendors");
-                });
-
-            modelBuilder.Entity("ktechStore.Core.Entities.VendorApplication", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AppliedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("BusinessDescription")
-                        .HasMaxLength(1000)
-                        .HasColumnType("character varying(1000)");
-
-                    b.Property<string>("ContactPhone")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<DateTime?>("ReviewedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ReviewedBy")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("ShopName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("VendorApplications");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -594,24 +461,6 @@ namespace ktechStore.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ktechStore.Core.Entities.CategoryRequest", b =>
-                {
-                    b.HasOne("ktechStore.Core.Entities.Category", "ApprovedCategory")
-                        .WithMany()
-                        .HasForeignKey("ApprovedCategoryId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("ktechStore.Core.Entities.Vendor", "RequestedByVendor")
-                        .WithMany()
-                        .HasForeignKey("RequestedByVendorId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ApprovedCategory");
-
-                    b.Navigation("RequestedByVendor");
-                });
-
             modelBuilder.Entity("ktechStore.Core.Entities.ModuleField", b =>
                 {
                     b.HasOne("ktechStore.Core.Entities.ModuleDefinition", "ModuleDefinition")
@@ -631,14 +480,7 @@ namespace ktechStore.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ktechStore.Core.Entities.Vendor", "Vendor")
-                        .WithMany("Products")
-                        .HasForeignKey("VendorId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.Navigation("Category");
-
-                    b.Navigation("Vendor");
                 });
 
             modelBuilder.Entity("ktechStore.Core.Entities.ProductDetail", b =>
@@ -652,17 +494,6 @@ namespace ktechStore.Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("ktechStore.Core.Entities.Vendor", b =>
-                {
-                    b.HasOne("ktechStore.Core.Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany()
-                        .HasForeignKey("ApplicationUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ApplicationUser");
-                });
-
             modelBuilder.Entity("ktechStore.Core.Entities.ModuleDefinition", b =>
                 {
                     b.Navigation("Fields");
@@ -671,11 +502,6 @@ namespace ktechStore.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("ktechStore.Core.Entities.Product", b =>
                 {
                     b.Navigation("ProductDetails");
-                });
-
-            modelBuilder.Entity("ktechStore.Core.Entities.Vendor", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

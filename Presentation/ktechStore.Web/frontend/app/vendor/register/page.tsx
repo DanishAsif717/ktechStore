@@ -5,13 +5,14 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import { CheckCircle, Store, Upload, ChevronLeft, ChevronRight, Building2, Phone, Banknote } from "lucide-react";
-import { categories } from "@/lib/mock-data";
+import { useCategories } from "@/hooks/useCategories";
 
 type Step = "business" | "contact" | "payment" | "review";
 
 export default function VendorRegisterPage() {
   const router = useRouter();
   const { registerVendor } = useAuth();
+  const { categories } = useCategories();
   const [step, setStep] = useState<Step>("business");
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -30,9 +31,9 @@ export default function VendorRegisterPage() {
     routingNumber: "",
   });
 
-  const updateForm = (key: keyof typeof form, value: any) => {
-    setForm(prev => ({ ...prev, [key]: value }));
-  };
+    const updateForm = <K extends keyof typeof form>(key: K, value: typeof form[K]) => {
+        setForm(prev => ({ ...prev, [key]: value }));
+    };
 
   const steps: { key: Step; label: string; icon: React.ReactNode }[] = [
     { key: "business", label: "Business Info", icon: <Store className="w-4 h-4" /> },

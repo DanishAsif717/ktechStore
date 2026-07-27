@@ -2,13 +2,26 @@
 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { formatPrice, getVendorById, getProductEmoji } from "@/lib/mock-data";
-import { useState, useMemo } from "react";
+import { formatPrice, getProductEmoji } from "@/lib/utils";
+import { fetchVendorById } from "@/lib/services/vendor.service";
+import { useState, useEffect, useMemo } from "react";
 import { Trash2, Minus, Plus, Store } from "lucide-react";
 import EmptyState from "@/components/shared/EmptyState";
+import type { Vendor } from "@/types";
 
 export default function CartPage() {
-  const { items, removeItem, updateQuantity, getSubtotal, clearCart } = useCart();
+  const { items, removeItem, updateQuantity, clearCart } = useCart();
+  const [vendors, setVendors] = useState<Record<string, Vendor | null>>({});
+
+  useEffect(() => {
+    const ids = [...new Set(items.map(i => i.product.vendorId))];
+    Promise.all(ids.map(id => fetchVendorById(id).then(v => ({ id, vendor: v ?? null }))))
+      .then(results => {
+        const map: Record<string, Vendor | null> = {};
+        results.forEach(r => { map[r.id] = r.vendor; });
+        setVendors(map);
+      });
+  }, [items]);
 
   const groupedByVendor = useMemo(() => {
     const groups: Record<string, typeof items> = {};
@@ -49,7 +62,7 @@ export default function CartPage() {
       <div className="grid lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6">
           {Object.entries(groupedByVendor).map(([vendorId, vendorItems]) => {
-            const vendor = getVendorById(vendorId);
+            const vendor = vendors[vendorId];
             const vendorTotal = vendorItems.reduce((s, i) => s + i.product.price * i.quantity, 0);
             return (
               <div key={vendorId} className="bg-card border border-border rounded-xl overflow-hidden">

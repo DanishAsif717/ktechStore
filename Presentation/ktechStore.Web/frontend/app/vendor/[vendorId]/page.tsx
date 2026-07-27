@@ -1,18 +1,80 @@
 "use client";
 
 import { useParams, notFound } from "next/navigation";
+import { useState, useEffect } from "react";
 import ProductCard from "@/components/shared/ProductCard";
-import { getVendorById, getProductsByVendor, formatPrice } from "@/lib/mock-data";
-import { Star, MapPin, Mail, Phone, Calendar, Users, Package, ShoppingBag, Heart } from "lucide-react";
+import { fetchVendorById } from "@/lib/services/vendor.service";
+import { fetchProductsByVendor } from "@/lib/services/product.service";
+import { Star, MapPin, Mail, Phone, Calendar, Users, Package, ShoppingBag, Heart, RefreshCw, AlertCircle } from "lucide-react";
+import type { Vendor, Product } from "@/types";
 
 export default function VendorStorefrontPage() {
   const params = useParams();
   const vendorId = params.vendorId as string;
-  const vendor = getVendorById(vendorId);
+  const [vendor, setVendor] = useState<Vendor | null>(null);
+  const [vendorProducts, setVendorProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setError(null);
+
+    Promise.all([
+      fetchVendorById(vendorId),
+      fetchProductsByVendor(vendorId),
+    ])
+      .then(([v, prods]) => {
+        if (cancelled) return;
+        setVendor(v ?? null);
+        setVendorProducts(prods);
+      })
+      .catch(err => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load vendor");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [vendorId]);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="h-48 md:h-64 bg-gray-200 rounded-xl animate-pulse mb-8" />
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="aspect-square bg-gray-200 rounded-xl animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+            <AlertCircle className="w-8 h-8 text-red-500" />
+          </div>
+          <h2 className="text-xl font-semibold text-foreground mb-2">Failed to load vendor</h2>
+          <p className="text-muted mb-6 max-w-md">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl hover:bg-primary-dark transition-colors text-sm font-medium"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!vendor) notFound();
-
-  const vendorProducts = getProductsByVendor(vendorId);
 
   return (
     <div>

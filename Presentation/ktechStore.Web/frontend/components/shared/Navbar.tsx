@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { Search, ShoppingCart, Heart, ChevronDown, Menu, X, Store, User } from "lucide-react";
-import { categories, getAllCategories } from "@/lib/mock-data";
+import { useCategories } from "@/hooks/useCategories";
 
 export default function Navbar() {
   const { getItemCount, openCart } = useCart();
   const { items: wishlistItems } = useWishlist();
+  const { categories } = useCategories();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -18,7 +19,7 @@ export default function Navbar() {
   const megaRef = useRef<HTMLDivElement>(null);
 
   const itemCount = getItemCount();
-  const allCategories = getAllCategories();
+  const allCategories = useMemo(() => categories.map(c => c.name).sort(), [categories]);
 
   useEffect(() => {
     const handleClick = (e: MouseEvent) => {

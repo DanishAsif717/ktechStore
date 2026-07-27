@@ -10,6 +10,11 @@ namespace ktechStore.Infrastructure.Persistence.Configurations
         {
             builder.HasIndex(p => p.SKU)
                    .IsUnique();
+
+            builder.HasOne(p => p.Vendor)
+                  .WithMany(v => v.Products)
+                  .HasForeignKey(p => p.VendorId)
+                  .OnDelete(DeleteBehavior.SetNull);
         }
     }
 }

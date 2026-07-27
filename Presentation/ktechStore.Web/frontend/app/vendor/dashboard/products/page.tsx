@@ -1,7 +1,8 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { getProductsByVendor, formatPrice, getProductEmoji } from "@/lib/mock-data";
+import { fetchProductsByVendor } from "@/lib/services/product.service";
+import { formatPrice, getProductEmoji } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Package, PlusCircle, Edit2, Trash2 } from "lucide-react";
@@ -16,7 +17,7 @@ export default function VendorProductsPage() {
   const [sortDir, setSortDir] = useState<SortDir>("asc");
 
   useEffect(() => {
-    if (user) setProducts(getProductsByVendor(user.vendor.id));
+    if (user) fetchProductsByVendor(user.vendor.id).then(setProducts);
   }, [user]);
 
   if (!user) return null;

@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import { categories } from "@/lib/mock-data";
+import { useCategories } from "@/hooks/useCategories";
 import { CheckCircle, Upload, Plus, X } from "lucide-react";
 
 export default function AddProductPage() {
   const router = useRouter();
   const { user } = useAuth();
+  const { categories } = useCategories();
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [specs, setSpecs] = useState<{ key: string; value: string }[]>([]);

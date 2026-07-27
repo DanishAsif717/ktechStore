@@ -1,14 +1,28 @@
+"use client";
+
 import Link from "next/link";
 import Hero from "@/components/shared/Hero";
 import ProductCard from "@/components/shared/ProductCard";
 import CategoryCard from "@/components/shared/CategoryCard";
 import VendorCard from "@/components/shared/VendorCard";
-import { products, categories, vendors, formatPrice, getDiscountedProducts } from "@/lib/mock-data";
+import { useProducts } from "@/hooks/useProducts";
+import { useCategories } from "@/hooks/useCategories";
+import { useEffect, useState } from "react";
+import { fetchVendors } from "@/lib/services/vendor.service";
+import type { Vendor } from "@/types";
 
 export default function HomePage() {
+  const { products } = useProducts();
+  const { categories } = useCategories();
+  const [vendors, setVendors] = useState<Vendor[]>([]);
+
+  useEffect(() => {
+    fetchVendors().then(setVendors);
+  }, []);
+
   const featured = products.filter(p => p.isFeatured).slice(0, 8);
   const topVendors = vendors.filter(v => v.status === "approved").slice(0, 4);
-  const deals = getDiscountedProducts().slice(0, 4);
+  const deals = products.filter(p => p.discount && p.discount > 0).slice(0, 4);
 
   return (
     <div>

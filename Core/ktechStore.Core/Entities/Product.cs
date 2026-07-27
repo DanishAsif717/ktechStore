@@ -43,7 +43,11 @@ namespace ktechStore.Core.Entities
         [ForeignKey(nameof(CategoryId))]
         public Category? Category { get; set; }
 
-      
+        // ---------- Vendor Fields ----------
+        public int? VendorId { get; set; }
+
+        [ForeignKey(nameof(VendorId))]
+        public Vendor? Vendor { get; set; }
 
         [MaxLength(100)]
         public string? CreatedBy { get; set; }
