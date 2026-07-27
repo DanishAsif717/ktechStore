@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import type { Product } from "@/types";
-import { formatPrice, getVendorById, getProductEmoji } from "@/lib/mock-data";
+import { useState, useEffect } from "react";
+import type { Product, Vendor } from "@/types";
+import { formatPrice, getProductEmoji } from "@/lib/utils";
+import { fetchVendorById } from "@/lib/services/vendor.service";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { ShoppingCart, Heart, Star } from "lucide-react";
@@ -16,8 +18,14 @@ interface ProductCardProps {
 export default function ProductCard({ product, showVendor = false }: ProductCardProps) {
     const { addItem, openCart } = useCart();
     const { isWishlisted, toggleItem } = useWishlist();
-    const vendor = getVendorById(product.vendorId);
+    const [vendor, setVendor] = useState<Vendor | null>(null);
     const wishlisted = isWishlisted(product.id);
+
+    useEffect(() => {
+        if (showVendor && product.vendorId) {
+            fetchVendorById(product.vendorId).then(v => setVendor(v ?? null));
+        }
+    }, [showVendor, product.vendorId]);
 
     const imageUrl = product.images?.[0];
     const hasValidImage = !!imageUrl && (imageUrl.startsWith("http") || imageUrl.startsWith("/"));

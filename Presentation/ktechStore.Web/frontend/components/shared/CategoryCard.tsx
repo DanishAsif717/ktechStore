@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Category } from "@/types";
-import { getCategoryEmoji } from "@/lib/mock-data";
+import { getCategoryEmoji } from "@/lib/utils";
 
 interface CategoryCardProps {
   category: Category;

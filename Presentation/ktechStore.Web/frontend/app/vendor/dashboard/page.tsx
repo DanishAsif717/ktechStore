@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { getVendorStats, getOrdersByVendor } from "@/lib/mock-data";
+import { fetchVendorStats } from "@/lib/services/order.service";
 import { DollarSign, ShoppingBag, Package, Star, TrendingUp } from "lucide-react";
 import { StatsCardSkeleton } from "@/components/shared/Skeleton";
 import { useState, useEffect } from "react";
@@ -14,11 +14,7 @@ export default function VendorDashboardHome() {
 
   useEffect(() => {
     if (user) {
-      const timer = setTimeout(() => {
-        setStats(getVendorStats(user.vendor.id));
-        setLoading(false);
-      }, 600);
-      return () => clearTimeout(timer);
+      fetchVendorStats(user.vendor.id).then(s => { setStats(s); setLoading(false); });
     }
   }, [user]);
 

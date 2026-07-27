@@ -1,7 +1,8 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { getOrdersByVendor, formatPrice } from "@/lib/mock-data";
+import { fetchOrdersByVendor } from "@/lib/services/order.service";
+import { formatPrice } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { ShoppingBag, PackageSearch } from "lucide-react";
 
@@ -10,7 +11,7 @@ export default function VendorOrdersPage() {
   const [orders, setOrders] = useState<any[]>([]);
 
   useEffect(() => {
-    if (user) setOrders(getOrdersByVendor(user.vendor.id));
+    if (user) fetchOrdersByVendor(user.vendor.id).then(setOrders);
   }, [user]);
 
   if (!user) return null;

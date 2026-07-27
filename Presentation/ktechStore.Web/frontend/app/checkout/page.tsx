@@ -2,15 +2,28 @@
 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { formatPrice, getVendorById, getProductEmoji, generateOrderId } from "@/lib/mock-data";
-import { useState, useMemo } from "react";
+import { formatPrice, getProductEmoji, generateOrderId } from "@/lib/utils";
+import { fetchVendorById } from "@/lib/services/vendor.service";
+import { useState, useMemo, useEffect } from "react";
 import { Store, CreditCard, CheckCircle, Package } from "lucide-react";
 import EmptyState from "@/components/shared/EmptyState";
+import type { Vendor } from "@/types";
 
 export default function CheckoutPage() {
-  const { items, getSubtotal, clearCart } = useCart();
+  const { items, clearCart } = useCart();
   const [submitted, setSubmitted] = useState(false);
   const [orderId, setOrderId] = useState("");
+  const [vendors, setVendors] = useState<Record<string, Vendor | null>>({});
+
+  useEffect(() => {
+    const ids = [...new Set(items.map(i => i.product.vendorId))];
+    Promise.all(ids.map(id => fetchVendorById(id).then(v => ({ id, vendor: v ?? null }))))
+      .then(results => {
+        const map: Record<string, Vendor | null> = {};
+        results.forEach(r => { map[r.id] = r.vendor; });
+        setVendors(map);
+      });
+  }, [items]);
 
   const groupedByVendor = useMemo(() => {
     const groups: Record<string, typeof items> = {};
@@ -51,7 +64,7 @@ export default function CheckoutPage() {
           <div className="space-y-3 text-left bg-gray-50 rounded-xl p-4 mb-8">
             <p className="text-sm font-semibold text-foreground">Order Summary</p>
             {Object.entries(groupedByVendor).map(([vendorId, vendorItems]) => {
-              const vendor = getVendorById(vendorId);
+              const vendor = vendors[vendorId];
               const vTotal = vendorItems.reduce((s, i) => s + i.product.price * i.quantity, 0);
               return (
                 <div key={vendorId} className="text-sm text-muted flex justify-between">
@@ -151,7 +164,7 @@ export default function CheckoutPage() {
 
           <div className="space-y-4 mb-4 max-h-80 overflow-y-auto">
             {Object.entries(groupedByVendor).map(([vendorId, vendorItems]) => {
-              const vendor = getVendorById(vendorId);
+              const vendor = vendors[vendorId];
               const vTotal = vendorItems.reduce((s, i) => s + i.product.price * i.quantity, 0);
               return (
                 <div key={vendorId} className="border border-border rounded-lg p-3">

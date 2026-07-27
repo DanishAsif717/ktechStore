@@ -2,30 +2,82 @@
 
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { useState } from "react";
-import { getProductBySlug, getCategoryBySlug, getProductsByCategory, getVendorById, getReviewsByProduct, formatPrice, getProductEmoji } from "@/lib/mock-data";
+import { useState, useMemo, useEffect } from "react";
+import { useProduct } from "@/hooks/useProduct";
+import { fetchCategoryBySlug } from "@/lib/services/category.service";
+import { fetchProductsByCategory, fetchProducts } from "@/lib/services/product.service";
+import { fetchVendorById } from "@/lib/services/vendor.service";
+import { fetchReviewsByProduct } from "@/lib/services/review.service";
+import { formatPrice, getProductEmoji } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import ProductCard from "@/components/shared/ProductCard";
 import ReviewCard from "@/components/shared/ReviewCard";
-import { ShoppingCart, Heart, Star, Truck, ShieldCheck, RotateCcw, Minus, Plus, Store } from "lucide-react";
+import { ShoppingCart, Heart, Star, Truck, ShieldCheck, RotateCcw, Minus, Plus, Store, RefreshCw, AlertCircle } from "lucide-react";
+import type { Product, Vendor, Category, Review } from "@/types";
 
 export default function ProductDetailPage() {
   const params = useParams();
   const slug = params.id as string;
-  const product = getProductBySlug(slug);
+  const { product, loading, error } = useProduct(slug);
   const { addItem, openCart } = useCart();
   const { isWishlisted, toggleItem } = useWishlist();
   const [quantity, setQuantity] = useState(1);
+  const [vendor, setVendor] = useState<Vendor | null>(null);
+  const [category, setCategory] = useState<Category | null>(null);
+  const [related, setRelated] = useState<Product[]>([]);
+  const [productReviews, setProductReviews] = useState<Review[]>([]);
+
+  useEffect(() => {
+    if (!product) return;
+    const slug = product.category.toLowerCase().replace(/\s+/g, "-");
+    fetchCategoryBySlug(slug).then(c => setCategory(c ?? null));
+    fetchVendorById(product.vendorId).then(v => setVendor(v ?? null));
+    fetchReviewsByProduct(product.id).then(setProductReviews);
+    fetchProductsByCategory(slug)
+      .then(ps => ps.filter(p => p.id !== product.id).slice(0, 4))
+      .then(setRelated);
+  }, [product]);
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="h-4 w-64 bg-gray-200 rounded animate-pulse mb-8" />
+        <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
+          <div className="aspect-square bg-gray-200 rounded-2xl animate-pulse" />
+          <div className="space-y-4">
+            <div className="h-8 w-3/4 bg-gray-200 rounded animate-pulse" />
+            <div className="h-6 w-1/3 bg-gray-200 rounded animate-pulse" />
+            <div className="h-20 bg-gray-200 rounded animate-pulse" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="flex flex-col items-center justify-center text-center">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
+            <AlertCircle className="w-8 h-8 text-red-500" />
+          </div>
+          <h2 className="text-xl font-semibold text-foreground mb-2">Failed to load product</h2>
+          <p className="text-muted mb-6 max-w-md">{error}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="inline-flex items-center gap-2 bg-primary text-white px-5 py-2.5 rounded-xl hover:bg-primary-dark transition-colors text-sm font-medium"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) notFound();
 
-  const vendor = getVendorById(product.vendorId);
-  const category = getCategoryBySlug(product.category.toLowerCase().replace(/\s+/g, "-"));
-  const productReviews = getReviewsByProduct(product.id);
-  const related = getProductsByCategory(product.category.toLowerCase().replace(/\s+/g, "-"))
-    .filter(p => p.id !== product.id)
-    .slice(0, 4);
   const wishlisted = isWishlisted(product.id);
 
   const handleAddToCart = () => {

@@ -1,6 +1,6 @@
 ﻿import type { CategoryApiResponse } from "@/types/api";
 import type { Category } from "@/types";
-import { getCategoryEmoji } from "@/lib/mock-data";
+import { getCategoryEmoji } from "@/lib/utils";
 
 function slugify(name: string): string {
     return name

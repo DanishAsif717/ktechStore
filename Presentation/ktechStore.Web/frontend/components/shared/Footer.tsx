@@ -1,7 +1,10 @@
+"use client";
+
 import Link from "next/link";
-import { categories } from "@/lib/mock-data";
+import { useCategories } from "@/hooks/useCategories";
 
 export default function Footer() {
+  const { categories } = useCategories();
   return (
     <footer className="bg-white border-t border-border mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

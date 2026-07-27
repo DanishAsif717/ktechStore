@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCart } from "@/context/CartContext";
-import { formatPrice, getProductEmoji } from "@/lib/mock-data";
+import { formatPrice, getProductEmoji } from "@/lib/utils";
 import { X, ShoppingBag } from "lucide-react";
 
 export default function CartSidebar() {

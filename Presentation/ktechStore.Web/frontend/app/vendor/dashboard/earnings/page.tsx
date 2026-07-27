@@ -1,7 +1,8 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { getVendorStats, getOrdersByVendor, formatPrice } from "@/lib/mock-data";
+import { fetchVendorStats, fetchOrdersByVendor } from "@/lib/services/order.service";
+import { formatPrice } from "@/lib/utils";
 import { useState, useEffect } from "react";
 import { DollarSign, TrendingUp, TrendingDown } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
@@ -13,8 +14,8 @@ export default function VendorEarningsPage() {
 
   useEffect(() => {
     if (user) {
-      setStats(getVendorStats(user.vendor.id));
-      setOrders(getOrdersByVendor(user.vendor.id));
+      fetchVendorStats(user.vendor.id).then(setStats);
+      fetchOrdersByVendor(user.vendor.id).then(setOrders);
     }
   }, [user]);
 

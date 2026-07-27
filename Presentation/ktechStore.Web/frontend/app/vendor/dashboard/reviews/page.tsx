@@ -1,7 +1,8 @@
 "use client";
 
 import { useAuth } from "@/context/AuthContext";
-import { getProductsByVendor, getReviewsByProduct } from "@/lib/mock-data";
+import { fetchProductsByVendor } from "@/lib/services/product.service";
+import { fetchReviewsByProduct } from "@/lib/services/review.service";
 import { useState, useEffect } from "react";
 import { Star, MessageSquare } from "lucide-react";
 
@@ -11,11 +12,14 @@ export default function VendorReviewsPage() {
 
   useEffect(() => {
     if (user) {
-      const vendorProducts = getProductsByVendor(user.vendor.id);
-      const allReviews = vendorProducts.flatMap(p =>
-        getReviewsByProduct(p.id).map(r => ({ ...r, productName: p.name, productId: p.id }))
-      );
-      setReviews(allReviews.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+      fetchProductsByVendor(user.vendor.id).then(vendorProducts => {
+        Promise.all(vendorProducts.map(p =>
+          fetchReviewsByProduct(p.id).then(r => r.map(rv => ({ ...rv, productName: p.name, productId: p.id })))
+        )).then(nested => {
+          const allReviews = nested.flat().sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+          setReviews(allReviews);
+        });
+      });
     }
   }, [user]);
 
