@@ -1,9 +1,6 @@
 ﻿import { useState, useEffect } from "react";
 import type { Category } from "@/types";
-import type { CategoryApiResponse } from "@/types/api";
-import { mapApiCategoryToCategory } from "@/lib/mappers/category-mapper";
-
-const baseUrl = typeof window === "undefined" ? process.env.INTERNAL_API_URL : "";
+import { fetchCategories } from "@/lib/services/category.service";
 
 export function useCategories() {
     const [categories, setCategories] = useState<Category[]>([]);
@@ -11,19 +8,25 @@ export function useCategories() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetch(`${baseUrl}/api/categories`, { cache: "no-store" })
-            .then(res => {
-                if (!res.ok) throw new Error("Failed to fetch categories");
-                return res.json();
-            })
-            .then((data: CategoryApiResponse[]) => {
-                setCategories(data.map(mapApiCategoryToCategory));
+        let cancelled = false;
+
+        fetchCategories()
+            .then(data => {
+                if (!cancelled) {
+                    setCategories(data);
+                    setError(null);
+                }
             })
             .catch(err => {
-                console.error("Failed to load categories:", err);
-                setError(err.message);
+                if (!cancelled) {
+                    setError(err instanceof Error ? err.message : "Failed to load categories");
+                }
             })
-            .finally(() => setLoading(false));
+            .finally(() => {
+                if (!cancelled) setLoading(false);
+            });
+
+        return () => { cancelled = true; };
     }, []);
 
     return { categories, loading, error };

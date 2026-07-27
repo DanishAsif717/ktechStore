@@ -19,7 +19,8 @@ export default function ProductCard({ product, showVendor = false }: ProductCard
     const vendor = getVendorById(product.vendorId);
     const wishlisted = isWishlisted(product.id);
 
-    const hasImage = product.images && product.images.length > 0;
+    const imageUrl = product.images?.[0];
+    const hasValidImage = !!imageUrl && (imageUrl.startsWith("http") || imageUrl.startsWith("/"));
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -40,9 +41,9 @@ export default function ProductCard({ product, showVendor = false }: ProductCard
             className="group bg-card rounded-xl border border-border overflow-hidden hover:shadow-lg hover:border-primary/20 transition-all duration-300 flex flex-col"
         >
             <div className="relative aspect-square bg-gradient-to-br from-primary-light to-white flex items-center justify-center p-8">
-                {hasImage ? (
+                {hasValidImage ? (
                     <Image
-                        src={product.images[0]}
+                        src={imageUrl}
                         alt={product.name}
                         fill
                         className="object-contain p-4 group-hover:scale-110 transition-transform duration-300"
