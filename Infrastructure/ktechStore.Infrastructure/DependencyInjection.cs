@@ -40,6 +40,8 @@ namespace ktechStore.Infrastructure
 
             services.AddScoped<IImageService, CloudinaryService>();
             services.AddScoped<IMistralService, MistralService>();
+            services.AddScoped<IVendorApplicationRepository, VendorApplicationRepository>();
+            services.AddScoped<IVendorRepository, VendorRepository>();
 
             return services;
         }
