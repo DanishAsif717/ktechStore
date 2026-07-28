@@ -1,0 +1,114 @@
+@model IEnumerable<ktechStore.Application.DTOs.VendorApplicationListDto>
+
+@{
+	ViewData["Title"] = "Vendor Requests";
+	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+}
+
+<!-- Notification Alert for Generated Password / Email -->
+@if (TempData["GeneratedPassword"] != null)
+{
+	<div class="alert alert-success alert-dismissible fade show" role="alert">
+		<h5 class="alert-heading mb-1"><i class="bx bx-check-circle me-1"></i> Vendor Approved Successfully!</h5>
+		<p class="mb-1">Credentials generated for the new vendor:</p>
+		<ul class="mb-0">
+			<li><strong>Email:</strong> @TempData["GeneratedEmail"]</li>
+			<li><strong>Temporary Password:</strong> <code>@TempData["GeneratedPassword"]</code></li>
+		</ul>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+	</div>
+}
+
+<div class="card">
+	<div class="card-header d-flex justify-content-between align-items-center">
+		<h5 class="mb-0">Vendor Applications</h5>
+		<span class="badge bg-label-primary">Total: @Model.Count()</span>
+	</div>
+
+	<div class="table-responsive text-nowrap">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th>Shop / Business</th>
+					<th>Email / Phone</th>
+					<th>Applied Date</th>
+					<th>Status</th>
+					<th class="text-center">Actions</th>
+				</tr>
+			</thead>
+			<tbody class="table-border-bottom-0">
+				@if (!Model.Any())
+				{
+					<tr>
+						<td colspan="5" class="text-center py-4">
+							<i class="bx bx-info-circle fs-3 text-muted mb-2"></i>
+							<p class="mb-0 text-muted">No vendor applications found.</p>
+						</td>
+					</tr>
+				}
+				else
+				{
+					@foreach (var item in Model)
+					{
+						<tr>
+							<td>
+								<strong class="d-block">@item.ShopName</strong>
+								@if (!string.IsNullOrEmpty(item.BusinessDescription))
+								{
+									<small class="text-muted d-block text-truncate" style="max-width: 250px;" title="@item.BusinessDescription">
+										@item.BusinessDescription
+									</small>
+								}
+							</td>
+							<td>
+								<div>@item.Email</div>
+								<small class="text-muted">@item.ContactPhone</small>
+							</td>
+							<td>@item.AppliedAt.ToString("dd MMM yyyy, hh:mm tt")</td>
+							<td>
+								@if (item.Status == "Pending")
+								{
+									<span class="badge bg-label-warning me-1">Pending</span>
+								}
+								else if (item.Status == "Approved")
+								{
+									<span class="badge bg-label-success me-1">Approved</span>
+								}
+								else
+								{
+									<span class="badge bg-label-danger me-1">@item.Status</span>
+								}
+							</td>
+							<td class="text-center">
+								@if (item.Status == "Pending")
+								{
+									<div class="d-flex justify-content-center gap-2">
+										<!-- Approve Form -->
+										<form asp-area="Vendor" asp-controller="VendorRequests" asp-action="Approve" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Are you sure you want to approve this vendor?');">
+											@Html.AntiForgeryToken()
+											<button type="submit" class="btn btn-sm btn-success">
+												<i class="bx bx-check me-1"></i> Approve
+											</button>
+										</form>
+
+										<!-- Reject Form -->
+										<form asp-area="Vendor" asp-controller="VendorRequests" asp-action="Reject" asp-route-id="@item.Id" method="post" onsubmit="return confirm('Are you sure you want to reject this application?');">
+											@Html.AntiForgeryToken()
+											<button type="submit" class="btn btn-sm btn-outline-danger">
+												<i class="bx bx-x me-1"></i> Reject
+											</button>
+										</form>
+									</div>
+								}
+								else
+								{
+									<span class="text-muted small">No actions</span>
+								}
+							</td>
+						</tr>
+					}
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
