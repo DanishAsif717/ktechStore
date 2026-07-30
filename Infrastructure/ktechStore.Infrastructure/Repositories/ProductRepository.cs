@@ -64,5 +64,16 @@ namespace ktechStore.Infrastructure.Repositories
         {
             return await _context.Products.AnyAsync(p => p.SKU == sku);
         }
+        public async Task<IEnumerable<Product>> GetByVendorIdAsync(int vendorId)
+        {
+            return await _context.Products
+                .Include(p => p.Category)
+                .Include(p => p.ProductDetails)
+                .Where(p => p.VendorId == vendorId)
+                .ToListAsync();
+        }
+
+        
+
     }
 }

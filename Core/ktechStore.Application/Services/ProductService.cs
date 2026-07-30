@@ -103,7 +103,7 @@ namespace ktechStore.Application.Services
             };
         }
 
-        public async Task CreateProductAsync(ProductUpsertDto dto, string user)
+        public async Task CreateProductAsync(ProductUpsertDto dto, string user, int? vendorId = null)
         {
             string uploadedUrl = await HandleProductImageUploadAsync(dto.ProductImageFile, dto.ImageUrl);
             var product = new Product
@@ -116,6 +116,7 @@ namespace ktechStore.Application.Services
                 ImageUrl = uploadedUrl,
                 IsActive = dto.IsActive,
                 CategoryId = dto.CategoryId,
+                VendorId = vendorId,
                 CreatedBy = user,
                 CreatedAt = DateTime.UtcNow
             };
@@ -307,6 +308,31 @@ namespace ktechStore.Application.Services
             }
 
             return sku;
+        }
+
+        public async Task<IEnumerable<ProductDto>> GetProductsByVendorAsync(int vendorId)
+        {
+            var products = await _productRepo.GetByVendorIdAsync(vendorId);
+            return products.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                Stock = p.Stock,
+                SKU = p.SKU,
+                ImageUrl = p.ImageUrl,
+                IsActive = p.IsActive,
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category?.Name ?? "No Category",
+                CreatedAt = p.CreatedAt
+            });
+        }
+
+        public async Task<bool> IsProductOwnedByVendorAsync(int productId, int vendorId)
+        {
+            var product = await _productRepo.GetByIdAsync(productId);
+            return product != null && product.VendorId == vendorId;
         }
 
     }

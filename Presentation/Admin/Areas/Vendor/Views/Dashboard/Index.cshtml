@@ -1,0 +1,46 @@
+@{
+    ViewData["Title"] = "Vendor Dashboard";
+    Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+}
+
+<h4 class="fw-bold py-3 mb-4">
+    <span class="text-muted fw-light">Vendor /</span> Dashboard
+</h4>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-1">Shop Name</h6>
+                <h4 class="mb-0">@ViewBag.ShopName</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-1">Total Products</h6>
+                <h4 class="mb-0">@ViewBag.TotalProducts</h4>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="text-muted mb-1">Total Stock</h6>
+                <h4 class="mb-0">@ViewBag.TotalStock</h4>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-area="Vendor" asp-controller="Products" asp-action="Index" class="btn btn-primary">
+        <i class="bx bx-package me-1"></i> Manage My Products
+    </a>
+    <a asp-area="Vendor" asp-controller="CategoryRequests" asp-action="Index" class="btn btn-outline-secondary">
+        <i class="bx bx-category me-1"></i> My Category Requests
+    </a>
+</div>

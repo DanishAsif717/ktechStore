@@ -1,0 +1,76 @@
+@model ktechStore.Application.DTOs.ProductUpsertDto
+
+@{
+	ViewData["Title"] = "Edit Product";
+	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+}
+
+<h4 class="fw-bold py-3 mb-4">
+	<span class="text-muted fw-light">Vendor /</span> Edit Product
+</h4>
+
+<form asp-action="Edit" enctype="multipart/form-data">
+	<input type="hidden" asp-for="Id" />
+	<div class="row">
+		<div class="col-md-8">
+			<div class="card mb-4">
+				<div class="card-body">
+					<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+					<div class="mb-3">
+						<label asp-for="Name" class="form-label"></label>
+						<input asp-for="Name" class="form-control" />
+						<span asp-validation-for="Name" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="Description" class="form-label"></label>
+						<textarea asp-for="Description" class="form-control" rows="3"></textarea>
+						<span asp-validation-for="Description" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="Price" class="form-label"></label>
+						<input asp-for="Price" class="form-control" type="number" step="0.01" />
+						<span asp-validation-for="Price" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="Stock" class="form-label"></label>
+						<input asp-for="Stock" class="form-control" type="number" />
+						<span asp-validation-for="Stock" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="SKU" class="form-label"></label>
+						<input asp-for="SKU" class="form-control" />
+						<span asp-validation-for="SKU" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="CategoryId" class="form-label">Category</label>
+						<select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
+							<option value="">-- Select Category --</option>
+						</select>
+						<span asp-validation-for="CategoryId" class="text-danger"></span>
+					</div>
+
+					<div class="mb-3">
+						<label asp-for="ProductImageFile" class="form-label">Update Image</label>
+						<input asp-for="ProductImageFile" type="file" class="form-control" accept="image/*" />
+						<input type="hidden" asp-for="ImageUrl" />
+					</div>
+
+					<div class="form-check form-switch mb-3">
+						<input asp-for="IsActive" class="form-check-input" type="checkbox" />
+						<label asp-for="IsActive" class="form-check-label">Active</label>
+					</div>
+
+					<button type="submit" class="btn btn-primary">Save Changes</button>
+					<a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+

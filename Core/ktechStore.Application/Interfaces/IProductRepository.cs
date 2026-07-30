@@ -13,6 +13,7 @@ namespace ktechStore.Application.Interfaces
         Task DeleteAsync(int id);
         Task<bool> ExistsAsync(int id);
         Task<bool> SkuExistsAsync(string sku);
+        Task<IEnumerable<Product>> GetByVendorIdAsync(int vendorId);
 
     }
 }

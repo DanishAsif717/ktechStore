@@ -1,0 +1,33 @@
+@model ktechStore.Application.DTOs.ProductDto
+
+@{
+	ViewData["Title"] = "Delete Product";
+	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+}
+
+<h4 class="fw-bold py-3 mb-4">
+	<span class="text-muted fw-light">Vendor /</span> Delete Product
+</h4>
+
+<div class="card">
+	<div class="card-body">
+		<h5>Are you sure you want to delete this product?</h5>
+
+		<dl class="row mt-4">
+			<dt class="col-sm-3">Name</dt>
+			<dd class="col-sm-9">@Model.Name</dd>
+
+			<dt class="col-sm-3">Category</dt>
+			<dd class="col-sm-9">@Model.CategoryName</dd>
+
+			<dt class="col-sm-3">Price</dt>
+			<dd class="col-sm-9">Rs. @Model.Price</dd>
+		</dl>
+
+		<form asp-action="Delete">
+			<input type="hidden" asp-for="Id" />
+			<button type="submit" class="btn btn-danger">Delete</button>
+			<a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+		</form>
+	</div>
+</div>

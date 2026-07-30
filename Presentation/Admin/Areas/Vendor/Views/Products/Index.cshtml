@@ -1,0 +1,64 @@
+@model IEnumerable<ktechStore.Application.DTOs.ProductDto>
+
+@{
+	ViewData["Title"] = "My Products";
+	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+}
+
+<h4 class="fw-bold py-3 mb-4">
+	<span class="text-muted fw-light">Vendor /</span> My Products
+</h4>
+
+<div class="mb-3">
+	<a asp-action="Create" class="btn btn-primary">
+		<i class="bx bx-plus me-1"></i> Add New Product
+	</a>
+</div>
+
+<div class="card">
+	<div class="table-responsive text-nowrap">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Name</th>
+					<th>Category</th>
+					<th>Price</th>
+					<th>Stock</th>
+					<th>SKU</th>
+					<th>Status</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var product in Model)
+				{
+					<tr>
+						<td>@product.Name</td>
+						<td>@product.CategoryName</td>
+						<td>Rs. @product.Price</td>
+						<td>@product.Stock</td>
+						<td>@product.SKU</td>
+						<td>
+							@if (product.IsActive)
+							{
+								<span class="badge bg-label-success">Active</span>
+							}
+							else
+							{
+								<span class="badge bg-label-secondary">Inactive</span>
+							}
+						</td>
+						<td>
+							<a asp-action="Edit" asp-route-id="@product.Id" class="btn btn-sm btn-outline-primary">
+								<i class="bx bx-edit"></i>
+							</a>
+							<a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-sm btn-outline-danger">
+								<i class="bx bx-trash"></i>
+							</a>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
