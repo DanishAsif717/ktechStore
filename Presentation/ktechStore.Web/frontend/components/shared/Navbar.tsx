@@ -153,7 +153,7 @@ export default function Navbar() {
             </Link>
 
             <Link
-              href="/vendor/login"
+              href="/admin/Vendor/Account/Login"
               className="hidden sm:inline-flex items-center gap-1.5 border border-border text-muted hover:text-primary px-3 py-2 rounded-lg text-sm font-medium hover:border-primary transition-colors"
             >
               <User className="w-4 h-4" />
