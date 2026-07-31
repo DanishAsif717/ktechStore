@@ -1,0 +1,53 @@
+@{
+	TempData.Keep();
+	string? currentPage = ViewContext.HttpContext.Request.Path;
+}
+<!-- Menu -->
+<aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
+
+	<div class='app-brand demo @((@ViewData["navbarFull"] != null && Convert.ToBoolean(@ViewData["navbarFull"])) ? "d-xl-none" : "")'>
+		<a asp-area="Vendor" asp-controller="Dashboard" asp-action="Index" class="app-brand-link">
+			<span class="app-brand-logo demo">
+				@await Html.PartialAsync("../_Partials/_Macros")
+			</span>
+			<span class="app-brand-text demo menu-text fw-bold ms-2">@TempData.Peek("appName")</span>
+		</a>
+
+		<a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto">
+			<i class="icon-base bx bx-chevron-left d-block d-xl-none align-middle"></i>
+		</a>
+	</div>
+
+	<div class="menu-divider mt-0"></div>
+
+	<div class="menu-inner-shadow"></div>
+
+	<ul class="menu-inner py-1">
+
+		<!-- Dashboard -->
+		<li class='menu-item@(currentPage.Contains("/Vendor/Dashboard") ? " active" : "")'>
+			<a asp-area="Vendor" asp-controller="Dashboard" asp-action="Index" class="menu-link">
+				<i class="menu-icon icon-base bx bx-home-smile"></i>
+				<div class="text-truncate" data-i18n="Dashboard">Dashboard</div>
+			</a>
+		</li>
+
+		<!-- Vendor Management -->
+		<li class="menu-header small text-uppercase">
+			<span class="menu-header-text">Vendor Management</span>
+		</li>
+
+		<!-- Vendor Requests -->
+		<li class='menu-item@(currentPage.Contains("/Vendor/VendorRequests") ? " active" : "")'>
+			<a asp-area="Vendor" asp-controller="VendorRequests" asp-action="Index" class="menu-link">
+				<i class="menu-icon icon-base bx bx-store"></i>
+				<div class="text-truncate">Vendor Requests</div>
+			</a>
+		</li>
+
+		<!-- Add more vendor-specific items here as controllers get built -->
+
+	</ul>
+
+</aside>
+<!-- / Menu -->
