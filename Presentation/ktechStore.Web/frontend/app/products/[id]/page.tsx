@@ -30,7 +30,9 @@ export default function ProductDetailPage() {
 
   useEffect(() => {
     if (!product) return;
-    const slug = product.category.toLowerCase().replace(/\s+/g, "-");
+      const slug = product.category.toLowerCase().trim()
+                                    .replace(/[^a-z0-9]+/g, "-")
+                                    .replace(/(^-|-$)/g, "");
     fetchCategoryBySlug(slug).then(c => setCategory(c ?? null));
     fetchVendorById(product.vendorId).then(v => setVendor(v ?? null));
     fetchReviewsByProduct(product.id).then(setProductReviews);
@@ -105,8 +107,18 @@ export default function ProductDetailPage() {
 
       <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
         <div className="space-y-4">
-          <div className="aspect-square bg-gradient-to-br from-primary-light to-white rounded-2xl flex items-center justify-center relative">
-            <span className="text-[10rem] md:text-[14rem]">{getProductEmoji(product.category)}</span>
+                  <div className="aspect-square bg-gradient-to-br from-primary-light to-white rounded-2xl flex items-center justify-center relative">
+                      {product.images ? (
+                          <img
+                              src={product.images}
+                              alt="Product image"
+                              className="w-full h-full object-cover"
+                          />
+                      ) : (
+                          <span className="text-[10rem] md:text-[14rem]">
+                              {getProductEmoji(product.category)}
+                          </span>
+                      )}
             {product.discount && (
               <span className="absolute top-4 left-4 bg-accent text-white text-sm font-bold px-3 py-1.5 rounded-lg">
                 -{product.discount}% OFF
@@ -162,10 +174,10 @@ export default function ProductDetailPage() {
           )}
 
           <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-2">
+           {/* <div className="flex items-center gap-2">
               <span className="text-muted">Unit:</span>
               <span className="font-medium text-foreground">{product.unit}</span>
-            </div>
+            </div>*/}
             <div className="flex items-center gap-2">
               <span className="text-muted">Stock:</span>
               {product.inStock ? (

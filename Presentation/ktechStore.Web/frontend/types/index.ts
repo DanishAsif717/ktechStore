@@ -43,9 +43,6 @@ export interface Category {
   name: string;
   slug: string;
   description: string;
-  image: string;
-  productCount: number;
-  icon: string;
 }
 
 export interface CartItem {

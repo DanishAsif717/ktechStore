@@ -42,8 +42,8 @@ namespace ktechStore.Infrastructure
             services.AddScoped<IMistralService, MistralService>();
             services.AddScoped<IVendorApplicationRepository, VendorApplicationRepository>();
             services.AddScoped<IVendorRepository, VendorRepository>();
-            services.AddScoped<ICategoryRequestRepository, CategoryRequestRepository>();
-
+            services.AddScoped<ICategoryRequestRepository, CategoryRequestRepository>(); 
+            services.AddScoped<IOrderGroupRepository, OrderGroupRepository>();
             return services;
         }
     }

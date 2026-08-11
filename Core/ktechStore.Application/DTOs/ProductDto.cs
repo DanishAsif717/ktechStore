@@ -15,7 +15,7 @@ namespace ktechStore.Application.DTOs
         public string? ImageUrl { get; set; }
         public bool IsActive { get; set; }
         public int CategoryId { get; set; }
-        public string? CategoryName { get; set; } // View me Category Name dikhane ke liye
+        public string? CategoryName { get; set; } 
         public DateTime CreatedAt { get; set; }
         public List<ProductDetailDto> ProductDetails { get; set; } = new List<ProductDetailDto>();
     }

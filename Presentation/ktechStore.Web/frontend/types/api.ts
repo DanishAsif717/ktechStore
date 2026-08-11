@@ -25,6 +25,7 @@ export interface ProductApiResponse {
 export interface CategoryApiResponse {
     id: number;
     name: string;
+    slug: string;
     description?: string;
     status: number;   
     createdAt: string;

@@ -12,7 +12,7 @@ function slugify(name: string): string {
 export function mapApiProductToProduct(p: ProductApiResponse): Product {
     return {
         id: p.id,
-        vendorId: "",                          // Vendor Flow abhi nahi bana
+        vendorId: "",                          
         name: p.name,
         slug: slugify(p.name),
         description: p.description ?? "",
@@ -20,10 +20,10 @@ export function mapApiProductToProduct(p: ProductApiResponse): Product {
         originalPrice: undefined,
         images: p.imageUrl ? [p.imageUrl] : [],
         category: p.categoryName,
-        subcategory: "",                       // Backend me abhi field nahi hai
+        subcategory: "",                       
         unit: "pc",
         inStock: p.isActive && p.stock > 0,
-        rating: 0,                             // Reviews system abhi nahi bana
+        rating: 0,                             
         reviewCount: 0,
         isFeatured: false,
         discount: undefined,
