@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import React from "react";
 import { useCart } from "@/context/CartContext";
 import { formatPrice, getProductEmoji } from "@/lib/utils";
 import { X, ShoppingBag } from "lucide-react";
@@ -44,8 +45,12 @@ export default function CartSidebar() {
               <ul className="space-y-4">
                 {items.map(item => (
                   <li key={item.product.id} className="flex gap-4 py-3 border-b border-border last:border-0">
-                    <div className="w-16 h-16 bg-primary-light rounded-lg flex items-center justify-center flex-shrink-0">
-                      <span className="text-2xl">{getProductEmoji(item.product.category)}</span>
+                    <div className="w-16 h-16 bg-primary-light rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                        <img
+                            src={item.product.images}
+                            alt={item.product.name}
+                            className="w-full h-full object-cover rounded-lg"
+                        />
                     </div>
                     <div className="flex-1 min-w-0">
                       <Link

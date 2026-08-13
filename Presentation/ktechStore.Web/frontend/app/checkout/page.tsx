@@ -11,9 +11,25 @@ import type { Vendor } from "@/types";
 
 export default function CheckoutPage() {
   const { items, clearCart } = useCart();
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [orderId, setOrderId] = useState("");
+  const [orderGroupId, setOrderGroupId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [vendors, setVendors] = useState<Record<string, Vendor | null>>({});
+
+  const [form, setForm] = useState({
+        firstName: "",
+        lastName: "",
+        email: "",
+        phone: "",
+        street: "",
+        city: "",
+        zip: "",
+  });
+
+  const updateForm = (key: keyof typeof form, value: string) => {
+    setForm(prev => ({ ...prev, [key]: value }));
+  };
 
   useEffect(() => {
     const ids = [...new Set(items.map(i => i.product.vendorId))];
@@ -60,7 +76,7 @@ export default function CheckoutPage() {
           </div>
           <h1 className="text-2xl font-bold text-foreground mb-2">Order Placed Successfully!</h1>
           <p className="text-muted mb-2">Thank you for your purchase. Your order has been placed and the vendors have been notified.</p>
-          <p className="text-sm font-medium text-primary mb-8">Order #{orderId}</p>
+          <p className="text-sm font-medium text-primary mb-8">Order #{orderGroupId}</p>
           <div className="space-y-3 text-left bg-gray-50 rounded-xl p-4 mb-8">
             <p className="text-sm font-semibold text-foreground">Order Summary</p>
             {Object.entries(groupedByVendor).map(([vendorId, vendorItems]) => {
@@ -74,7 +90,7 @@ export default function CheckoutPage() {
               );
             })}
             <div className="border-t border-border pt-2 flex justify-between font-semibold text-foreground">
-              <span>Total Paid</span>
+              <span>Total (Cash on Delivery)</span>
               <span>{formatPrice(total)}</span>
             </div>
           </div>
@@ -88,13 +104,63 @@ export default function CheckoutPage() {
       </div>
     );
   }
+   const canPlaceOrder = () => {
+        return (
+            form.firstName.trim().length > 0 &&
+            form.email.trim().length > 0 &&
+            form.phone.trim().length > 0 &&
+            form.street.trim().length > 0 &&
+            form.city.trim().length > 0
+        );
+    };
+   const handlePlaceOrder = async () => {
+        // 🔥 NAYA: validation check
+        if (!canPlaceOrder()) {
+            setError("Please fill in all required fields.");
+            return;
+        }
 
-  const handlePlaceOrder = () => {
-    const id = generateOrderId();
-    setOrderId(id);
-    clearCart();
-    setSubmitted(true);
-  };
+        setSubmitting(true);
+        setError(null);
+
+        try {
+            // 🔥 NAYA: /api/checkout ko POST request — yeh backend ka CheckoutApiController hit karta hai
+            const res = await fetch("/api/checkout", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    // 🔥 NAYA: form state se data nikal kar backend ke CheckoutDto format me bheja
+                    customerName: `${form.firstName} ${form.lastName}`.trim(),
+                    customerEmail: form.email,
+                    customerPhone: form.phone,
+                    shippingAddress: `${form.street}, ${form.city} ${form.zip}`.trim(),
+                    items: items.map(i => ({
+                        productId: i.product.id,
+                        quantity: i.quantity,
+                    })),
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                // 🔥 NAYA: agar backend error de (jaise BadRequest), usko throw karke catch block me pakdo
+                throw new Error(data.message || "Failed to place order");
+            }
+
+            // 🔥 NAYA: backend se asal OrderGroupId lo (random mock ID nahi)
+            setOrderGroupId(data.orderGroupId);
+
+            clearCart();
+            setSubmitted(true);
+        } catch (err) {
+            // 🔥 NAYA: koi bhi error aaye to user ko dikhao
+            setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+        } finally {
+            // 🔥 NAYA: chahe success ho ya fail, loading state band karo
+            setSubmitting(false);
+        }
+    }; 
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -146,7 +212,7 @@ export default function CheckoutPage() {
             <h2 className="text-lg font-semibold text-foreground mb-4">Payment Method</h2>
             <div className="space-y-3">
               {[
-                { name: "Credit Card", icon: CreditCard },
+                // { name: "Credit Card", icon: CreditCard },
                 { name: "Cash on Delivery", icon: Package },
               ].map(({ name, icon: Icon }) => (
                 <label key={name} className="flex items-center gap-3 p-3 border border-border rounded-lg cursor-pointer hover:border-primary transition-colors">
@@ -156,7 +222,12 @@ export default function CheckoutPage() {
                 </label>
               ))}
             </div>
-          </div>
+            </div>
+            {error && (
+                <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
+                    {error}
+                </div>
+            )}
         </div>
 
         <div className="bg-card border border-border rounded-xl p-6 h-fit sticky top-24">
@@ -174,8 +245,12 @@ export default function CheckoutPage() {
                   </div>
                   {vendorItems.map(item => (
                     <div key={item.product.id} className="flex items-center gap-3 py-1.5">
-                      <div className="w-8 h-8 bg-primary-light rounded-lg flex items-center justify-center flex-shrink-0">
-                        <span className="text-sm">{getProductEmoji(item.product.category)}</span>
+                       <div className="w-8 h-8 bg-primary-light rounded-lg flex-shrink-0 overflow-hidden">
+                            <img
+                                src={item.product.images}
+                                alt={item.product.name}
+                                className="w-full h-full object-cover"
+                            />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-xs text-foreground line-clamp-1">{item.product.name}</p>
@@ -200,23 +275,20 @@ export default function CheckoutPage() {
             <div className="flex justify-between">
               <span className="text-muted">Shipping</span>
               <span className="text-green-600 font-medium">Free</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-muted">Tax</span>
-              <span className="text-foreground">{formatPrice(total * 0.08)}</span>
-            </div>
+            </div>       
             <div className="border-t border-border pt-3 flex justify-between">
-              <span className="font-semibold text-foreground">Total</span>
+              <span className="font-semibold text-foreground">Total(COD)</span>
               <span className="font-bold text-lg text-primary">{formatPrice(total * 1.08)}</span>
             </div>
           </div>
 
           <button
             onClick={handlePlaceOrder}
+            disabled={submitting}
             className="w-full bg-primary text-white font-medium py-3 rounded-xl hover:bg-primary-dark transition-colors mt-6 flex items-center justify-center gap-2"
           >
             <CheckCircle className="w-5 h-5" />
-            Place Order
+            {submitting ? "Placing Order..." : "Place Order"}
           </button>
         </div>
       </div>

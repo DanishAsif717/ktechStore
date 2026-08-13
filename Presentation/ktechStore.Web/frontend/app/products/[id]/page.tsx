@@ -102,6 +102,7 @@ export default function ProductDetailPage() {
     const wishlisted = isWishlisted(product.id);
 
     const handleAddToCart = () => {
+        console.log("Check Qty",quantity);
         for (let i = 0; i < quantity; i++) {
             addItem(product as any);
         }

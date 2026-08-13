@@ -9,9 +9,7 @@ export async function fetchCategories(): Promise<Category[]> {
 
 export async function fetchCategoryBySlug(slug: string): Promise<Category | null> {
     const categories = await fetchCategories();
-    console.log("Data For Category Test", categories);
     const data = categories.find(c => c.slug === slug) ?? null;
-    console.log("Data Test", data);
     return data;
 }
 
