@@ -15,7 +15,14 @@ export interface Vendor {
   address: string;
   followers: number;
 }
-
+export interface ProductDetail {
+    id: number;
+    price?: number;
+    stock: number;
+    size?: string;
+    color?: string;
+    imageUrl?: string;
+}
 export interface Product {
   id: number;
   vendorId: string;
@@ -24,7 +31,7 @@ export interface Product {
   description: string;
   price: number;
   originalPrice?: number;
-  images: string[];
+  images: string;
   category: string;
   subcategory: string;
   unit: string;
@@ -36,6 +43,8 @@ export interface Product {
   tags: string[];
   specifications: { key: string; value: string }[];
   createdAt: string;
+  productDetails: ProductDetail[];
+
 }
 
 export interface Category {

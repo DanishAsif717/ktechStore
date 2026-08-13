@@ -18,7 +18,7 @@ export function mapApiProductToProduct(p: ProductApiResponse): Product {
         description: p.description ?? "",
         price: p.price,
         originalPrice: undefined,
-        images: p.imageUrl ? [p.imageUrl] : [],
+        images: p.imageUrl ?? "" ,
         category: p.categoryName,
         subcategory: "",                       
         unit: "pc",
@@ -33,5 +33,13 @@ export function mapApiProductToProduct(p: ProductApiResponse): Product {
             value: `Rs. ${d.price ?? p.price} - Stock: ${d.stock}`,
         })),
         createdAt: p.createdAt,
+        productDetails: p.productDetails.map((d) => ({
+            id: d.id,
+            price: d.price ?? undefined,
+            stock: d.stock,
+            size: d.size ?? undefined,
+            color: d.color ?? undefined,
+            imageUrl: d.imageUrl ?? undefined,
+        })),
     };
 }
