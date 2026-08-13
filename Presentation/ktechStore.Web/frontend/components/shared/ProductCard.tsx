@@ -27,7 +27,7 @@ export default function ProductCard({ product, showVendor = false }: ProductCard
         }
     }, [showVendor, product.vendorId]);
 
-    const imageUrl = product.images?.[0];
+    const imageUrl = product.images;
     const hasValidImage = !!imageUrl && (imageUrl.startsWith("http") || imageUrl.startsWith("/"));
 
     const handleAddToCart = (e: React.MouseEvent) => {

@@ -12,6 +12,7 @@ namespace ktechStore.Application
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IVendorService, VendorService>();
             services.AddScoped<ICategoryRequestService, CategoryRequestService>();
+            services.AddScoped<IOrderService, OrderService>();
 
             return services;
         }

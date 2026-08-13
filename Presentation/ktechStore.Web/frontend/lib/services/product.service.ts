@@ -8,7 +8,7 @@ export async function fetchProducts(): Promise<Product[]> {
 }
 
 export async function fetchProductBySlug(slug: string): Promise<Product | null> {
-  const products = await fetchProducts();
+  const products = await fetchProducts();  
   return products.find(p => p.slug === slug) ?? null;
 }
 

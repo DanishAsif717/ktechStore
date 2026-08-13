@@ -12,18 +12,18 @@ function slugify(name: string): string {
 export function mapApiProductToProduct(p: ProductApiResponse): Product {
     return {
         id: p.id,
-        vendorId: "",                          // Vendor Flow abhi nahi bana
+        vendorId: "",                          
         name: p.name,
         slug: slugify(p.name),
         description: p.description ?? "",
         price: p.price,
         originalPrice: undefined,
-        images: p.imageUrl ? [p.imageUrl] : [],
+        images: p.imageUrl ?? "" ,
         category: p.categoryName,
-        subcategory: "",                       // Backend me abhi field nahi hai
+        subcategory: "",                       
         unit: "pc",
         inStock: p.isActive && p.stock > 0,
-        rating: 0,                             // Reviews system abhi nahi bana
+        rating: 0,                             
         reviewCount: 0,
         isFeatured: false,
         discount: undefined,
@@ -33,5 +33,13 @@ export function mapApiProductToProduct(p: ProductApiResponse): Product {
             value: `Rs. ${d.price ?? p.price} - Stock: ${d.stock}`,
         })),
         createdAt: p.createdAt,
+        productDetails: p.productDetails.map((d) => ({
+            id: d.id,
+            price: d.price ?? undefined,
+            stock: d.stock,
+            size: d.size ?? undefined,
+            color: d.color ?? undefined,
+            imageUrl: d.imageUrl ?? undefined,
+        })),
     };
 }

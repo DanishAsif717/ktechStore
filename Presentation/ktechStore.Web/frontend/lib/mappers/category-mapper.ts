@@ -1,6 +1,5 @@
 ﻿import type { CategoryApiResponse } from "@/types/api";
 import type { Category } from "@/types";
-import { getCategoryEmoji } from "@/lib/utils";
 
 function slugify(name: string): string {
     return name
@@ -15,10 +14,7 @@ export function mapApiCategoryToCategory(c: CategoryApiResponse): Category {
     return {
         id: c.id,
         name: c.name,
-        slug,
         description: c.description ?? "",
-        image: getCategoryEmoji(slug),
-        productCount: 0,   
-        icon: getCategoryEmoji(slug),
+        slug:slug,
     };
 }

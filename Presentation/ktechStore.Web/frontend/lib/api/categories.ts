@@ -6,8 +6,11 @@ const baseUrl = typeof window !== "undefined"
 
 export async function fetchCategoriesFromApi(): Promise<CategoryApiResponse[]> {
   const res = await fetch(`${baseUrl}/api/categories`, { cache: "no-store" });
-  if (!res.ok) throw new Error("Failed to fetch categories");
-  return res.json();
+    if (!res.ok) throw new Error("Failed to fetch categories");
+    const data = await res.json();
+    console.log("Developer For Test:", data);
+
+    return data;
 }
 
 export async function fetchCategoryFromApi(id: number): Promise<CategoryApiResponse> {
