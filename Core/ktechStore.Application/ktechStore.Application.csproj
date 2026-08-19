@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.10" />
     <PackageReference Include="ObjectDumper.NET" Version="4.3.2" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
   </ItemGroup>
 
   <ItemGroup>

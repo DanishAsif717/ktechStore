@@ -1,14 +1,14 @@
 <Solution>
   <Folder Name="/Core/">
-    <Project Path="../../../../../../../../nandgs/ktechStore/Core/ktechStore.Application/ktechStore.Application.csproj" />
-    <Project Path="../../../../../../../../nandgs/ktechStore/Core/ktechStore.Core/ktechStore.Core.csproj" />
+    <Project Path="../Core/ktechStore.Application/ktechStore.Application.csproj" />
+    <Project Path="../Core/ktechStore.Core/ktechStore.Core.csproj" />
   </Folder>
   <Folder Name="/Infrastructure/">
-    <Project Path="../../../../../../../../nandgs/ktechStore/Infrastructure/ktechStore.Infrastructure/ktechStore.Infrastructure.csproj" />
+    <Project Path="../Infrastructure/ktechStore.Infrastructure/ktechStore.Infrastructure.csproj" />
   </Folder>
   <Folder Name="/Presentation/">
-    <Project Path="../../../../../../../../nandgs/ktechStore/Presentation/Admin/AspnetCoreMvcFull.csproj" />
-    <Project Path="../../../../../../../../nandgs/ktechStore/Presentation/ktechStore.Web/ktechStore.Web.csproj" />
+    <Project Path="../Presentation/Admin/AspnetCoreMvcFull.csproj" />
+    <Project Path="../Presentation/ktechStore.Web/ktechStore.Web.csproj" />
   </Folder>
   <Folder Name="/Solution Items/">
     <File Path="sharedsettings.json" />

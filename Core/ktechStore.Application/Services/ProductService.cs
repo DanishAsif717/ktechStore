@@ -4,10 +4,8 @@ using ktechStore.Application.Interfaces;
 using ktechStore.Core.Entities;
 using ktechStore.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Serilog;
+
 
 namespace ktechStore.Application.Services
 {
@@ -291,8 +289,16 @@ namespace ktechStore.Application.Services
         {
             if (file != null && file.Length > 0)
             {
+                Log.Information("Uploading image {FileName}, Size: {Size} bytes", file.FileName, file.Length);
+
                 var cloudUrl = await _imageService.UploadImageAsync(file, "ktech_store_products_local");
-                if (!string.IsNullOrEmpty(cloudUrl)) return cloudUrl;
+                if (!string.IsNullOrEmpty(cloudUrl))
+                {
+                    Log.Information("Upload success: {Url}", cloudUrl);
+                    return cloudUrl;
+                }
+                Log.Warning("Upload returned null/empty for {FileName}, falling back to existing URL", file.FileName);
+
             }
             return existingUrl;
         }

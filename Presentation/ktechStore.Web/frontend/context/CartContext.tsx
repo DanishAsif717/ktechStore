@@ -39,7 +39,8 @@ interface CartContextType {
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case "ADD_ITEM": {
-      const existing = state.items.find(i => i.product.id === action.product.id);
+          const existing = state.items.find(i => i.product.id === action.product.id);
+          console.log("Existing", existing);
       if (existing) {
         return {
           ...state,

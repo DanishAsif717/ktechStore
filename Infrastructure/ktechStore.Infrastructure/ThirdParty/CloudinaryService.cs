@@ -1,13 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks; 
-using CloudinaryDotNet;
+﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 using ktechStore.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
-using System.Linq;
-
 using Microsoft.Extensions.Configuration;
+using Serilog;
+
 
 namespace ktechStore.Infrastructure.ThirdParty
 {
@@ -46,6 +43,8 @@ namespace ktechStore.Infrastructure.ThirdParty
 
                 uploadResult = await _cloudinary.UploadAsync(uploadParams);
             }
+            if (uploadResult.Error != null)
+                Log.Error("Cloudinary error: {Message}", uploadResult.Error.Message);
 
             return uploadResult.SecureUrl?.ToString();
         }

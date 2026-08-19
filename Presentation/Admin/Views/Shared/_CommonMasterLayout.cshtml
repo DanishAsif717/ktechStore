@@ -21,7 +21,7 @@
 
   @{
     string title = ViewData["title"] as string ?? "";
-    string appName = TempData.Peek("appName") as string ?? "";
+	string appName = TempData?.Peek("appName")?.ToString() ?? "KTech Store";
     string productPage = TempData.Peek("productPage") as string ?? "";
     }
   <title>@title | @appName - Asp.Net Core MVC Free Admin Template</title>
