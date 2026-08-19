@@ -69,7 +69,6 @@ namespace ktechStore.Infrastructure.ThirdParty
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    // 🔥 Service down / error case - jo tumhe chahiye tha
                     _logger.LogError(
                         "Mistral API failed. StatusCode: {StatusCode}, Response: {Response}",
                         response.StatusCode, jsonResponse

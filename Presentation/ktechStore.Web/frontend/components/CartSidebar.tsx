@@ -47,7 +47,11 @@ export default function CartSidebar() {
                   <li key={item.product.id} className="flex gap-4 py-3 border-b border-border last:border-0">
                     <div className="w-16 h-16 bg-primary-light rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
                         <img
-                            src={item.product.images}
+                            src={
+                                Array.isArray(item.product.images)
+                                    ? item.product.images[0] || '/placeholder.png'
+                                    : item.product.images || '/placeholder.png'
+                            }
                             alt={item.product.name}
                             className="w-full h-full object-cover rounded-lg"
                         />

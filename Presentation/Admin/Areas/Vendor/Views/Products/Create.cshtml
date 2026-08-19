@@ -1,74 +1,385 @@
 @model ktechStore.Application.DTOs.ProductUpsertDto
+@using Microsoft.AspNetCore.Http
 
 @{
-	ViewData["Title"] = "Add Product";
+	ViewData["Title"] = "Create Product";
 	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
 }
 
-<h4 class="fw-bold py-3 mb-4">
-	<span class="text-muted fw-light">Vendor /</span> Add Product
-</h4>
+<h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">Vendor /</span> Create Product</h4>
 
 <form asp-action="Create" enctype="multipart/form-data">
 	<div class="row">
 		<div class="col-md-8">
 			<div class="card mb-4">
+				<h5 class="card-header">Add a New Product</h5>
 				<div class="card-body">
 					<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-					<div class="mb-3">
-						<label asp-for="Name" class="form-label"></label>
-						<input asp-for="Name" class="form-control" />
-						<span asp-validation-for="Name" class="text-danger"></span>
-					</div>
+					<div class="row">
+						<div class="mb-3 col-md-6">
+							<label asp-for="Name" class="form-label fw-semibold"></label>
+							<input asp-for="Name" id="productNameInput" class="form-control" placeholder="Enter product name" />
+							<span asp-validation-for="Name" class="text-danger"></span>
+						</div>
 
-					<div class="mb-3">
-						<label asp-for="Description" class="form-label"></label>
-						<textarea asp-for="Description" class="form-control" rows="3"></textarea>
-						<span asp-validation-for="Description" class="text-danger"></span>
-					</div>
+						<div class="mb-3 col-md-6">
+							<div class="d-flex justify-content-between align-items-center mb-1">
+								<label asp-for="SKU" class="form-label fw-semibold mb-0"></label>
+								<button type="button" id="btnAiGenerateSku" class="btn btn-xs btn-outline-primary py-0">
+									<i class="bx bx-bolt-circle"></i> ✨ Generate SKU
+								</button>
+							</div>
+							<input asp-for="SKU" id="productSkuInput" class="form-control" placeholder="e.g., PROD-100" />
+							<span asp-validation-for="SKU" class="text-danger"></span>
+						</div>
 
-					<div class="mb-3">
-						<label asp-for="Price" class="form-label"></label>
-						<input asp-for="Price" class="form-control" type="number" step="0.01" />
-						<span asp-validation-for="Price" class="text-danger"></span>
-					</div>
+						<div class="mb-3 col-md-6">
+							<label asp-for="Price" class="form-label fw-semibold"></label>
+							<div class="input-group input-group-merge">
+								<span class="input-group-text">Rs.</span>
+								<input asp-for="Price" class="form-control" type="number" step="0.01" placeholder="0.00" />
+							</div>
+							<span asp-validation-for="Price" class="text-danger"></span>
+						</div>
 
-					<div class="mb-3">
-						<label asp-for="Stock" class="form-label"></label>
-						<input asp-for="Stock" class="form-control" type="number" />
-						<span asp-validation-for="Stock" class="text-danger"></span>
-					</div>
+						<div class="mb-3 col-md-6">
+							<label asp-for="Stock" class="form-label fw-semibold"></label>
+							<input asp-for="Stock" class="form-control" type="number" placeholder="0" />
+							<span asp-validation-for="Stock" class="text-danger"></span>
+						</div>
 
-					<div class="mb-3">
-						<label asp-for="SKU" class="form-label"></label>
-						<input asp-for="SKU" class="form-control" />
-						<span asp-validation-for="SKU" class="text-danger"></span>
-					</div>
+						<div class="mb-3 col-md-6">
+							<label asp-for="CategoryId" class="form-label fw-semibold">Category</label>
+							<select asp-for="CategoryId" id="categorySelectInput" class="form-select" asp-items="ViewBag.CategoryId">
+								<option value="">-- Select Category --</option>
+							</select>
+							<span asp-validation-for="CategoryId" class="text-danger"></span>
+						</div>
 
-					<div class="mb-3">
-						<label asp-for="CategoryId" class="form-label">Category</label>
-						<select asp-for="CategoryId" class="form-select" asp-items="ViewBag.CategoryId">
-							<option value="">-- Select Category --</option>
-						</select>
-						<span asp-validation-for="CategoryId" class="text-danger"></span>
-					</div>
+						<div class="mb-3 col-md-6">
+							<label asp-for="ProductImageFile" class="form-label fw-semibold">Upload Product Image</label>
+							<input asp-for="ProductImageFile" type="file" id="imageFileInput" class="form-control" accept="image/*" />
+							<span asp-validation-for="ProductImageFile" class="text-danger"></span>
 
-					<div class="mb-3">
-						<label asp-for="ProductImageFile" class="form-label">Product Image</label>
-						<input asp-for="ProductImageFile" type="file" class="form-control" accept="image/*" />
-					</div>
+							<input type="hidden" asp-for="ImageUrl" id="productImageUrlHidden" />
+						</div>
 
-					<div class="form-check form-switch mb-3">
-						<input asp-for="IsActive" class="form-check-input" type="checkbox" />
-						<label asp-for="IsActive" class="form-check-label">Active</label>
-					</div>
+						<div class="mb-3 col-md-12">
+							<div class="d-flex justify-content-between align-items-center mb-1">
+								<label asp-for="Description" class="form-label fw-semibold mb-0"></label>
+								<button type="button" id="btnAiGenerate" class="btn btn-sm btn-outline-secondary">
+									<i class="bx bx-wand me-1"></i> ✨ AI Generate
+								</button>
+							</div>
+							<textarea asp-for="Description" id="productDescription" class="form-control" rows="3" placeholder="Enter product description..."></textarea>
+							<span asp-validation-for="Description" class="text-danger"></span>
+						</div>
 
-					<button type="submit" class="btn btn-primary">Save Product</button>
-					<a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+						<div class="mb-3 col-md-12">
+							<!-- Notice for Vendor -->
+							<div class="alert alert-warning d-flex align-items-center py-2 px-3 mb-3" role="alert">
+								<i class="bx bx-time-five me-2 fs-5"></i>
+								<small><strong>Note:</strong> When a new product is submitted, it will first go to Admin Approval (Pending). Approval is required for the product to be displayed in the store.</small>
+							</div>
+
+							<!-- Vendor Active/Inactive Toggle Button -->
+							<div class="form-check form-switch mt-2">
+								<input class="form-check-input" type="checkbox" asp-for="IsActive" checked />
+								<label class="form-check-label fw-semibold" asp-for="IsActive">Visible & Active in Store</label>
+							</div>
+						</div>
+
+						<div class="mb-2 col-md-12">
+							<div class="form-check form-switch mt-2 p-3 bg-label-light rounded border border-dashed">
+								<input class="form-check-input ms-0 me-2" type="checkbox" id="toggleVariants" />
+								<label class="form-check-label fw-bold text-primary" for="toggleVariants">This product has multiple variants (e.g., size, color, weight)</label>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="card mb-4 d-none" id="variantCardSection">
+				<div class="card-header d-flex justify-content-between align-items-center border-bottom mb-3">
+					<h5 class="mb-0">Product Variants Configuration</h5>
+					<button type="button" class="btn btn-sm btn-outline-primary" id="addVariantRowBtn">
+						<i class="bx bx-plus me-1"></i> Add Variant Row
+					</button>
+				</div>
+				<div class="card-body">
+					<div class="table-responsive text-nowrap">
+						<table class="table table-bordered table-sm" id="variantsTable">
+							<thead>
+								<tr>
+									<th style="width: 15%;">Size <span class="text-danger">*</span></th>
+									<th style="width: 15%;">Color <span class="text-danger">*</span></th>
+									<th style="width: 15%;">Price (Rs.)</th>
+									<th style="width: 12%;">Stock Qty</th>
+									<th style="width: 25%;">Upload Variant Image</th>
+									<th style="width: 10%;" class="text-center">Preview</th>
+									<th style="width: 8%;" class="text-center">Action</th>
+								</tr>
+							</thead>
+							<tbody id="variantsContainer">
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<div class="mb-4">
+				<button type="submit" class="btn btn-primary me-2">
+					<i class="bx bx-plus me-1"></i> Create Product
+				</button>
+				<a asp-action="Index" class="btn btn-outline-secondary">
+					<i class="bx bx-arrow-back me-1"></i> Back to List
+				</a>
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="card mb-4">
+				<h5 class="card-header">Main Image Preview</h5>
+				<div class="card-body text-center">
+					<div class="border rounded p-2 d-flex align-items-center justify-content-center bg-light" style="min-height: 250px; position: relative;">
+						<img id="imgPreview" src="#" alt="Product Preview" class="img-fluid rounded d-none" style="max-height: 240px; object-fit: contain;" />
+						<div id="previewPlaceholder" class="text-muted">
+							<i class="bx bx-image-add display-4 d-block mb-2"></i>
+							<span>No Image Selected</span>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
 	</div>
 </form>
 
+<script>
+	document.addEventListener("DOMContentLoaded", function() {
+		const toggleVariants = document.getElementById("toggleVariants");
+		const variantSection = document.getElementById("variantCardSection");
+		const container = document.getElementById("variantsContainer");
+		const addBtn = document.getElementById("addVariantRowBtn");
+		const btnAiGenerate = document.getElementById("btnAiGenerate");
+		const btnAiGenerateSku = document.getElementById("btnAiGenerateSku");
+		const imageFileInput = document.getElementById("imageFileInput");
+		const imgPreview = document.getElementById("imgPreview");
+		const previewPlaceholder = document.getElementById("previewPlaceholder");
+
+		let variantIndex = 0;
+
+		// --- Live Main Image Preview ---
+		imageFileInput.addEventListener("change", function() {
+			const file = this.files[0];
+			if (file) {
+				const reader = new FileReader();
+				reader.onload = function(e) {
+					imgPreview.setAttribute("src", e.target.result);
+					imgPreview.classList.remove("d-none");
+					previewPlaceholder.classList.add("d-none");
+				}
+				reader.readAsDataURL(file);
+			} else {
+				imgPreview.setAttribute("src", "#");
+				imgPreview.classList.add("d-none");
+				previewPlaceholder.classList.remove("d-none");
+			}
+		});
+
+		// --- Toggle View Visibility (Variants) ---
+		toggleVariants.addEventListener("change", function() {
+			if (this.checked) {
+				variantSection.classList.remove("d-none");
+				if (container.children.length === 0) {
+					addVariantRow();
+				}
+			} else {
+				variantSection.classList.add("d-none");
+				container.innerHTML = "";
+				variantIndex = 0;
+			}
+		});
+
+		// Add Variant Row Button Trigger
+		addBtn.addEventListener("click", function() {
+			addVariantRow();
+		});
+
+		// 🔥 Dynamic HTML generation with dedicated file input and live preview cell
+		function addVariantRow() {
+			const html = `
+					<tr class="variant-row" data-index="${variantIndex}">
+						<td>
+							<input name="ProductDetails[${variantIndex}].Size" class="form-control form-control-sm" placeholder="e.g., Large, XL" required />
+						</td>
+						<td>
+							<input name="ProductDetails[${variantIndex}].Color" class="form-control form-control-sm" placeholder="e.g., Red, Blue" required />
+						</td>
+						<td>
+							<input name="ProductDetails[${variantIndex}].Price" class="form-control form-control-sm" type="number" step="0.01" value="0.00" />
+						</td>
+						<td>
+							<input name="ProductDetails[${variantIndex}].Stock" class="form-control form-control-sm" type="number" value="0" />
+						</td>
+						<td>
+							<input type="file" name="ProductDetails[${variantIndex}].VariantImageFile" class="form-control form-control-sm variant-image-input" accept="image/*" />
+							<input type="hidden" name="ProductDetails[${variantIndex}].ImageUrl" class="variant-hidden-url" />
+						</td>
+						<td class="text-center align-middle">
+							<div class="d-flex align-items-center justify-content-center border rounded bg-light mx-auto" style="width: 40px; height: 40px; overflow: hidden;">
+								<img src="#" alt="Thumb" class="img-fluid d-none variant-thumb-preview" style="max-height: 100%; object-fit: cover;" />
+								<i class="bx bx-image text-muted variant-thumb-icon"></i>
+							</div>
+						</td>
+						<td class="text-center align-middle">
+							<button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
+								<i class="bx bx-trash"></i>
+							</button>
+						</td>
+					</tr>
+				`;
+			container.insertAdjacentHTML('beforeend', html);
+			variantIndex++;
+		}
+
+		// 🔥 Dynamic Event listener for capturing variant image uploads & updating thumbnails
+		container.addEventListener("change", function(e) {
+			if (e.target.classList.contains("variant-image-input")) {
+				const input = e.target;
+				const row = input.closest(".variant-row");
+				const thumbImg = row.querySelector(".variant-thumb-preview");
+				const thumbIcon = row.querySelector(".variant-thumb-icon");
+
+				const file = input.files[0];
+				if (file) {
+					const reader = new FileReader();
+					reader.onload = function(event) {
+						thumbImg.setAttribute("src", event.target.result);
+						thumbImg.classList.remove("d-none");
+						thumbIcon.classList.add("d-none");
+					}
+					reader.readAsDataURL(file);
+				} else {
+					thumbImg.setAttribute("src", "#");
+					thumbImg.classList.add("d-none");
+					thumbIcon.classList.remove("d-none");
+				}
+			}
+		});
+
+		// Remove Row Event Handler
+		container.addEventListener("click", function(e) {
+			if (e.target.closest(".remove-row-btn")) {
+				const row = e.target.closest(".variant-row");
+				row.remove();
+				reIndexRows();
+			}
+		});
+
+		// Re-indexing logic to ensure Model Binding stays intact
+		function reIndexRows() {
+			const rows = container.querySelectorAll(".variant-row");
+			variantIndex = 0;
+			rows.forEach(function(row) {
+				row.setAttribute("data-index", variantIndex);
+				row.querySelector('input[name$=".Size"]').setAttribute("name", `ProductDetails[${variantIndex}].Size`);
+				row.querySelector('input[name$=".Color"]').setAttribute("name", `ProductDetails[${variantIndex}].Color`);
+				row.querySelector('input[name$=".Price"]').setAttribute("name", `ProductDetails[${variantIndex}].Price`);
+				row.querySelector('input[name$=".Stock"]').setAttribute("name", `ProductDetails[${variantIndex}].Stock`);
+				row.querySelector('input[name$=".VariantImageFile"]').setAttribute("name", `ProductDetails[${variantIndex}].VariantImageFile`);
+				row.querySelector('input[name$=".ImageUrl"]').setAttribute("name", `ProductDetails[${variantIndex}].ImageUrl`);
+				variantIndex++;
+			});
+		}
+
+		// Utility function to get Product and Category state
+		function getProductContext() {
+			const productNameInput = document.getElementById("productNameInput");
+			const categorySelect = document.getElementById("categorySelectInput");
+
+			if (!productNameInput || !categorySelect) return null;
+
+			const productName = productNameInput.value.trim();
+			let categoryName = "";
+			if (categorySelect.selectedIndex > 0) {
+				categoryName = categorySelect.options[categorySelect.selectedIndex].text;
+			}
+			return { productName, categoryName };
+		}
+
+		// --- SKU Generation Click Event ---
+		btnAiGenerateSku.addEventListener("click", async function() {
+			const context = getProductContext();
+			if (!context || !context.productName) {
+				alert("Pehle Product Name likhein taake AI SKU code bana sakay!");
+				return;
+			}
+
+			const originalBtnHtml = btnAiGenerateSku.innerHTML;
+			btnAiGenerateSku.innerHTML = `<span class="spinner-border spinner-border-sm" role="status"></span>`;
+			btnAiGenerateSku.disabled = true;
+
+			try {
+				const skuUrl = '@Url.Action("GenerateSku", "Products", new { area = "Catalog" })';
+				const response = await fetch(skuUrl, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ productName: context.productName, categoryName: context.categoryName })
+				});
+
+				if (!response.ok) throw new Error("Server error");
+
+				const data = await response.json();
+				if (data.success) {
+					document.getElementById("productSkuInput").value = data.sku;
+				} else {
+					alert(data.message || "Failed to generate SKU.");
+				}
+			} catch (error) {
+				console.error("SKU Error:", error);
+				alert("SKU endpoint hit nahi ho saka.");
+			} finally {
+				btnAiGenerateSku.innerHTML = originalBtnHtml;
+				btnAiGenerateSku.disabled = false;
+			}
+		});
+
+		// --- Description Generation Click Event ---
+		btnAiGenerate.addEventListener("click", async function() {
+			const context = getProductContext();
+			if (!context || !context.productName) {
+				alert("Pehle Product Name likhein taake AI description bana sakay!");
+				return;
+			}
+
+			const originalBtnHtml = btnAiGenerate.innerHTML;
+			btnAiGenerate.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Generating...`;
+			btnAiGenerate.disabled = true;
+
+			try {
+				const generateUrl = '@Url.Action("GenerateDescription", "Products", new { area = "Catalog" })';
+				const response = await fetch(generateUrl, {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ productName: context.productName, categoryName: context.categoryName })
+				});
+
+				if (!response.ok) throw new Error("Server error");
+
+				const data = await response.json();
+				if (data.success) {
+					document.getElementById("productDescription").value = data.description;
+				} else {
+					alert(data.message || "Failed to generate description.");
+				}
+			} catch (error) {
+				console.error("AI Error:", error);
+				alert("Mistral API backend error.");
+			} finally {
+				btnAiGenerate.innerHTML = originalBtnHtml;
+				btnAiGenerate.disabled = false;
+			}
+		});
+	});
+</script>

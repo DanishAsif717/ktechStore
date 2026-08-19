@@ -124,12 +124,10 @@ export default function CheckoutPage() {
         setError(null);
 
         try {
-            // 🔥 NAYA: /api/checkout ko POST request — yeh backend ka CheckoutApiController hit karta hai
             const res = await fetch("/api/checkout", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    // 🔥 NAYA: form state se data nikal kar backend ke CheckoutDto format me bheja
                     customerName: `${form.firstName} ${form.lastName}`.trim(),
                     customerEmail: form.email,
                     customerPhone: form.phone,
@@ -144,20 +142,16 @@ export default function CheckoutPage() {
             const data = await res.json();
 
             if (!res.ok) {
-                // 🔥 NAYA: agar backend error de (jaise BadRequest), usko throw karke catch block me pakdo
                 throw new Error(data.message || "Failed to place order");
             }
 
-            // 🔥 NAYA: backend se asal OrderGroupId lo (random mock ID nahi)
             setOrderGroupId(data.orderGroupId);
 
             clearCart();
             setSubmitted(true);
         } catch (err) {
-            // 🔥 NAYA: koi bhi error aaye to user ko dikhao
             setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
         } finally {
-            // 🔥 NAYA: chahe success ho ya fail, loading state band karo
             setSubmitting(false);
         }
     }; 

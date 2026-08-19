@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using ktechStore.Core.Enums;
 
 
 namespace ktechStore.Core.Entities
@@ -34,6 +35,9 @@ namespace ktechStore.Core.Entities
         public string? ImageUrl { get; set; }
 
         public bool IsActive { get; set; } = true;
+
+        //  New Field for Admin Approval Tracking
+        public ProductStatus Status { get; set; } = ProductStatus.Pending;
 
         // ---------- Foreign Keys ----------
 
