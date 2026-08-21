@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using ktechStore.Application.DTOs;
+﻿using ktechStore.Application.DTOs;
+using ktechStore.Core.Enums;
 
 namespace ktechStore.Application.Interfaces
 {
@@ -15,6 +14,9 @@ namespace ktechStore.Application.Interfaces
         Task<string> GenerateUniqueSkuAsync(string productName, string categoryName);
         Task<IEnumerable<ProductDto>> GetProductsByVendorAsync(int vendorId);
         Task<bool> IsProductOwnedByVendorAsync(int productId, int vendorId);
+        Task<List<PendingProductDto>> GetPendingProductsAsync();
+        Task<bool> ApproveProductAsync(int productId);
+        Task<bool> RejectProductAsync(int productId, string? reason);
 
 
     }

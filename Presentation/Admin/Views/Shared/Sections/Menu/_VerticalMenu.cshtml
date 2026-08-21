@@ -128,9 +128,33 @@
 						</div>
 					</a>
 				</li>
-			</ul>
+  			</ul>
 		</li>
 
+		<li class="menu-item @(currentPage.Contains("/Catalog/") ? "active open" : "")">
+			<a href="javascript:void(0);" class="menu-link menu-toggle">
+				<i class="menu-icon icon-base bx bx-shopping-bag"></i>
+				<div class="text-truncate">Approvals</div>
+			</a>
+			<ul class="menu-sub">			
+				<!--  NEW: Pending Product Approvals with Badge -->
+				<li class="menu-item @(currentPage.Contains("/Catalog/Products/Approvals") ? "active" : "")">
+					<a asp-area="Catalog" asp-controller="Products" asp-action="Approvals" class="menu-link d-flex justify-content-between align-items-center">
+						<div class="text-truncate">Product Approvals</div>
+						<!-- Optional: Pending count badge -->
+						<span class="badge badge-center rounded-pill bg-danger w-px-20 h-px-20">3</span>
+					</a>
+				</li>
+
+				<!-- Vendor Request Link -->
+				<li class="menu-item @(currentPage.Contains("/Vendor/VendorRequests") ? "active" : "")">
+					<a asp-area="Vendor" asp-controller="VendorRequests" asp-action="Index" class="menu-link">
+						<div class="text-truncate">Vendor Requests</div>
+					</a>
+				</li>
+
+			</ul>
+		</li>
 
    
     <!-- Apps & Pages -->

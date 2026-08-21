@@ -3,6 +3,7 @@ using ktechStore.Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NToastNotify;
 using System.Threading.Tasks;
 
 namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
@@ -15,16 +16,20 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
     private readonly IProductService _productService;
     private readonly ICategoryService _categoryService;
     private readonly IMistralService _mistralService;
+    private readonly IToastNotification _toastNotification;
 
     public ProductsController(
       IProductService productService,
       ICategoryService categoryService,
-      IMistralService mistralService
+      IMistralService mistralService,
+      IToastNotification toastNotification
+
     )
     {
       _productService = productService;
       _categoryService = categoryService;
       _mistralService = mistralService;
+      _toastNotification = toastNotification;
     }
 
 
@@ -151,5 +156,44 @@ namespace AspnetCoreMvcFull.Areas.Catalog.Controllers
       await _productService.DeleteProductAsync(id);
       return RedirectToAction(nameof(Index));
     }
+
+    // GET: /Catalog/Products/Approvals
+    public async Task<IActionResult> Approvals()
+    {
+      var pendingProducts = await _productService.GetPendingProductsAsync();
+      return View(pendingProducts);
+    }
+    // POST: Approve
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Approve(int id)
+    {
+      var result = await _productService.ApproveProductAsync(id);
+      if (!result)
+      {
+        _toastNotification.AddErrorToastMessage("Product not found or already processed.");
+        return RedirectToAction(nameof(Approvals));
+      }
+
+      _toastNotification.AddSuccessToastMessage("Product approved successfully.");
+      return RedirectToAction(nameof(Approvals));
+    }
+
+    // POST: Reject
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Reject(int id, string? reason)
+    {
+      var result = await _productService.RejectProductAsync(id,  reason);
+      if (!result)
+      {
+        _toastNotification.AddErrorToastMessage("Product not found or already processed.");
+        return RedirectToAction(nameof(Approvals));
+      }
+
+      _toastNotification.AddSuccessToastMessage("Product rejected.");
+      return RedirectToAction(nameof(Approvals));
+    }
+
   }
 }

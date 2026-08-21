@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http;
 using ktechStore.Application.Validations;
+using ktechStore.Core.Enums;
 
 
 namespace ktechStore.Application.DTOs
@@ -27,6 +28,7 @@ namespace ktechStore.Application.DTOs
 
         public string? ImageUrl { get; set; }
         public bool IsActive { get; set; } = true;
+        public ProductStatus Status { get; set; } = ProductStatus.Pending;
 
         [RequiredIfIdZero(ErrorMessage = "Product image is required")]
         public IFormFile? ProductImageFile { get; set; }
