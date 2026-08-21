@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using ktechStore.Application.Interfaces;
 using ktechStore.Core.Entities;
+using ktechStore.Core.Enums;
 using ktechStore.Core.Interfaces;
 using ktechStore.Infrastructure.Persistence;
-using ktechStore.Application.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 namespace ktechStore.Infrastructure.Repositories
@@ -73,7 +74,16 @@ namespace ktechStore.Infrastructure.Repositories
                 .ToListAsync();
         }
 
-        
+        public async Task<List<Product>> GetByStatusAsync(ProductStatus status)
+        {
+            return await _context.Products
+                .Where(p => p.Status == status)
+                .Include(p => p.Vendor)
+                .Include(p => p.Category)
+                .ToListAsync();
+        }
+
+
 
     }
 }

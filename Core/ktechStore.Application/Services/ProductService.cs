@@ -2,6 +2,7 @@
 using ktechStore.Application.Extensions;
 using ktechStore.Application.Interfaces;
 using ktechStore.Core.Entities;
+using ktechStore.Core.Enums;
 using ktechStore.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Serilog;
@@ -124,6 +125,7 @@ namespace ktechStore.Application.Services
                 SKU = dto.SKU,
                 ImageUrl = uploadedUrl,
                 IsActive = dto.IsActive,
+                Status = vendorId.HasValue ? ProductStatus.Pending : ProductStatus.Approved,
                 CategoryId = dto.CategoryId,
                 VendorId = vendorId,
                 CreatedBy = user,
@@ -303,7 +305,6 @@ namespace ktechStore.Application.Services
             return existingUrl;
         }
 
-
         #endregion
         public async Task<string> GenerateUniqueSkuAsync(string productName, string categoryName)
         {
@@ -352,5 +353,47 @@ namespace ktechStore.Application.Services
             return product != null && product.VendorId == vendorId;
         }
 
+        public async Task<List<PendingProductDto>> GetPendingProductsAsync()
+        {
+            var products = await _productRepo.GetByStatusAsync(ProductStatus.Pending);
+
+            return products.Select(p => new PendingProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                ImageUrl = p.ImageUrl,
+                Price = p.Price,
+                VendorName = p.Vendor != null ? p.Vendor.ShopName : "N/A",   
+                CategoryName = p.Category != null ? p.Category.Name : "N/A",
+                CreatedAt = p.CreatedAt
+            }).ToList();
+        }
+
+        public async Task<bool> ApproveProductAsync(int productId)
+        {
+            var product = await _productRepo.GetByIdAsync(productId);
+            if (product == null || product.Status != ProductStatus.Pending)
+                return false;
+
+            product.Status = ProductStatus.Approved;
+            product.IsActive = true;
+
+            await _productRepo.UpdateAsync(product);
+            return true;
+        }
+
+        public async Task<bool> RejectProductAsync(int productId, string? reason)
+        {
+            var product = await _productRepo.GetByIdAsync(productId);
+            if (product == null || product.Status != ProductStatus.Pending)
+                return false;
+
+            product.Status = ProductStatus.Rejected;
+            product.IsActive = false;
+            product.RejectionReason = reason;
+
+            await _productRepo.UpdateAsync(product);
+            return true;
+        }
     }
 }

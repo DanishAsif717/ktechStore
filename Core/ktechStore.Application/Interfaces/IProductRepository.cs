@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using ktechStore.Core.Entities;
+using ktechStore.Core.Enums;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using ktechStore.Core.Entities;
 
 namespace ktechStore.Application.Interfaces
 {
@@ -14,6 +15,8 @@ namespace ktechStore.Application.Interfaces
         Task<bool> ExistsAsync(int id);
         Task<bool> SkuExistsAsync(string sku);
         Task<IEnumerable<Product>> GetByVendorIdAsync(int vendorId);
+        Task<List<Product>> GetByStatusAsync(ProductStatus status);
+
 
     }
 }

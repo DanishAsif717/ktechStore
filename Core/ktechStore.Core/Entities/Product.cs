@@ -39,6 +39,8 @@ namespace ktechStore.Core.Entities
         //  New Field for Admin Approval Tracking
         public ProductStatus Status { get; set; } = ProductStatus.Pending;
 
+        public string? RejectionReason { get; set; }
+
         // ---------- Foreign Keys ----------
 
         [Required]
