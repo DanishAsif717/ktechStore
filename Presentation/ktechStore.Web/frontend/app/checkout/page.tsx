@@ -113,6 +113,12 @@ export default function CheckoutPage() {
             form.city.trim().length > 0
         );
     };
+    const handleChange = (e:any) => {
+      setForm({
+        ...form,
+        [e.target.name]: e.target.value,
+      });
+    };
    const handlePlaceOrder = async () => {
         // 🔥 NAYA: validation check
         if (!canPlaceOrder()) {
@@ -167,19 +173,47 @@ export default function CheckoutPage() {
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">First Name</label>
-                <input type="text" className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors" placeholder="John" />
+                    <input
+                        type="text"
+                        name="firstName"
+                        value={form.firstName}
+                        onChange={handleChange}
+                        className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors"
+                        placeholder="John"
+                    />
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Last Name</label>
-                <input type="text" className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors" placeholder="Doe" />
+                    <input
+                        type="text"
+                        name="lastName"
+                        value={form.lastName}
+                        onChange={handleChange}
+                        className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors"
+                        placeholder="Doe"
+                    />
               </div>
               <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-foreground mb-1">Email</label>
-                <input type="email" className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors" placeholder="john@example.com" />
-              </div>
+                    <input
+                        type="email"
+                        name="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors"
+                        placeholder="john@example.com"
+                    />
+             </div>
               <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-foreground mb-1">Phone</label>
-                <input type="tel" className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors" placeholder="+1 (555) 123-4567" />
+                    <input
+                        type="tel"
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleChange}
+                        className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors"
+                        placeholder="+1 (555) 123-4567"
+                    />
               </div>
             </div>
           </div>
@@ -189,15 +223,36 @@ export default function CheckoutPage() {
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="sm:col-span-2">
                 <label className="block text-sm font-medium text-foreground mb-1">Street Address</label>
-                <input type="text" className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors" placeholder="123 Main Street" />
+                    <input
+                        type="text"
+                        name="street"
+                        value={form.street}
+                        onChange={handleChange}
+                        className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors"
+                        placeholder="123 Main Street"
+                    />
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">City</label>
-                <input type="text" className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors" placeholder="New York" />
+                    <input
+                        type="text"
+                        name="city"
+                        value={form.city}
+                        onChange={handleChange}
+                        className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors"
+                        placeholder="New York"
+                    />
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">ZIP Code</label>
-                <input type="text" className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors" placeholder="10001" />
+                    <input
+                        type="text"
+                        name="zip"
+                        value={form.zip}
+                        onChange={handleChange}
+                        className="w-full border border-border rounded-lg px-4 py-2.5 text-sm outline-none focus:border-primary transition-colors"
+                        placeholder="10001"
+                    />
               </div>
             </div>
           </div>
