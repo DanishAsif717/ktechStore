@@ -12,15 +12,19 @@ namespace ktechStore.Application.Services
     {
         private readonly IOrderGroupRepository _orderGroupRepo;
         private readonly IProductRepository _productRepo;
+        private readonly IOrderRepository _orderRepo;
         //private readonly IJazzCashService _jazzCashService;
 
         public OrderService(
             IOrderGroupRepository orderGroupRepo,
-            IProductRepository productRepo)
+            IProductRepository productRepo,
+            IOrderRepository orderRepo)
+
             //IJazzCashService jazzCashService)
         {
             _orderGroupRepo = orderGroupRepo;
             _productRepo = productRepo;
+            _orderRepo = orderRepo;
             //_jazzCashService = jazzCashService;
         }
         public async Task<CheckoutResultDto> PlaceOrderAsync(CheckoutDto dto)
@@ -43,6 +47,7 @@ namespace ktechStore.Application.Services
             foreach (var item in dto.Items)
             {
                 var product = await _productRepo.GetByIdAsync(item.ProductId);
+
                 if (product == null) continue;
 
                 if (!vendorGroups.ContainsKey(product.VendorId))
@@ -64,6 +69,8 @@ namespace ktechStore.Application.Services
 
                 foreach (var (product, qty) in group.Value)
                 {
+                    Console.WriteLine($"  Product: {product.Name}, ProductId: {product.Id}, Qty: {qty}");
+
                     var lineTotal = product.Price * qty;
                     orderSubTotal += lineTotal;
 
@@ -181,7 +188,7 @@ namespace ktechStore.Application.Services
 
             var responseCode = callbackParams.GetValueOrDefault("pp_ResponseCode");
 
-            if (responseCode == "000") // 🔥 000 = JazzCash ka "Success" code
+            if (responseCode == "000") 
             {
                 orderGroup.PaymentStatus = PaymentStatus.Paid;
                 orderGroup.StripePaymentIntentId = callbackParams.GetValueOrDefault("pp_TxnRefNo");
@@ -198,6 +205,10 @@ namespace ktechStore.Application.Services
 
             await _orderGroupRepo.UpdateAsync(orderGroup);
             return responseCode == "000";
+        }
+        public async Task<List<Order>> GetOrdersByVendorAsync(int vendorId)
+        {
+            return await _orderRepo.GetOrdersByVendorAsync(vendorId);
         }
     }
 }

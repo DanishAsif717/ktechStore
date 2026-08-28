@@ -44,6 +44,9 @@ namespace ktechStore.Infrastructure
             services.AddScoped<IVendorRepository, VendorRepository>();
             services.AddScoped<ICategoryRequestRepository, CategoryRequestRepository>(); 
             services.AddScoped<IOrderGroupRepository, OrderGroupRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+
+
             return services;
         }
     }
