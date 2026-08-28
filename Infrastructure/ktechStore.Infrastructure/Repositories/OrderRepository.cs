@@ -22,5 +22,12 @@ namespace ktechStore.Infrastructure.Repositories
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
         }
+        public async Task<Order?> GetOrderDetailsAsync(int orderId, int vendorId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderItems)
+                .FirstOrDefaultAsync(o => o.Id == orderId && o.VendorId == vendorId);
+        }
+
     }
 }

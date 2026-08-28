@@ -42,5 +42,16 @@ namespace AspnetCoreMvcFull.Areas.Vendor.Controllers
       var orders = await _orderService.GetOrdersByVendorAsync(vendor.Id);
       return View(orders);
     }
-  }
+
+    public async Task<IActionResult> Details(int id)
+    {
+      var vendor = await GetCurrentVendorAsync();
+      if (vendor == null) return NotFound("Vendor profile not found.");
+
+      var order = await _orderService.GetVendorOrderDetailsAsync(id, vendor.Id);
+      if (order == null) return NotFound("Order not found.");
+
+      return View(order);
+    }
+}
 }

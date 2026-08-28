@@ -45,6 +45,14 @@
 			</a>
 		</li>
 
+		<!-- Vendor Requests -->
+		<li class='menu-item@(currentPage.Contains("/Vendor/Orders") ? " active" : "")'>
+			<a asp-area="Vendor" asp-controller="Orders" asp-action="Index" class="menu-link">
+				<i class="menu-icon icon-base bx bx-store"></i>
+				<div class="text-truncate">Orders</div>
+			</a>
+		</li>
+
 		<!-- Add more vendor-specific items here as controllers get built -->
 
 	</ul>

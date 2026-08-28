@@ -210,5 +210,9 @@ namespace ktechStore.Application.Services
         {
             return await _orderRepo.GetOrdersByVendorAsync(vendorId);
         }
+        public async Task<Order?> GetVendorOrderDetailsAsync(int orderId, int vendorId)
+        {
+            return await _orderRepo.GetOrderDetailsAsync(orderId, vendorId);
+        }
     }
 }
