@@ -1,0 +1,68 @@
+@model IEnumerable<ktechStore.Core.Entities.Order>
+@using ktechStore.Core.Enums
+
+
+@{
+	ViewData["Title"] = "My Orders";
+	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+}
+
+<h4 class="fw-bold py-3 mb-4">
+	<span class="text-muted fw-light">Vendor /</span> My Orders
+</h4>
+
+<div class="card">
+	<div class="table-responsive text-nowrap">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Order #</th>
+					<th>Items</th>
+					<th>SubTotal</th>
+					<th>Status</th>
+					<th>Created At</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var order in Model)
+				{
+					<tr>
+						<td>#@order.Id</td>
+						<td>@order.OrderItems.Count item(s)</td>
+						<td>Rs. @order.SubTotal</td>
+						<td>
+							@switch (order.Status)
+							{
+								case OrderStatus.Pending:
+									<span class="badge bg-label-warning">Pending</span>
+									break;
+								case OrderStatus.Processing:
+									<span class="badge bg-label-info">Processing</span>
+									break;
+								case OrderStatus.Shipped:
+									<span class="badge bg-label-primary">Shipped</span>
+									break;
+								case OrderStatus.Delivered:
+									<span class="badge bg-label-success">Delivered</span>
+									break;
+								case OrderStatus.Cancelled:
+									<span class="badge bg-label-danger">Cancelled</span>
+									break;
+								default:
+									<span class="badge bg-label-secondary">@order.Status</span>
+									break;
+							}
+						</td>
+						<td>@order.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")</td>
+						<td>
+							<a asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-outline-primary">
+								<i class="bx bx-show"></i> View
+							</a>
+						</td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+</div>
