@@ -102,7 +102,7 @@
 		<li class="menu-header small text-uppercase">
 			<span class="menu-header-text">Store Management</span>
 		</li>
-		<li class="menu-item @(currentPage.Contains("/Catalog/") ? "active open" : "")">
+		<li class="menu-item @(currentPage.Contains("/Catalog/")|| currentPage.Contains("/Vendor/") ? "active open" : "")">
 			<a href="javascript:void(0);" class="menu-link menu-toggle">
 				<i class="menu-icon icon-base bx bx-shopping-bag"></i>
 				<div class="text-truncate">Catalog</div>
@@ -123,9 +123,7 @@
 				<!-- Vendor Request Link -->
 				<li class="menu-item @(currentPage.Contains("/Vendor/VendorRequests") ? "active" : "")">
 					<a asp-area="Vendor" asp-controller="VendorRequests" asp-action="Index" class="menu-link">
-						<div class="text-truncate">Vendor
-
-						</div>
+						<div class="text-truncate">Vendor</div>
 					</a>
 				</li>
   			</ul>

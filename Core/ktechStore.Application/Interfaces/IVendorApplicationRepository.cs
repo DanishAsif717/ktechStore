@@ -9,5 +9,6 @@ namespace ktechStore.Application.Interfaces
         Task<IEnumerable<VendorApplication>> GetAllAsync();
         Task<VendorApplication?> GetByIdAsync(int id);
         Task UpdateAsync(VendorApplication application);
+        //Task<int> GetPendingVendorCountAsync();
     }
 }
