@@ -395,5 +395,11 @@ namespace ktechStore.Application.Services
             await _productRepo.UpdateAsync(product);
             return true;
         }
+
+        public async Task<int> CountApprovalsProductsAsync()
+        {
+            var pendingProducts = await _productRepo.GetByStatusAsync(ProductStatus.Pending);
+            return pendingProducts.Count;
+        }
     }
 }

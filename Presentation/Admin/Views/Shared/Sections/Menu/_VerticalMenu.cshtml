@@ -140,7 +140,7 @@
 					<a asp-area="Catalog" asp-controller="Products" asp-action="Approvals" class="menu-link d-flex justify-content-between align-items-center">
 						<div class="text-truncate">Product Approvals</div>
 						<!-- Optional: Pending count badge -->
-						<span class="badge badge-center rounded-pill bg-danger w-px-20 h-px-20">3</span>
+						@await Component.InvokeAsync("PendingProductsCount")
 					</a>
 				</li>
 
