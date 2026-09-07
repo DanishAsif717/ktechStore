@@ -9,5 +9,6 @@ namespace ktechStore.Application.Interfaces
         Task<IEnumerable<VendorApplicationListDto>> GetAllApplicationsAsync();
         Task<VendorApprovalResultDto> ApproveApplicationAsync(int applicationId, string reviewedBy);
         Task RejectApplicationAsync(int applicationId, string reviewedBy);
+        Task<int> CountVendorApporvalAsync();
     }
 }
