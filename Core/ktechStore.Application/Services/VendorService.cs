@@ -141,5 +141,13 @@ namespace ktechStore.Application.Services
                 .Select(s => s[random.Next(s.Length)]).ToArray());
             return password;
         }
+
+        public async Task<int> CountVendorApporvalAsync()
+        {
+            int count = await _vendorApplicationRepo.CountAsync();
+            Console.WriteLine("**********************************");
+            Console.WriteLine($"Total Vendor Approvals Count: {count}");
+            return count;
+        }
     }
 }

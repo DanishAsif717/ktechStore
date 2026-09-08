@@ -17,7 +17,6 @@ namespace ktechStore.Application.Interfaces
         Task<List<PendingProductDto>> GetPendingProductsAsync();
         Task<bool> ApproveProductAsync(int productId);
         Task<bool> RejectProductAsync(int productId, string? reason);
-
-
+        Task<int> CountApprovalsProductsAsync();
     }
 }

@@ -1,0 +1,87 @@
+@model ktechStore.Core.Entities.Order
+@using ktechStore.Core.Enums
+
+
+@{
+	ViewData["Title"] = "Order Details";
+	Layout = "~/Views/Shared/_ContentNavbarLayout.cshtml";
+}
+
+<h4 class="fw-bold py-3 mb-4">
+	<span class="text-muted fw-light">Vendor / Orders /</span> Order #@Model.Id
+</h4>
+
+<div class="mb-3">
+	<a asp-action="Index" class="btn btn-outline-secondary">
+		<i class="bx bx-arrow-back me-1"></i> Back to Orders
+	</a>
+</div>
+
+<div class="row">
+	<div class="col-md-4 mb-4">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">Order Info</h5>
+				<p class="mb-1">
+					<strong>Status:</strong>
+					@switch (Model.Status)
+					{
+						case OrderStatus.Pending:
+							<span class="badge bg-label-warning">Pending</span>
+							break;
+						case OrderStatus.Processing:
+							<span class="badge bg-label-info">Processing</span>
+							break;
+						case OrderStatus.Shipped:
+							<span class="badge bg-label-primary">Shipped</span>
+							break;
+						case OrderStatus.Delivered:
+							<span class="badge bg-label-success">Delivered</span>
+							break;
+						case OrderStatus.Cancelled:
+							<span class="badge bg-label-danger">Cancelled</span>
+							break;
+						default:
+							<span class="badge bg-label-secondary">@Model.Status</span>
+							break;
+					}
+				</p>
+				<p class="mb-1"><strong>Created At:</strong> @Model.CreatedAt.ToString("dd MMM yyyy, hh:mm tt")</p>
+				<p class="mb-0"><strong>SubTotal:</strong> Rs. @Model.SubTotal</p>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="card">
+	<h5 class="card-header">Order Items</h5>
+	<div class="table-responsive text-nowrap">
+		<table class="table">
+			<thead>
+				<tr>
+					<th>Product Name</th>
+					<th>Unit Price</th>
+					<th>Quantity</th>
+					<th>Line Total</th>
+				</tr>
+			</thead>
+			<tbody>
+				@foreach (var item in Model.OrderItems)
+				{
+					<tr>
+						<td>@item.ProductName</td>
+						<td>Rs. @item.UnitPrice</td>
+						<td>@item.Quantity</td>
+						<td>Rs. @item.LineTotal</td>
+					</tr>
+				}
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="3" class="text-end fw-bold">SubTotal</td>
+					<td class="fw-bold">Rs. @Model.SubTotal</td>
+				</tr>
+			</tfoot>
+		</table>
+	</div>
+</div>
