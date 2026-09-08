@@ -144,8 +144,10 @@ namespace ktechStore.Application.Services
 
         public async Task<int> CountVendorApporvalAsync()
         {
-            var vendorApprovals = await _vendorApplicationRepo.GetAllAsync();
-            return vendorApprovals.Count;
+            int count = await _vendorApplicationRepo.CountAsync();
+            Console.WriteLine("**********************************");
+            Console.WriteLine($"Total Vendor Approvals Count: {count}");
+            return count;
         }
     }
 }

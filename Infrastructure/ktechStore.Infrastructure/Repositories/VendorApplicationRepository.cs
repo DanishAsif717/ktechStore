@@ -43,5 +43,10 @@ namespace ktechStore.Infrastructure.Repositories
             await _context.SaveChangesAsync();
         }
 
+        public async Task<int> CountAsync()
+        {
+            return await _context.VendorApplications.CountAsync();
+        }
+
     }
 }
