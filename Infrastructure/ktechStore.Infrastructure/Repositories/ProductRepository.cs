@@ -5,6 +5,7 @@ using ktechStore.Core.Interfaces;
 using ktechStore.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 
 
@@ -24,6 +25,7 @@ namespace ktechStore.Infrastructure.Repositories
             return await _context.Products
                 .Include(p => p.Category)
                 .Include(p => p.ProductDetails)
+                .Where(p => p.Status == ProductStatus.Approved)
                 .ToListAsync();
         }
 
