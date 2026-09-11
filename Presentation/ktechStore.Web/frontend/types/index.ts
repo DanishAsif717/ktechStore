@@ -50,6 +50,8 @@ export interface Product {
 export interface Category {
   id: number;
   name: string;
+  image?: string;
+  productCount?: string;
   slug: string;
   description: string;
 }

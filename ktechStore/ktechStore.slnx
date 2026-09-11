@@ -13,4 +13,5 @@
   <Folder Name="/Solution Items/">
     <File Path="sharedsettings.json" />
   </Folder>
+  <Project Path="ktechStore.Tests/ktechStore.Tests.csproj" Id="96754f01-9a79-4f88-8431-5b6a8900bb09" />
 </Solution>
