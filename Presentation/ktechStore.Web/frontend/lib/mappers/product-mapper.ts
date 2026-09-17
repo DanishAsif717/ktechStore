@@ -22,7 +22,7 @@ export function mapApiProductToProduct(p: ProductApiResponse): Product {
         category: p.categoryName,
         subcategory: "",                       
         unit: "pc",
-        inStock: p.isActive && p.stock > 0,
+        stock:p.stock,
         rating: 0,                             
         reviewCount: 0,
         isFeatured: false,

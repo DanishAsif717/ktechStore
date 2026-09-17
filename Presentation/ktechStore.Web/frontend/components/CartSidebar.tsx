@@ -72,23 +72,30 @@ export default function CartSidebar() {
                         >-</button>
                         <span className="text-sm font-medium w-6 text-center">{item.quantity}</span>
                         <button
-                          onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                            onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                            disabled={item.quantity >= item.product.stock}
                           className="w-7 h-7 rounded-md border border-border flex items-center justify-center text-muted hover:text-foreground hover:border-primary transition-colors text-sm"
                           aria-label="Increase quantity"
                         >+</button>
-                      </div>
+                        </div>
+                        {item.quantity >= item.product.stock && (
+                            <p className="text-xs text-red-500 mt-1">Max stock reached ({item.product.stock} available)</p>
+                        )}
                     </div>
-                    <div className="flex flex-col items-end justify-between">
+                        <div className="flex flex-col items-end justify-between">
+                        <button
+                            onClick={() => removeItem(item.product.id)}
+                            className="text-muted hover:text-red-500 transition-colors"
+                            aria-label="Remove item"
+                        >
+                            <X className="w-4 h-4" />
+                        </button>
+
                       <span className="text-sm font-semibold text-foreground">
                         {formatPrice(item.product.price * item.quantity)}
                       </span>
-                      <button
-                        onClick={() => removeItem(item.product.id)}
-                        className="text-muted hover:text-red-500 transition-colors"
-                        aria-label="Remove item"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
+
+                     
                     </div>
                   </li>
                 ))}

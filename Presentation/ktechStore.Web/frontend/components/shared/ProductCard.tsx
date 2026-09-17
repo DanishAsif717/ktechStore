@@ -21,6 +21,8 @@ export default function ProductCard({ product, showVendor = false }: ProductCard
     const { isWishlisted, toggleItem } = useWishlist();
     const [vendor, setVendor] = useState<Vendor | null>(null);
     const wishlisted = isWishlisted(product.id);
+    { console.log("Product Stock Value:", product.stock, "Type:", typeof product.stock) }
+
 
     useEffect(() => {
         if (showVendor && product.vendorId) {
@@ -34,14 +36,14 @@ export default function ProductCard({ product, showVendor = false }: ProductCard
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        addItem(product as any);
+        addItem(product);
         openCart();
     };
 
     const handleWishlist = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        toggleItem(product as any);
+        toggleItem(product);
     };
 
     return (
@@ -82,7 +84,8 @@ export default function ProductCard({ product, showVendor = false }: ProductCard
                 >
                     <ShoppingCart className="w-4 h-4" />
                 </button>
-                {!product.inStock && (
+
+                {!product.stock && (
                     <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded-xl">
                         <span className="bg-muted text-white text-sm font-medium px-4 py-1.5 rounded-lg">Out of Stock</span>
                     </div>
