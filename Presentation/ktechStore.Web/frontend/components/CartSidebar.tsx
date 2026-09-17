@@ -88,8 +88,8 @@ export default function CartSidebar() {
                             className="text-muted hover:text-red-500 transition-colors"
                             aria-label="Remove item"
                         >
-                            <X className="w-4 h-4" />
-                        </button>
+                        <X className="w-4 h-4" />
+                        </button>  
 
                       <span className="text-sm font-semibold text-foreground">
                         {formatPrice(item.product.price * item.quantity)}
