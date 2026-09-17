@@ -401,5 +401,10 @@ namespace ktechStore.Application.Services
             var pendingProducts = await _productRepo.GetByStatusAsync(ProductStatus.Pending);
             return pendingProducts.Count;
         }
+
+        public async Task<List<Product>> GetValidProductsByIdsAsync(List<int> productIds)
+        {
+            return await _productRepo.GetValidProductsByIdsAsync(productIds);
+        }
     }
 }

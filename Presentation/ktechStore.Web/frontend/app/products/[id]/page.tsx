@@ -12,9 +12,11 @@ import { formatPrice, getProductEmoji } from "@/lib/utils";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import ProductCard from "@/components/shared/ProductCard";
+import ProductGallery from "@/components/shared/ProductGallery";
 import ReviewCard from "@/components/shared/ReviewCard";
 import { ShoppingCart, Heart, Star, Truck, ShieldCheck, RotateCcw, Minus, Plus, Store, RefreshCw, AlertCircle } from "lucide-react";
-import type { Product, Vendor, Category, Review } from "@/types";
+import type { Vendor, Category, Review } from "@/types";
+import type { Product } from "@/types/Product";
 
 export default function ProductDetailPage() {
     const params = useParams();
@@ -42,13 +44,7 @@ export default function ProductDetailPage() {
     };
 
     useEffect(() => {
-        if (!product) return;
-        setMainImage(product.images);
-        setThumbnailList(                
-            product.productDetails
-                .map(d => d.imageUrl)
-                .filter((url): url is string => Boolean(url))
-        )
+        if (!product) return;       
         const slug = product.category.toLowerCase().trim()
             .replace(/[^a-z0-9]+/g, "-")
             .replace(/(^-|-$)/g, "");
@@ -104,7 +100,7 @@ export default function ProductDetailPage() {
     const handleAddToCart = () => {
         console.log("Check Qty",quantity);
         for (let i = 0; i < quantity; i++) {
-            addItem(product as any);
+            addItem(product);
         }
         openCart();
     };
@@ -126,42 +122,7 @@ export default function ProductDetailPage() {
             </nav>
 
             <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-                <div className="space-y-4">
-                    <div className="aspect-square bg-gradient-to-br from-primary-light to-white rounded-2xl flex items-center justify-center relative">
-                        {mainImage ? (
-                            <img
-                                src={mainImage}
-                                alt="Product image"
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <span className="text-[10rem] md:text-[14rem]">
-                                {getProductEmoji(product.category)}
-                            </span>
-                        )}
-                        {product.discount && (
-                            <span className="absolute top-4 left-4 bg-accent text-white text-sm font-bold px-3 py-1.5 rounded-lg">
-                                -{product.discount}% OFF
-                            </span>
-                        )}
-                    </div>
-
-                    {/* Details Images - variant thumbnails from productDetails */}
-                    {product.productDetails.some(d => d.imageUrl) && (
-                        <div className="flex gap-3 overflow-x-auto">
-                            {thumbnailList.map((imgUrl, index) => (
-                                <img
-                                    key={index}
-                                    src={imgUrl}
-                                    alt="Variant"
-                                    onClick={() => setImageMain(imgUrl, index)}
-                                    className="w-16 h-16 rounded-lg object-cover border border-border flex-shrink-0 cursor-pointer hover:border-primary transition-colors"
-                                />
-                            ))}
-                        </div>
-                    )}
-                </div>
-
+                <ProductGallery key={product.id} product={product} />
                 <div className="space-y-6">
                     <div>
                         {category && (
@@ -258,7 +219,7 @@ export default function ProductDetailPage() {
                                     Add to Cart
                                 </button>
                                 <button
-                                    onClick={() => toggleItem(product as any)}
+                                    onClick={() => toggleItem(product)}
                                     className={`px-4 py-3.5 rounded-xl border-2 transition-colors flex items-center justify-center gap-2 ${wishlisted
                                             ? "border-red-200 bg-red-50 text-red-500"
                                             : "border-border text-muted hover:text-red-500 hover:border-red-200"

@@ -9,7 +9,8 @@ import EmptyState from "@/components/shared/EmptyState";
 import { searchProducts } from "@/lib/services/product.service";
 import { searchVendors } from "@/lib/services/vendor.service";
 import { Search, Package, Store, RefreshCw, AlertCircle } from "lucide-react";
-import type { Product, Vendor } from "@/types";
+import type { Vendor } from "@/types";
+import type { Product } from "@/types/Product";
 
 function SearchResults() {
   const searchParams = useSearchParams();

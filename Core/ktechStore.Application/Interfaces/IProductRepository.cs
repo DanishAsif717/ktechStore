@@ -16,6 +16,7 @@ namespace ktechStore.Application.Interfaces
         Task<bool> SkuExistsAsync(string sku);
         Task<IEnumerable<Product>> GetByVendorIdAsync(int vendorId);
         Task<List<Product>> GetByStatusAsync(ProductStatus status);
+        Task<List<Product>> GetValidProductsByIdsAsync(List<int> productIds);
 
 
     }

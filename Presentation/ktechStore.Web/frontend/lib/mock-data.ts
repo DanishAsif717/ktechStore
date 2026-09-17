@@ -2,7 +2,8 @@ import vendorsData from "@/data/vendors.json";
 import ordersData from "@/data/orders.json";
 import reviewsData from "@/data/reviews.json";
 import productsData from "@/data/products.json";
-import type { Vendor, Product, Category, Review, Order, VendorDashboardStats } from "@/types";
+import type { Vendor, Category, Review, Order, VendorDashboardStats } from "@/types";
+import type { Product } from "@/types/Product";
 
 export const vendors: Vendor[] = vendorsData as Vendor[];
 export const orders: Order[] = ordersData as Order[];

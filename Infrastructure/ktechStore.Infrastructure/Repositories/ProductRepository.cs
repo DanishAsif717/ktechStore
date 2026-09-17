@@ -85,6 +85,12 @@ namespace ktechStore.Infrastructure.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Product>> GetValidProductsByIdsAsync(List<int> productIds)
+        {
+            return await _context.Products
+                .Where(p => productIds.Contains(p.Id) && p.Status == ProductStatus.Approved)
+                .ToListAsync();
+        }
 
 
     }

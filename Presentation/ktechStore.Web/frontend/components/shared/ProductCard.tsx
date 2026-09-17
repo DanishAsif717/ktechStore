@@ -3,7 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import type { Product, Vendor } from "@/types";
+import type { Vendor } from "@/types";
+import type { Product } from "@/types/Product";
 import { formatPrice, getProductEmoji } from "@/lib/utils";
 import { fetchVendorById } from "@/lib/services/vendor.service";
 import { useCart } from "@/context/CartContext";
@@ -27,7 +28,7 @@ export default function ProductCard({ product, showVendor = false }: ProductCard
         }
     }, [showVendor, product.vendorId]);
 
-    const imageUrl = product.images;
+    const imageUrl = product.imageUrl;
     const hasValidImage = !!imageUrl && (imageUrl.startsWith("http") || imageUrl.startsWith("/"));
 
     const handleAddToCart = (e: React.MouseEvent) => {
