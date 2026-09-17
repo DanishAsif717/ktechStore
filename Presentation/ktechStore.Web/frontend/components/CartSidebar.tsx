@@ -3,8 +3,9 @@
 import Link from "next/link";
 import React from "react";
 import { useCart } from "@/context/CartContext";
-import { formatPrice, getProductEmoji } from "@/lib/utils";
+import { formatPrice } from "@/lib/utils";
 import { X, ShoppingBag } from "lucide-react";
+import Image from "next/image";
 
 export default function CartSidebar() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, getSubtotal } = useCart();
@@ -45,15 +46,13 @@ export default function CartSidebar() {
               <ul className="space-y-4">
                 {items.map(item => (
                   <li key={item.product.id} className="flex gap-4 py-3 border-b border-border last:border-0">
-                    <div className="w-16 h-16 bg-primary-light rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
-                        <img
-                            src={
-                                Array.isArray(item.product.images)
-                                    ? item.product.images[0] || '/placeholder.png'
-                                    : item.product.images || '/placeholder.png'
-                            }
+                    <div className="w-16 h-16 bg-primary-light rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden relative">
+                        <Image
+                            src={item.product.imageUrl || '/placeholder.png'}
                             alt={item.product.name}
-                            className="w-full h-full object-cover rounded-lg"
+                            fill
+                            className="object-cover rounded-lg"
+                            sizes="(max-width: 768px) 48px, 64px"
                         />
                     </div>
                     <div className="flex-1 min-w-0">

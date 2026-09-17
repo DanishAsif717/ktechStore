@@ -6,7 +6,8 @@ import ProductCard from "@/components/shared/ProductCard";
 import { fetchVendorById } from "@/lib/services/vendor.service";
 import { fetchProductsByVendor } from "@/lib/services/product.service";
 import { Star, MapPin, Mail, Phone, Calendar, Users, Package, ShoppingBag, Heart, RefreshCw, AlertCircle } from "lucide-react";
-import type { Vendor, Product } from "@/types";
+import type { Vendor } from "@/types";
+import type { Product } from "@/types/Product";
 
 export default function VendorStorefrontPage() {
   const params = useParams();

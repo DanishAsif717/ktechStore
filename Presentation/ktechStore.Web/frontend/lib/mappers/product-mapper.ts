@@ -1,5 +1,5 @@
 ﻿import type { ProductApiResponse } from "@/types/api";
-import type { Product } from "@/types";
+import type { Product } from "@/types/Product";
 
 function slugify(name: string): string {
     return name
@@ -18,7 +18,7 @@ export function mapApiProductToProduct(p: ProductApiResponse): Product {
         description: p.description ?? "",
         price: p.price,
         originalPrice: undefined,
-        images: p.imageUrl ?? "" ,
+        imageUrl: p.imageUrl ?? "",
         category: p.categoryName,
         subcategory: "",                       
         unit: "pc",

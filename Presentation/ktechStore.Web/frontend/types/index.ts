@@ -1,3 +1,5 @@
+import { Product } from "./Product";
+
 export interface Vendor {
   id: string;
   shopName: string;
@@ -23,30 +25,6 @@ export interface ProductDetail {
     color?: string;
     imageUrl?: string;
 }
-export interface Product {
-  id: number;
-  vendorId: string;
-  name: string;
-  slug: string;
-  description: string;
-  price: number;
-  originalPrice?: number;
-  images: string;
-  category: string;
-  subcategory: string;
-  unit: string;
-  inStock: boolean;
-  rating: number;
-  reviewCount: number;
-  isFeatured?: boolean;
-  discount?: number;
-  tags: string[];
-  specifications: { key: string; value: string }[];
-  createdAt: string;
-  productDetails: ProductDetail[];
-
-}
-
 export interface Category {
   id: number;
   name: string;

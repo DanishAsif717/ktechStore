@@ -33,5 +33,12 @@ namespace ktechStore.Web.Controllers.Api
             if (product == null) return NotFound();
             return Ok(product);
         }
+
+        [HttpPost("validate-cart")]
+        public async Task<IActionResult> ValidateCart([FromBody] List<int> productIds)
+        {
+            var validProducts = await _productService.GetValidProductsByIdsAsync(productIds);
+            return Ok(validProducts);
+        }
     }
 }

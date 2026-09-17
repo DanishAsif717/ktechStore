@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useReducer, useEffect, type ReactNode } from "react";
-import type { Product } from "@/types";
+import type { Product } from "@/types/Product";
 
 interface WishlistState {
   items: Product[];

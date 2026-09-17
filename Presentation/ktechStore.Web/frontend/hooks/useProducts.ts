@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from "react";
-import type { Product } from "@/types";
+import type { Product } from "@/types/Product";
 import { fetchProducts } from "@/lib/services/product.service";
 
 export function useProducts() {

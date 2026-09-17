@@ -1,4 +1,5 @@
 ﻿using ktechStore.Application.DTOs;
+using ktechStore.Core.Entities;
 using ktechStore.Core.Enums;
 
 namespace ktechStore.Application.Interfaces
@@ -18,5 +19,6 @@ namespace ktechStore.Application.Interfaces
         Task<bool> ApproveProductAsync(int productId);
         Task<bool> RejectProductAsync(int productId, string? reason);
         Task<int> CountApprovalsProductsAsync();
+        Task<List<Product>> GetValidProductsByIdsAsync(List<int> productIds);
     }
 }

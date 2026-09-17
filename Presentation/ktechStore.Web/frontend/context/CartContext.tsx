@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useReducer, useEffect, type ReactNode } from "react";
-import type { Product } from "@/types";
+import type { Product } from "@/types/Product";
 
 export interface CartItem {
   product: Product;
@@ -46,7 +46,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           ...state,
           items: state.items.map(i =>
             i.product.id === action.product.id
-              ? { ...i, quantity: i.quantity + 1 }
+                  ? { ...i, product: action.product, quantity: i.quantity + 1 }
               : i
           ),
         };
@@ -82,24 +82,41 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { items: [], isOpen: false });
 
-  useEffect(() => {
-    const saved = localStorage.getItem("ktech-cart");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) {
-          for (const item of parsed) {
-            dispatch({ type: "ADD_ITEM", product: item.product });
-            if (item.quantity > 1) {
-              for (let i = 1; i < item.quantity; i++) {
-                dispatch({ type: "ADD_ITEM", product: item.product });
-              }
-            }
-          }
-        }
-      } catch { }
-    }
-  }, []);
+     useEffect(() => {
+        const saved = localStorage.getItem("ktech-cart");
+        if (!saved) return;
+
+        try {
+            const parsed = JSON.parse(saved);
+            if (!Array.isArray(parsed) || parsed.length === 0) return;
+
+            const loadAndValidate = async () => {
+                const productIds = parsed.map((item: CartItem) => item.product.id);
+
+                const res = await fetch("/api/products/validate-cart", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(productIds),
+                });
+
+                const validProducts: Product[] = await res.json();
+                // const validIds = new Set(validProducts.map(p => p.id));
+                const validProductMap = new Map(validProducts.map(p => [p.id, p]));
+                console.log("data for validProductMap", validProductMap);
+
+                for (const item of parsed) {
+                    const freshProduct = validProductMap.get(item.product.id);
+                    if (freshProduct) {
+                        for (let i = 0; i < item.quantity; i++) {
+                            dispatch({ type: "ADD_ITEM", product: freshProduct });
+                        }
+                    }
+                }
+            };
+
+            loadAndValidate();
+        } catch { }
+    }, []);
 
   useEffect(() => {
     localStorage.setItem("ktech-cart", JSON.stringify(state.items));
