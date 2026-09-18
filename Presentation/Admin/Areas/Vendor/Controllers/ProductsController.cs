@@ -154,5 +154,15 @@ namespace AspnetCoreMvcFull.Areas.Vendor.Controllers
       _toastNotification.AddSuccessToastMessage("Product deleted");
       return RedirectToAction(nameof(Index));
     }
+
+    // GET: Catalog/Products/Details/5
+    public async Task<IActionResult> Details(int id)
+    {
+      var product = await _productService.GetProductByIdAsync(id);
+      if (product == null) return NotFound();
+
+      return View(product);
+    }
+
   }
 }

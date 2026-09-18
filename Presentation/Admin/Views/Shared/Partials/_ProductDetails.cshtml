@@ -1,0 +1,155 @@
+@model ktechStore.Application.DTOs.ProductDto
+
+@{
+	var breadcrumbLabel = ViewData["BreadcrumbLabel"] as string ?? "Products";
+}
+
+<h4 class="fw-bold py-3 mb-4"><span class="text-muted fw-light">@breadcrumbLabel /</span> Product Details</h4>
+
+<div class="card mb-4">
+	<h5 class="card-header">Product Overview</h5>
+	<div class="card-body">
+		<div class="row">
+			<div class="col-md-3 text-center mb-3">
+				@if (!string.IsNullOrEmpty(Model.ImageUrl))
+				{
+					<img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded d-block m-auto shadow-sm cursor-pointer view-zoom-img" style="max-height: 200px; object-fit: cover;" />
+				}
+				else
+				{
+					<div class="bg-light rounded d-flex align-items-center justify-content-center m-auto shadow-sm" style="height: 200px; width: 100%; max-width: 200px;">
+						<span class="text-muted">No Image</span>
+					</div>
+				}
+			</div>
+
+			<div class="col-md-9">
+				<dl class="row mb-0">
+					<dt class="col-sm-3 fw-bold">Name</dt>
+					<dd class="col-sm-9">@Model.Name</dd>
+
+					<dt class="col-sm-3 fw-bold">Category</dt>
+					<dd class="col-sm-9"><span class="badge bg-label-primary">@Model.CategoryName</span></dd>
+
+					<dt class="col-sm-3 fw-bold">Base Price</dt>
+					<dd class="col-sm-9 text-success fw-semibold">Rs. @Model.Price.ToString("N2")</dd>
+
+					<dt class="col-sm-3 fw-bold">Total Stock</dt>
+					<dd class="col-sm-9">@Model.Stock</dd>
+
+					<dt class="col-sm-3 fw-bold">SKU</dt>
+					<dd class="col-sm-9"><code class="text-dark">@Model.SKU</code></dd>
+
+					<dt class="col-sm-3 fw-bold">Status</dt>
+					<dd class="col-sm-9">
+						@if (Model.IsActive)
+						{
+							<span class="badge bg-label-success">Active</span>
+						}
+						else
+						{
+							<span class="badge bg-label-danger">Inactive</span>
+						}
+					</dd>
+
+					<dt class="col-sm-3 fw-bold">Created At</dt>
+					<dd class="col-sm-9">@Model.CreatedAt.ToString("dd-MMM-yyyy hh:mm tt")</dd>
+
+					<dt class="col-sm-3 fw-bold">Description</dt>
+					<dd class="col-sm-9 text-muted">@(string.IsNullOrEmpty(Model.Description) ? "No description provided." : Model.Description)</dd>
+				</dl>
+			</div>
+		</div>
+	</div>
+</div>
+
+@if (Model.ProductDetails != null && Model.ProductDetails.Any())
+{
+	<div class="card mb-4">
+		<h5 class="card-header border-bottom mb-3">Available Variants & Configurations</h5>
+		<div class="card-body">
+			<div class="table-responsive text-nowrap">
+				<table class="table table-striped table-bordered table-sm align-middle">
+					<thead>
+						<tr>
+							<th style="width: 5%;">#</th>
+							<th style="width: 15%;">Size</th>
+							<th style="width: 15%;">Color</th>
+							<th style="width: 20%;">Variant Price</th>
+							<th style="width: 15%;">Stock Qty</th>
+							<th style="width: 30%;">Variant Image</th>
+						</tr>
+					</thead>
+					<tbody>
+						@{
+							int serial = 1;
+						}
+						@foreach (var detail in Model.ProductDetails)
+						{
+							<tr>
+								<td class="fw-bold">@serial</td>
+								<td>@(string.IsNullOrEmpty(detail.Size) ? "-" : detail.Size)</td>
+								<td>@(string.IsNullOrEmpty(detail.Color) ? "-" : detail.Color)</td>
+								<td class="text-success fw-semibold">
+									Rs. @(detail.Price.HasValue ? detail.Price.Value.ToString("N2") : Model.Price.ToString("N2"))
+								</td>
+								<td>@detail.Stock</td>
+								<td>
+									@if (!string.IsNullOrEmpty(detail.ImageUrl))
+									{
+										<div class="d-flex align-items-center gap-2">
+											<div class="border rounded bg-light d-flex align-items-center justify-content-center cursor-pointer view-zoom-img" style="width: 40px; height: 40px; overflow: hidden;" data-img-url="@detail.ImageUrl">
+												<img src="@detail.ImageUrl" alt="Variant preview" class="img-fluid" style="max-height: 100%; object-fit: cover;" />
+											</div>
+											<a href="@detail.ImageUrl" target="_blank" class="btn btn-xs btn-outline-secondary py-0 px-1">
+												<i class="bx bx-link-external small"></i> Open Full
+											</a>
+										</div>
+									}
+									else
+									{
+										<span class="text-muted small"><i class="bx bx-image-alt me-1"></i>No Variant Image</span>
+									}
+								</td>
+							</tr>
+							serial++;
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+}
+
+<div class="mb-4">
+	<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary me-2">
+		<span class="tf-icons bx bx-edit-alt me-1"></span>Edit Product
+	</a>
+	<a asp-action="Index" class="btn btn-outline-secondary">
+		<span class="tf-icons bx bx-arrow-back me-1"></span>Back to List
+	</a>
+</div>
+
+<div class="modal fade" id="imagePreviewModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content bg-transparent border-0 shadow-none">
+			<div class="modal-body text-center p-0">
+				<button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+				<img src="" id="modalPreviewTarget" class="img-fluid rounded shadow" style="max-height: 85vh; object-fit: contain;" />
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.cursor-pointer {
+		cursor: pointer;
+		transition: transform 0.2s ease;
+	}
+
+		.cursor-pointer:hover {
+			transform: scale(1.05);
+		}
+</style>
+
+<script src="~/js/custom/product-details.js"></script>
