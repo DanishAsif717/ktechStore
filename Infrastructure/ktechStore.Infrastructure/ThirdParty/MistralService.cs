@@ -24,8 +24,15 @@ namespace ktechStore.Infrastructure.ThirdParty
 
         public async Task<string> GenerateDescriptionAsync(string productName, string categoryName)
         {
+            
             var prompt = $"Generate a clean, engaging e-commerce product description under 250 characters for a product named '{productName}' inside the category '{categoryName}'.";
-            return await CallMistralApiAsync(prompt, "You are a professional e-commerce copywriter.");
+                        
+            var data = await CallMistralApiAsync(prompt, "You are a professional e-commerce copywriter.");
+
+            Console.WriteLine("***************Test Mistral*********************");
+            Console.WriteLine("Data Test Mistral" , data);
+            return data;
+
         }
 
         // 👍 SKU Generation Logic

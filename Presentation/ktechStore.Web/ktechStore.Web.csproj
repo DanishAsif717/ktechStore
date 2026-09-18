@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="frontend\components\shared\ProductGallery.tsx" />
     <None Remove="frontend\hooks\useProducts.ts" />
     <None Remove="frontend\lib\api\products.ts" />
     <None Remove="frontend\lib\mappers\product-mapper.ts" />
@@ -34,6 +35,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <TypeScriptCompile Include="frontend\components\shared\ProductGallery.tsx" />
 	  <TypeScriptCompile Include="frontend\hooks\useProducts.ts" />
 	  <TypeScriptCompile Include="frontend\lib\api\products.ts" />
 	  <TypeScriptCompile Include="frontend\lib\mappers\product-mapper.ts" />

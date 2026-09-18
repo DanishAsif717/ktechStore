@@ -176,7 +176,7 @@ export default function ProductDetailPage() {
             </div>*/}
                         <div className="flex items-center gap-2">
                             <span className="text-muted">Stock:</span>
-                            {product.inStock ? (
+                            {product.stock ? (
                                 <span className="text-green-600 font-medium flex items-center gap-1">
                                     <span className="w-2 h-2 bg-green-600 rounded-full" />
                                     In Stock
@@ -187,7 +187,7 @@ export default function ProductDetailPage() {
                         </div>
                     </div>
 
-                    {product.inStock && (
+                    {product.stock && (
                         <>
                             <div className="flex items-center gap-4">
                                 <div className="flex items-center border border-border rounded-lg">

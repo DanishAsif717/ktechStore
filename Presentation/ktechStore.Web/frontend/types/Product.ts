@@ -1,7 +1,6 @@
 import { ProductDetail } from ".";
 
 export interface Product {
-    imageUrl: string;
     id: number;
     vendorId: string;
     name: string;
@@ -9,10 +8,11 @@ export interface Product {
     description: string;
     price: number;
     originalPrice?: number;
+    imageUrl: string;
     category: string;
     subcategory: string;
     unit: string;
-    inStock: boolean;
+    stock: number;
     rating: number;
     reviewCount: number;
     isFeatured?: boolean;

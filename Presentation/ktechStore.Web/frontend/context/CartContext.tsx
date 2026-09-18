@@ -46,7 +46,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
           ...state,
           items: state.items.map(i =>
             i.product.id === action.product.id
-                  ? { ...i, product: action.product, quantity: i.quantity + 1 }
+                  ?{ ...i, product: action.product, quantity: i.quantity + 1 }
               : i
           ),
         };
@@ -56,14 +56,15 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case "REMOVE_ITEM":
       return { ...state, items: state.items.filter(i => i.product.id !== action.productId) };
     case "UPDATE_QUANTITY":
-      return {
-        ...state,
-        items: state.items.map(i =>
-          i.product.id === action.productId
-            ? { ...i, quantity: Math.max(0, action.quantity) }
-            : i
-        ).filter(i => i.quantity > 0),
-      };
+        return {
+            ...state,
+            items: state.items.map(i => {
+                if (i.product.id !== action.productId) return i;
+                const maxStock = i.product.stock ?? Infinity;
+                const clampedQty = Math.min(Math.max(0, action.quantity), maxStock);
+                return { ...i, quantity: clampedQty };
+            }).filter(i => i.quantity > 0),
+        };
     case "CLEAR_CART":
       return { ...state, items: [] };
     case "TOGGLE_CART":

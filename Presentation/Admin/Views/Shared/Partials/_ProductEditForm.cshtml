@@ -1,0 +1,199 @@
+@model ktechStore.Application.DTOs.ProductUpsertDto
+
+@{
+	var breadcrumbLabel = ViewData["BreadcrumbLabel"] as string ?? "Products";
+	var currentArea = ViewContext.RouteData.Values["area"]?.ToString();
+	var skuUrl = Url.Action("GenerateSku", "Products", new { area = currentArea });
+	var descriptionUrl = Url.Action("GenerateDescription", "Products", new { area = currentArea });
+}
+
+<h4 class="fw-bold py-3 mb-4">
+	<span class="text-muted fw-light">@breadcrumbLabel /</span> Edit Product
+</h4>
+
+<div id="productEditRoot" data-sku-url="@skuUrl" data-description-url="@descriptionUrl">
+
+	<form asp-action="Edit" enctype="multipart/form-data">
+		<div class="row">
+			<div class="col-md-8">
+				<div class="card mb-4">
+					<h5 class="card-header">Modify Product Information</h5>
+					<div class="card-body">
+						<div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+						<input type="hidden" asp-for="Id" />
+
+						<div class="row">
+							<div class="mb-3 col-md-6">
+								<label asp-for="Name" class="form-label fw-semibold"></label>
+								<input asp-for="Name" id="productNameInput" class="form-control" placeholder="Enter product name" />
+								<span asp-validation-for="Name" class="text-danger"></span>
+							</div>
+
+							<div class="mb-3 col-md-6">
+								<div class="d-flex justify-content-between align-items-center mb-1">
+									<label asp-for="SKU" class="form-label fw-semibold mb-0"></label>
+									<button type="button" id="btnAiGenerateSku" class="btn btn-xs btn-outline-primary py-0">
+										<i class="bx bx-bolt-circle"></i> ✨ Generate SKU
+									</button>
+								</div>
+								<input asp-for="SKU" id="productSkuInput" class="form-control" placeholder="e.g., PROD-123" />
+								<span asp-validation-for="SKU" class="text-danger"></span>
+							</div>
+
+							<div class="mb-3 col-md-6">
+								<label asp-for="Price" class="form-label fw-semibold"></label>
+								<div class="input-group input-group-merge">
+									<span class="input-group-text">Rs.</span>
+									<input asp-for="Price" class="form-control" type="number" step="0.01" />
+								</div>
+								<span asp-validation-for="Price" class="text-danger"></span>
+							</div>
+
+							<div class="mb-3 col-md-6">
+								<label asp-for="Stock" class="form-label fw-semibold"></label>
+								<input asp-for="Stock" class="form-control" type="number" />
+								<span asp-validation-for="Stock" class="text-danger"></span>
+							</div>
+
+							<div class="mb-3 col-md-6">
+								<label asp-for="CategoryId" class="form-label fw-semibold">Category</label>
+								<select asp-for="CategoryId" id="categorySelectInput" class="form-select" asp-items="ViewBag.CategoryId">
+									<option value="">-- Select Category --</option>
+								</select>
+								<span asp-validation-for="CategoryId" class="text-danger"></span>
+							</div>
+
+							<div class="mb-3 col-md-6">
+								<label asp-for="ProductImageFile" class="form-label fw-semibold">Update Product Image</label>
+								<input asp-for="ProductImageFile" type="file" id="imageFileInput" class="form-control" accept="image/*" />
+								<span asp-validation-for="ProductImageFile" class="text-danger"></span>
+
+								<input type="hidden" asp-for="ImageUrl" id="productImageUrlHidden" />
+							</div>
+
+							<div class="mb-3 col-md-12">
+								<div class="d-flex justify-content-between align-items-center mb-1">
+									<label asp-for="Description" class="form-label fw-semibold mb-0"></label>
+									<button type="button" id="btnAiGenerate" class="btn btn-sm btn-outline-secondary">
+										<i class="bx bx-wand me-1"></i> ✨ AI Generate
+									</button>
+								</div>
+								<textarea asp-for="Description" id="productDescription" class="form-control" rows="3" placeholder="Describe the item details..."></textarea>
+								<span asp-validation-for="Description" class="text-danger"></span>
+							</div>
+
+							<div class="mb-3 col-md-12">
+								<div class="form-check form-switch mt-2">
+									<input class="form-check-input" type="checkbox" asp-for="IsActive" />
+									<label class="form-check-label fw-semibold" asp-for="IsActive">Visible & Active in Store</label>
+								</div>
+							</div>
+
+							<div class="mb-2 col-md-12">
+								<div class="form-check form-switch mt-2 p-3 bg-label-light rounded border border-dashed">
+									<input class="form-check-input ms-0 me-2" type="checkbox" id="toggleVariants" @(Model.ProductDetails != null && Model.ProductDetails.Any() ? "checked" : "") />
+									<label class="form-check-label fw-bold text-primary" for="toggleVariants">This product has multiple variants (e.g., size, color, weight)</label>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="card mb-4 @(Model.ProductDetails != null && Model.ProductDetails.Any() ? "" : "d-none")" id="variantCardSection">
+					<div class="card-header d-flex justify-content-between align-items-center border-bottom mb-3">
+						<h5 class="mb-0">Product Variants Configuration</h5>
+						<button type="button" class="btn btn-sm btn-outline-primary" id="addVariantRowBtn">
+							<i class="bx bx-plus me-1"></i> Add Variant Row
+						</button>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive text-nowrap">
+							<table class="table table-bordered table-sm" id="variantsTable">
+								<thead>
+									<tr>
+										<th style="width: 15%;">Size</th>
+										<th style="width: 15%;">Color</th>
+										<th style="width: 15%;">Price (Rs.)</th>
+										<th style="width: 12%;">Stock Qty</th>
+										<th style="width: 25%;">Upload Variant Image</th>
+										<th style="width: 10%;" class="text-center">Preview</th>
+										<th style="width: 8%;" class="text-center">Action</th>
+									</tr>
+								</thead>
+								<tbody id="variantsContainer">
+									@if (Model.ProductDetails != null && Model.ProductDetails.Any())
+									{
+										for (int i = 0; i < Model.ProductDetails.Count; i++)
+										{
+											var hasImg = !string.IsNullOrEmpty(Model.ProductDetails[i].ImageUrl);
+											<tr class="variant-row" data-index="@i">
+												<td>
+													<input type="hidden" name="ProductDetails[@i].Id" value="@Model.ProductDetails[i].Id" />
+													<input name="ProductDetails[@i].Size" class="form-control form-control-sm" value="@Model.ProductDetails[i].Size" placeholder="e.g., Large, XL" />
+												</td>
+												<td>
+													<input name="ProductDetails[@i].Color" class="form-control form-control-sm" value="@Model.ProductDetails[i].Color" placeholder="e.g., Red, Blue" />
+												</td>
+												<td>
+													<input name="ProductDetails[@i].Price" class="form-control form-control-sm" type="number" step="0.01" value="@Model.ProductDetails[i].Price" />
+												</td>
+												<td>
+													<input name="ProductDetails[@i].Stock" class="form-control form-control-sm" type="number" value="@Model.ProductDetails[i].Stock" />
+												</td>
+												<td>
+													<input type="file" name="ProductDetails[@i].VariantImageFile" class="form-control form-control-sm variant-image-input" accept="image/*" />
+													<input type="hidden" name="ProductDetails[@i].ImageUrl" class="variant-hidden-url" value="@Model.ProductDetails[i].ImageUrl" />
+												</td>
+												<td class="text-center align-middle">
+													<div class="d-flex align-items-center justify-content-center border rounded bg-light mx-auto" style="width: 40px; height: 40px; overflow: hidden;">
+														<img src="@(hasImg ? Model.ProductDetails[i].ImageUrl : "#")" alt="Thumb" class="img-fluid @(hasImg ? "" : "d-none") variant-thumb-preview" style="max-height: 100%; object-fit: cover;" />
+														<i class="bx bx-image text-muted variant-thumb-icon @(hasImg ? "d-none" : "")"></i>
+													</div>
+												</td>
+												<td class="text-center align-middle">
+													<button type="button" class="btn btn-sm btn-icon btn-outline-danger remove-row-btn">
+														<i class="bx bx-trash"></i>
+													</button>
+												</td>
+											</tr>
+										}
+									}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+
+				<div class="mb-4">
+					<button type="submit" class="btn btn-primary me-2">
+						<i class="bx bx-save me-1"></i> Save Changes
+					</button>
+					<a asp-action="Index" class="btn btn-outline-secondary">
+						<i class="bx bx-arrow-back me-1"></i> Back to List
+					</a>
+				</div>
+			</div>
+
+			<div class="col-md-4">
+				<div class="card mb-4">
+					<h5 class="card-header">Main Image Preview</h5>
+					<div class="card-body text-center">
+						@{
+							var hasMainImg = !string.IsNullOrEmpty(Model.ImageUrl);
+						}
+						<div class="border rounded p-2 d-flex align-items-center justify-content-center bg-light" style="min-height: 250px; position: relative;">
+							<img id="imgPreview" src="@(hasMainImg ? Model.ImageUrl : "#")" alt="Product Preview" class="img-fluid rounded @(hasMainImg ? "" : "d-none")" style="max-height: 240px; object-fit: contain;" />
+							<div id="previewPlaceholder" class="text-muted @(hasMainImg ? "d-none" : "")">
+								<i class="bx bx-image-add display-4 d-block mb-2"></i>
+								<span>No Image Uploaded</span>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+
+</div>
+
+<script src="~/js/custom/product-edit.js"></script>
