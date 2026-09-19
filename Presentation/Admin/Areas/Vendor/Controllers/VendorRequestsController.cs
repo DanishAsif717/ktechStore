@@ -19,10 +19,19 @@ namespace AspnetCoreMvcFull.Areas.Vendor.Controllers
     }
 
     // GET: Vendor/VendorRequests
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string status = "pending")
     {
       var applications = await _vendorService.GetAllApplicationsAsync();
-      return View(applications);
+      var filtered = status.ToLower() switch
+      {
+        "pending" => applications.Where(a => a.Status == "Pending"),
+        "approved" => applications.Where(a => a.Status == "Approved"),
+        "rejected" => applications.Where(a => a.Status == "Rejected"),
+        _ => applications   
+      };
+
+      ViewBag.CurrentStatus = status;
+      return View(filtered.ToList());
     }
 
     // POST: Vendor/VendorRequests/Approve/5
