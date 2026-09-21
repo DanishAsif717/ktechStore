@@ -4,6 +4,7 @@
 	TempData.Keep();
 	string? currentPage = ViewContext.HttpContext.Request.Path;
 	var modules = await ModuleService.GetAllAsync();
+	var currentStatus = Context.Request.Query["status"].ToString();
 }
 <!-- Menu -->
 @* ! Do this simple *@
@@ -96,40 +97,53 @@
 		</ul>
 	</li>
 
+	<!-- Catalog Module (Categories & Products) -->
+	<li class="menu-header small text-uppercase">
+		<span class="menu-header-text">Store Management</span>
+	</li>
+	<li class="menu-item @(currentPage.Contains("/Catalog/") ? "active open" : "")">
+		<a href="javascript:void(0);" class="menu-link menu-toggle">
+			<i class="menu-icon icon-base bx bx-shopping-bag"></i>
+			<div class="text-truncate">Catalog</div>
+		</a>
+		<ul class="menu-sub">
+			<!-- Categories Link -->
+			<li class="menu-item @(currentPage.Contains("/Catalog/Categories") ? "active" : "")">
+				<a asp-area="Catalog" asp-controller="Categories" asp-action="Index" class="menu-link">
+					<div class="text-truncate">Categories</div>
+				</a>
+			</li>
+			<!-- Products Link -->
+			<li class="menu-item @(currentPage.Contains("/Catalog/Products") ? "active" : "")">
+				<a asp-area="Catalog" asp-controller="Products" asp-action="Index" class="menu-link">
+					<div class="text-truncate">Products</div>
+				</a>
+			</li>
+  		</ul>
+	</li>
 
 
-		<!-- Catalog Module (Categories & Products) -->
-		<li class="menu-header small text-uppercase">
-			<span class="menu-header-text">Store Management</span>
-		</li>
-		<li class="menu-item @(currentPage.Contains("/Catalog/")|| currentPage.Contains("/Vendor/") ? "active open" : "")">
-			<a href="javascript:void(0);" class="menu-link menu-toggle">
-				<i class="menu-icon icon-base bx bx-shopping-bag"></i>
-				<div class="text-truncate">Catalog</div>
-			</a>
-			<ul class="menu-sub">
-				<!-- Categories Link -->
-				<li class="menu-item @(currentPage.Contains("/Catalog/Categories") ? "active" : "")">
-					<a asp-area="Catalog" asp-controller="Categories" asp-action="Index" class="menu-link">
-						<div class="text-truncate">Categories</div>
-					</a>
-				</li>
-				<!-- Products Link -->
-				<li class="menu-item @(currentPage.Contains("/Catalog/Products") ? "active" : "")">
-					<a asp-area="Catalog" asp-controller="Products" asp-action="Index" class="menu-link">
-						<div class="text-truncate">Products</div>
-					</a>
-				</li>
-				<!-- Vendor Request Link -->
-				<li class="menu-item @(currentPage.Contains("/Vendor/VendorRequests") ? "active" : "")">
-					<a asp-area="Vendor" asp-controller="VendorRequests" asp-action="Index" class="menu-link">
-						<div class="text-truncate">Vendor</div>
-					</a>
-				</li>
-  			</ul>
-		</li>
-
-		<li class="menu-item @(currentPage.Contains("/Catalog/") ? "active open" : "")">
+	<!-- Vendors Module -->
+	<li class="menu-item @(currentPage.Contains("VendorRequests") ? "active open" : "")">
+		  <a href="javascript:void(0);" class="menu-link menu-toggle">
+			  <i class="menu-icon icon-base bx bx-store"></i>
+			  <div class="text-truncate">Vendors</div>
+		  </a>
+		  <ul class="menu-sub">
+				<li class="menu-item @(currentPage.Contains("/Vendor/VendorRequests") && (string.Equals(currentStatus, "approved", StringComparison.OrdinalIgnoreCase) || string.IsNullOrEmpty(currentStatus)) ? "active" : "")">
+				  <a asp-area="Vendor" asp-controller="VendorRequests" asp-action="Index" asp-route-status="approved" class="menu-link">
+					  <div class="text-truncate">All Vendors</div>
+				  </a>
+			  </li>
+				<li class="menu-item @(currentPage.Contains("/Vendor/VendorRequests") && string.Equals(currentStatus, "pending", StringComparison.OrdinalIgnoreCase) ? "active" : "")">
+				  <a asp-area="Vendor" asp-controller="VendorRequests" asp-action="Index" asp-route-status="pending" class="menu-link d-flex justify-content-between align-items-center">
+					  <div class="text-truncate">Vendor Requests</div>
+					  @await Component.InvokeAsync("VendorRequestCount")
+				  </a>
+			  </li>
+		  </ul>
+    </li>
+	<li class="menu-item @(currentPage.Contains("/Catalog/") ? "active open" : "")">
 			<a href="javascript:void(0);" class="menu-link menu-toggle">
 				<i class="menu-icon icon-base bx bx-shopping-bag"></i>
 				<div class="text-truncate">Approvals</div>
@@ -142,15 +156,7 @@
 						<!-- Optional: Pending count badge -->
 						@await Component.InvokeAsync("PendingProductsCount")
 					</a>
-				</li>
-
-				<!-- Vendor Request Link -->
-				<li class="menu-item @(currentPage.Contains("/Vendor/VendorRequests") ? "active" : "")">
-					<a asp-area="Vendor" asp-controller="VendorRequests" asp-action="Index" class="menu-link">
-						<div class="text-truncate">Vendor Requests</div>
-						@await Component.InvokeAsync("VendorRequestCount")
-					</a>
-				</li>
+				</li>	
 
 			</ul>
 		</li>

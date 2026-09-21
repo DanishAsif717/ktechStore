@@ -1,5 +1,6 @@
 ﻿using ktechStore.Application.Interfaces;
 using ktechStore.Core.Entities;
+using ktechStore.Core.Enums;
 using ktechStore.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -45,7 +46,8 @@ namespace ktechStore.Infrastructure.Repositories
 
         public async Task<int> CountAsync()
         {
-            return await _context.VendorApplications.CountAsync();
+            return await _context.VendorApplications
+                         .CountAsync(x => x.Status == VendorStatus.Pending);
         }
 
     }
