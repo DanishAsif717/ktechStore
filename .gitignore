@@ -432,3 +432,5 @@ sharedsettings.json
 Logs/
 **/Logs/
 
+#DEPLOY
+deploy/nginx.conf.template

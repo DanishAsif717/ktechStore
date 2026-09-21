@@ -63,7 +63,10 @@ app.Use((context, next) =>
   context.Request.PathBase = "/admin";  
   return next();
 });
-app.UseHttpsRedirection();
+if (!app.Environment.IsProduction())
+{
+  app.UseHttpsRedirection();
+}
 app.UseStaticFiles();
 app.UseNToastNotify();
 app.UseRouting();
