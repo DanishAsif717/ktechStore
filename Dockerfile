@@ -5,9 +5,9 @@
 # warna .next/standalone folder generate hi nahi hogi.
 FROM node:20-alpine AS frontend-build
 WORKDIR /frontend
-COPY ktechStore.Web/Frontend/package*.json ./
+COPY Presentation/ktechStore.Web/frontend/package*.json ./
 RUN npm install
-COPY ktechStore.Web/Frontend/ ./
+COPY Presentation/ktechStore.Web/frontend/ ./
 RUN npm run build
 
 # =========================================================
@@ -17,7 +17,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS web-build
 WORKDIR /src
 COPY . .
 # ⚠️ Apne .csproj ka exact naam/path check kar lena
-RUN dotnet publish ktechStore.Web/ktechStore.Web.csproj -c Release -o /app/web /p:UseAppHost=false
+RUN dotnet publish Presentation/ktechStore.Web/ktechStore.Web.csproj -c Release -o /app/web /p:UseAppHost=false
 
 # =========================================================
 # Stage 3: AdminPanelProject publish
@@ -26,7 +26,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS admin-build
 WORKDIR /src
 COPY . .
 # ⚠️ Apne .csproj ka exact naam/path check kar lena
-RUN dotnet publish AdminPanelProject/AdminPanelProject.csproj -c Release -o /app/admin /p:UseAppHost=false
+RUN dotnet publish Presentation/Admin/AspnetCoreMvcFull.csproj -c Release -o /app/admin /p:UseAppHost=false
 
 # =========================================================
 # Stage 4: Final runtime image (Web + Admin + Next.js + Supervisor)
@@ -51,7 +51,7 @@ COPY --from=frontend-build /frontend/.next/static ./frontend/.next/static
 COPY --from=frontend-build /frontend/public ./frontend/public
 
 # ktechStore.Web ka production override (container ke internal addresses)
-COPY appsettings.Production.json ./web/appsettings.Production.json
+COPY Presentation/ktechStore.Web/appsettings.Production.json ./web/appsettings.Production.json
 
 # Supervisor config aur entrypoint copy karo
 COPY deploy/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
