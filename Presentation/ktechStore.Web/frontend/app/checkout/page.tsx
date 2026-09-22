@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from 'next/image';
 import { useCart } from "@/context/CartContext";
 import { formatPrice, getProductEmoji, generateOrderId } from "@/lib/utils";
 import { fetchVendorById } from "@/lib/services/vendor.service";
@@ -295,10 +296,11 @@ export default function CheckoutPage() {
                   {vendorItems.map(item => (
                     <div key={item.product.id} className="flex items-center gap-3 py-1.5">
                        <div className="w-8 h-8 bg-primary-light rounded-lg flex-shrink-0 overflow-hidden">
-                            <img
-                                src={item.product.images}
+                            <Image
+                                src={item.product.imageUrl}
                                 alt={item.product.name}
-                                className="w-full h-full object-cover"
+                                fill
+                                className="object-cover"
                             />
                       </div>
                       <div className="flex-1 min-w-0">
