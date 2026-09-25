@@ -28,8 +28,8 @@
     <ProjectReference Include="..\..\Infrastructure\ktechStore.Infrastructure\ktechStore.Infrastructure.csproj" />
   </ItemGroup>
 
-	<ItemGroup>
-		<None Include="..\..\ktechStore\sharedsettings.json" Link="sharedsettings.json">
+	<ItemGroup>		
+		<None Include="$(MSBuildThisFileDirectory)..\..\sharedsettings.json" Condition="Exists('$(MSBuildThisFileDirectory)..\..\sharedsettings.json')">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

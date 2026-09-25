@@ -39,7 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="..\..\ktechStore\sharedsettings.json" Link="sharedsettings.json">
+      <None Include="..\..\ktechStore\sharedsettings.json" Link="sharedsettings.json" Condition="Exists('..\..\ktechStore\sharedsettings.json')">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

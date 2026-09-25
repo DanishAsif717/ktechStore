@@ -24,6 +24,7 @@ RUN npm run build:prod
 FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS web-build
 WORKDIR /src
 COPY . .
+RUN mkdir -p ktechStore && echo "{}" > ktechStore/sharedsettings.json
 RUN dotnet restore Presentation/ktechStore.Web/ktechStore.Web.csproj
 RUN dotnet publish Presentation/ktechStore.Web/ktechStore.Web.csproj -c Release -o /app/web /p:UseAppHost=false /p:TreatWarningsAsErrors=false
 
