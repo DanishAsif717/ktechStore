@@ -14,7 +14,7 @@ RUN npm run build
 FROM node:20 AS admin-assets-build
 WORKDIR /admin-src
 COPY Presentation/Admin/package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY Presentation/Admin/ ./
 RUN npm run build:prod
 
