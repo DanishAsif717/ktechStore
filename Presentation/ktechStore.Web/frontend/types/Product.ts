@@ -23,3 +23,30 @@ export interface Product {
     productDetails: ProductDetail[];
 
 }
+
+export interface Specification {
+    key: string;
+    value: string;
+}
+
+export interface DummyProduct {
+    id: number;
+    vendorId: string;
+    name: string;
+    slug: string;
+    description: string;
+    price: number;
+    images: string[];
+    category: string;
+    subcategory: string;
+    unit: string;
+    inStock: boolean;
+    rating: number;
+    discount: number;
+    reviewCount: number;
+    isFeatured?: boolean; 
+    tags: string[];
+    specifications: Specification[];
+    createdAt: string;
+
+}

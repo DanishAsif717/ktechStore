@@ -1,4 +1,5 @@
-import type { Product } from "@/types";
+import type { Product } from "@/types/Product";
+
 import { fetchProductsFromApi, fetchProductFromApi } from "@/lib/api/products";
 import { mapApiProductToProduct } from "@/lib/mappers/product-mapper";
 
@@ -50,8 +51,8 @@ export async function searchProducts(query: string): Promise<Product[]> {
   return products.filter(p =>
     p.name.toLowerCase().includes(q) ||
     p.description.toLowerCase().includes(q) ||
-    p.category.toLowerCase().includes(q) ||
-    p.tags.some(t => t.toLowerCase().includes(q))
+    p.category.toLowerCase().includes(q) 
+    // p.tags.some(t => t.toLowerCase().includes(q))
   );
 }
 

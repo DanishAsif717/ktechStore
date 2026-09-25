@@ -3,38 +3,38 @@ import ordersData from "@/data/orders.json";
 import reviewsData from "@/data/reviews.json";
 import productsData from "@/data/products.json";
 import type { Vendor, Category, Review, Order, VendorDashboardStats } from "@/types";
-import type { Product } from "@/types/Product";
+import type { DummyProduct } from "@/types/Product";
 
 export const vendors: Vendor[] = vendorsData as Vendor[];
 export const orders: Order[] = ordersData as Order[];
 export const reviews: Review[] = reviewsData as Review[];
-export const products: Product[] = productsData as Product[];
+export const products: DummyProduct[] = productsData as DummyProduct[];
 
 export function getVendorById(id: string): Vendor | undefined {
   return vendors.find(v => v.id === id);
 }
 
-export function getProductsByVendor(vendorId: string): Product[] {
+export function getProductsByVendor(vendorId: string):  DummyProduct[] {
   return products.filter(p => p.vendorId === vendorId);
 }
 
-export function getProductById(id: number): Product | undefined {
+export function getProductById(id: number): DummyProduct | undefined {
   return products.find(p => p.id === id);
 }
 
-export function getProductBySlug(slug: string): Product | undefined {
+export function getProductBySlug(slug: string): DummyProduct | undefined {
   return products.find(p => p.slug === slug);
 }
 
-export function getFeaturedProducts(): Product[] {
+export function getFeaturedProducts():  DummyProduct[] {
   return products.filter(p => p.isFeatured);
 }
 
-export function getDiscountedProducts(): Product[] {
+export function getDiscountedProducts():  DummyProduct[] {
   return products.filter(p => p.discount && p.discount > 0);
 }
 
-export function getProductsByCategory(categorySlug: string): Product[] {
+export function getProductsByCategory(categorySlug: string):  DummyProduct[] {
   return products.filter(p => {
     const cat = categories.find(c => c.slug === categorySlug);
     return cat ? p.category === cat.name : false;
@@ -81,12 +81,12 @@ export function getVendorStats(vendorId: string): VendorDashboardStats {
 }
 
 export const categories: Category[] = [
-  { id: 1, name: "Grocery", slug: "grocery", description: "Fresh groceries, fruits, vegetables, dairy & more", image: "🥬", productCount: products.filter(p => p.category === "Grocery").length, icon: "🛒" },
-  { id: 2, name: "Clothes", slug: "clothes", description: "Fashion, apparel, shoes & accessories", image: "👕", productCount: products.filter(p => p.category === "Clothes").length, icon: "👗" },
-  { id: 3, name: "Car Parts", slug: "car-parts", description: "Auto parts, accessories & maintenance", image: "🔧", productCount: products.filter(p => p.category === "Car Parts").length, icon: "🚗" },
-  { id: 4, name: "Electronics", slug: "electronics", description: "Gadgets, wearables & tech accessories", image: "⚡", productCount: products.filter(p => p.category === "Electronics").length, icon: "📱" },
-  { id: 5, name: "Home & Kitchen", slug: "home-kitchen", description: "Furniture, decor, cookware & home essentials", image: "🏠", productCount: products.filter(p => p.category === "Home & Kitchen").length, icon: "🏡" },
-  { id: 6, name: "Sports", slug: "sports", description: "Sports equipment, activewear & fitness gear", image: "💪", productCount: products.filter(p => p.category === "Sports").length, icon: "⚽" },
+  { id: 1, name: "Grocery", slug: "grocery", description: "Fresh groceries, fruits, vegetables, dairy & more", image: "🥬"},
+  { id: 2, name: "Clothes", slug: "clothes", description: "Fashion, apparel, shoes & accessories", image: "👕" },
+  { id: 3, name: "Car Parts", slug: "car-parts", description: "Auto parts, accessories & maintenance", image: "🔧"},
+  { id: 4, name: "Electronics", slug: "electronics", description: "Gadgets, wearables & tech accessories", image: "⚡" },
+  { id: 5, name: "Home & Kitchen", slug: "home-kitchen", description: "Furniture, decor, cookware & home essentials", image: "🏠" },
+  { id: 6, name: "Sports", slug: "sports", description: "Sports equipment, activewear & fitness gear", image: "💪"},
 ];
 
 export function getCategoryBySlug(slug: string): Category | undefined {
@@ -115,7 +115,7 @@ export function getAllSubcategories(category?: string): string[] {
   return Array.from(subs).sort();
 }
 
-export function searchProducts(query: string): Product[] {
+export function searchProducts(query: string):  DummyProduct[] {
   const q = query.toLowerCase();
   return products.filter(p =>
     p.name.toLowerCase().includes(q) ||

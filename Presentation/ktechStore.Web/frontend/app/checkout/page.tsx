@@ -114,7 +114,7 @@ export default function CheckoutPage() {
             form.city.trim().length > 0
         );
     };
-    const handleChange = (e:any) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       setForm({
         ...form,
         [e.target.name]: e.target.value,
