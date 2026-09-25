@@ -9,7 +9,17 @@ COPY Presentation/ktechStore.Web/frontend/ ./
 RUN npm run build
 
 # =========================================================
-# Stage 2: ktechStore.Web publish (.NET 10.0)
+# Stage 2: Admin Panel Frontend Assets build (Gulp/Node)
+# =========================================================
+FROM node:20 AS admin-assets-build
+WORKDIR /admin-src
+COPY Presentation/Admin/package*.json ./
+RUN npm install
+COPY Presentation/Admin/ ./
+RUN npm run build:prod
+
+# =========================================================
+# Stage 3: ktechStore.Web publish (.NET 10.0)
 # =========================================================
 FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS web-build
 WORKDIR /src
@@ -18,18 +28,18 @@ RUN dotnet restore Presentation/ktechStore.Web/ktechStore.Web.csproj
 RUN dotnet publish Presentation/ktechStore.Web/ktechStore.Web.csproj -c Release -o /app/web /p:UseAppHost=false /p:TreatWarningsAsErrors=false
 
 # =========================================================
-# Stage 3: AdminPanelProject publish (.NET 10.0)
+# Stage 4: AdminPanelProject publish (.NET 10.0)
 # =========================================================
 FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS admin-build
 WORKDIR /src
 COPY . .
 # ⚠️ Apne Admin .csproj ka exact file name verify kar lein (e.g. Admin.csproj ya AdminPanelProject.csproj)
+COPY --from=admin-assets-build /admin-src/wwwroot ./Presentation/Admin/wwwroot
 RUN dotnet restore Presentation/Admin/AspnetCoreMvcFull.csproj
 RUN dotnet publish Presentation/Admin/AspnetCoreMvcFull.csproj -c Release -o /app/admin /p:UseAppHost=false /p:TreatWarningsAsErrors=false
 
-
 # =========================================================
-# Stage 4: Final runtime image (.NET 10.0)
+# Stage 5: Final runtime image (.NET 10.0)
 # =========================================================
 FROM mcr.microsoft.com/dotnet/aspnet:10.0-preview
 WORKDIR /app
