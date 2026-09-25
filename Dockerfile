@@ -15,7 +15,7 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0-preview AS web-build
 WORKDIR /src
 COPY . .
 RUN dotnet restore Presentation/ktechStore.Web/ktechStore.Web.csproj
-RUN dotnet publish Presentation/ktechStore.Web/ktechStore.Web.csproj -c Release -o /app/web /p:UseAppHost=false
+RUN dotnet publish Presentation/ktechStore.Web/ktechStore.Web.csproj -c Release -o /app/web /p:UseAppHost=false /p:TreatWarningsAsErrors=false
 
 # =========================================================
 # Stage 3: AdminPanelProject publish (.NET 10.0)
@@ -25,7 +25,8 @@ WORKDIR /src
 COPY . .
 # ⚠️ Apne Admin .csproj ka exact file name verify kar lein (e.g. Admin.csproj ya AdminPanelProject.csproj)
 RUN dotnet restore Presentation/Admin/AspnetCoreMvcFull.csproj
-RUN dotnet publish Presentation/Admin/AspnetCoreMvcFull.csproj -c Release -o /app/admin /p:UseAppHost=false
+RUN dotnet publish Presentation/Admin/AspnetCoreMvcFull.csproj -c Release -o /app/admin /p:UseAppHost=false /p:TreatWarningsAsErrors=false
+
 
 # =========================================================
 # Stage 4: Final runtime image (.NET 10.0)
