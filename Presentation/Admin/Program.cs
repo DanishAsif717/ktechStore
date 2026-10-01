@@ -7,8 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
-using NToastNotify;   
-
+using NToastNotify;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,7 +38,6 @@ builder.Services.AddControllersWithViews(options =>
   PositionClass = ToastPositions.TopRight
 });
 
-
 // 🔥 Cookie authentication configure 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -47,7 +45,6 @@ builder.Services.ConfigureApplicationCookie(options =>
   options.AccessDeniedPath = "/Account/AccessDenied";
   options.Cookie.Name = "KtechStoreAdminAuth";
 });
-
 
 var app = builder.Build();
 
@@ -58,18 +55,22 @@ if (!app.Environment.IsDevelopment())
   app.UseHsts();
 }
 
-
+// 1. PathBase Define Karein
 app.UsePathBase("/admin");
-// app.Use((context, next) =>
-// {
-//   context.Request.PathBase = "/admin";  
-//   return next();
-// });
+
 if (!app.Environment.IsProduction())
 {
   app.UseHttpsRedirection();
 }
-app.UseStaticFiles();
+
+// 2. 🔥 Explicit Static File Handling (dono routes ko support dene ke liye)
+app.UseStaticFiles(); // Default / wwwroot requests ke liye
+
+app.UseStaticFiles(new StaticFileOptions
+{
+  RequestPath = "/admin" // Explicitly /admin/assets-vendor/... waali requests ke liye
+});
+
 app.UseNToastNotify();
 app.UseRouting();
 app.UseAuthentication();
@@ -104,4 +105,5 @@ using (var scope = app.Services.CreateScope())
     }
   }
 }
+
 app.Run();
