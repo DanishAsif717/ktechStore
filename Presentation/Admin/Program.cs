@@ -38,7 +38,7 @@ builder.Services.AddControllersWithViews(options =>
   PositionClass = ToastPositions.TopRight
 });
 
-// 🔥 Cookie authentication configure 
+// Cookie authentication configure 
 builder.Services.ConfigureApplicationCookie(options =>
 {
   options.LoginPath = "/Account/Login";
@@ -48,28 +48,19 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
   app.UseExceptionHandler("/Home/Error");
   app.UseHsts();
 }
 
-// 1. PathBase Define Karein
-app.UsePathBase("/admin");
-
 if (!app.Environment.IsProduction())
 {
   app.UseHttpsRedirection();
 }
 
-// 2. 🔥 Explicit Static File Handling (dono routes ko support dene ke liye)
-app.UseStaticFiles(); // Default / wwwroot requests ke liye
-
-app.UseStaticFiles(new StaticFileOptions
-{
-  RequestPath = "/admin" // Explicitly /admin/assets-vendor/... waali requests ke liye
-});
+// Single Standard Static Files Middleware
+app.UseStaticFiles();
 
 app.UseNToastNotify();
 app.UseRouting();
