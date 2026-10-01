@@ -58,11 +58,13 @@ if (!app.Environment.IsDevelopment())
   app.UseHsts();
 }
 
-app.Use((context, next) =>
-{
-  context.Request.PathBase = "/admin";  
-  return next();
-});
+
+app.UsePathBase("/admin");
+// app.Use((context, next) =>
+// {
+//   context.Request.PathBase = "/admin";  
+//   return next();
+// });
 if (!app.Environment.IsProduction())
 {
   app.UseHttpsRedirection();
