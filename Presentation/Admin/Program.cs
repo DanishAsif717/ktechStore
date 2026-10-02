@@ -60,6 +60,7 @@ if (!app.Environment.IsProduction())
 }
 
 // Single Standard Static Files Middleware
+app.UsePathBase("/admin");
 app.UseStaticFiles();
 
 app.UseNToastNotify();
