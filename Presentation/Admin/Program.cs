@@ -60,7 +60,11 @@ if (!app.Environment.IsProduction())
 }
 
 // Single Standard Static Files Middleware
-app.UsePathBase("/admin");
+app.Use((context, next) =>
+{
+    context.Request.PathBase = "/admin";
+    return next();
+});
 app.UseStaticFiles();
 
 app.UseNToastNotify();
