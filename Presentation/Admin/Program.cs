@@ -66,40 +66,78 @@ app.Use((context, next) =>
     return next();
 });
 app.UseStaticFiles();
-
 app.UseNToastNotify();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapAdminRoutes();
 
+
+
 using (var scope = app.Services.CreateScope())
 {
-  var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+  var services = scope.ServiceProvider;
+
+  var roleManager =
+      services.GetRequiredService<RoleManager<IdentityRole>>();
+
+  var userManager =
+      services.GetRequiredService<UserManager<ApplicationUser>>();
+
+  var adminEmail = builder.Configuration["Admin:Email"];
+  var adminPassword = builder.Configuration["Admin:Password"];
+
+  if (string.IsNullOrWhiteSpace(adminEmail) ||
+      string.IsNullOrWhiteSpace(adminPassword))
+  {
+    throw new InvalidOperationException(
+        "Admin credentials are missing from configuration.");
+  }
+
   string[] roles = { "Admin", "Vendor" };
+
   foreach (var role in roles)
   {
     if (!await roleManager.RoleExistsAsync(role))
-      await roleManager.CreateAsync(new IdentityRole(role));
+    {
+      var roleResult = await roleManager.CreateAsync(
+          new IdentityRole(role));
+
+      if (!roleResult.Succeeded)
+        throw new Exception("Failed to create role: " + role);
+    }
   }
 
-  var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-  var adminEmail = "admin@ktechstore.com";
-  if (await userManager.FindByEmailAsync(adminEmail) == null)
+  var adminUser = await userManager.FindByEmailAsync(adminEmail);
+
+  if (adminUser == null)
   {
-    var adminUser = new ApplicationUser
+    adminUser = new ApplicationUser
     {
       UserName = adminEmail,
       Email = adminEmail,
       FullName = "Super Admin",
       EmailConfirmed = true
     };
-    var result = await userManager.CreateAsync(adminUser, "Admin@123");
-    if (result.Succeeded)
+
+    var result = await userManager.CreateAsync(
+        adminUser, adminPassword);
+
+    if (!result.Succeeded)
     {
-      await userManager.AddToRoleAsync(adminUser, "Admin");
+      throw new Exception(
+          "Admin creation failed: " +
+          string.Join(", ", result.Errors.Select(e => e.Code)));
     }
   }
-}
 
+  if (!await userManager.IsInRoleAsync(adminUser, "Admin"))
+  {
+    var result = await userManager.AddToRoleAsync(
+        adminUser, "Admin");
+
+    if (!result.Succeeded)
+      throw new Exception("Failed to assign Admin role.");
+  }
+}
 app.Run();
